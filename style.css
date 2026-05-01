@@ -22,7 +22,7 @@ p {
   color: #aaa;
 }
 
-/* LINKS */
+/* LINKS NAV */
 .links {
   text-align: center;
   margin: 20px;
@@ -45,7 +45,7 @@ p {
   transform: scale(1.05);
 }
 
-/* GRID */
+/* GRID ALBUMS */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -53,7 +53,7 @@ p {
   padding: 40px;
 }
 
-/* CARD */
+/* ALBUM CARD */
 .card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
@@ -80,9 +80,12 @@ p {
   padding: 15px;
 }
 
-/* TRACK */
+/* TRACKS (AVEC COVER) */
 .track {
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
   margin: 10px auto;
   max-width: 600px;
   background: rgba(255,255,255,0.03);
@@ -94,6 +97,17 @@ p {
 .track:hover {
   background: rgba(255,255,255,0.08);
   transform: translateX(6px);
+}
+
+.track img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.track span {
+  color: white;
 }
 
 /* VIDEO */
