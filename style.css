@@ -1,0 +1,45 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #0d0d0d;
+  color: #ffffff;
+  text-align: center;
+}
+
+header {
+  padding: 60px 20px;
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.slogan {
+  font-style: italic;
+  color: #bbbbbb;
+}
+
+.intro {
+  margin: 40px 20px;
+  font-size: 18px;
+}
+
+.links {
+  margin-top: 40px;
+}
+
+.links a {
+  display: inline-block;
+  margin: 10px;
+  padding: 12px 20px;
+  color: white;
+  text-decoration: none;
+  border: 1px solid white;
+  transition: 0.3s;
+}
+
+.links a:hover {
+  background-color: white;
+  color: black;
+}
