@@ -1,65 +1,73 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg, #0a0a0a, #000);
+  background: radial-gradient(circle at top, #151515, #000);
   color: white;
+  overflow-x: hidden;
 }
 
 /* HEADER */
 header {
   text-align: center;
-  padding: 100px 20px 60px;
+  padding: 90px 20px 40px;
+  animation: fadeDown 0.8s ease;
 }
 
 h1 {
   font-size: 48px;
-  letter-spacing: 2px;
+  margin: 0;
 }
 
-.slogan {
+p {
   color: #aaa;
 }
 
-/* NAV */
+/* LINKS */
 .links {
   text-align: center;
-  margin-bottom: 50px;
+  margin: 20px;
 }
 
 .links a {
+  display: inline-block;
   margin: 10px;
-  padding: 12px 24px;
+  padding: 12px 22px;
+  border: 1px solid #333;
   border-radius: 8px;
-  text-decoration: none;
   color: white;
-  border: 1px solid #444;
+  text-decoration: none;
   transition: 0.3s;
 }
 
 .links a:hover {
   background: white;
   color: black;
+  transform: scale(1.05);
 }
 
-/* ALBUM GRID */
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
+  gap: 25px;
   padding: 40px;
 }
 
 /* CARD */
 .card {
-  background: #111;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   overflow: hidden;
+  text-decoration: none;
+  color: white;
   transition: 0.4s;
-  position: relative;
+  backdrop-filter: blur(8px);
 }
 
 .card:hover {
-  transform: translateY(-10px) scale(1.02);
+  transform: translateY(-10px);
+  border-color: rgba(255,255,255,0.3);
 }
 
 .card img {
@@ -69,54 +77,38 @@ h1 {
 }
 
 .card-content {
-  padding: 20px;
+  padding: 15px;
 }
 
-.card h3 {
-  margin: 0;
+/* TRACK */
+.track {
+  padding: 14px;
+  margin: 10px auto;
+  max-width: 600px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  transition: 0.3s;
 }
 
-.card p {
-  color: #aaa;
-  font-size: 14px;
-}
-
-/* PLAY BUTTON */
-.play {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 50%;
-  font-size: 18px;
+.track:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateX(6px);
 }
 
 /* VIDEO */
 .video {
-  display: flex;
-  justify-content: center;
-  margin: 60px 0;
+  text-align: center;
+  margin: 50px 0;
 }
 
 iframe {
   border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
-/* BIO */
-.bio {
-  max-width: 800px;
-  margin: auto;
-  line-height: 1.7;
-  padding: 20px;
-}
-
-/* FADE */
-.fade {
-  animation: fade 1s ease;
-}
-
-@keyframes fade {
-  from {opacity: 0; transform: translateY(20px);}
+/* ANIMATION */
+@keyframes fadeDown {
+  from {opacity: 0; transform: translateY(-20px);}
   to {opacity: 1; transform: translateY(0);}
 }
