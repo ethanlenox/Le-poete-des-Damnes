@@ -1,152 +1,74 @@
-/* =========================
-   BASE
-========================= */
-
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top, #1a1a1a, #000000);
+  font-family: system-ui, Arial, sans-serif;
+  background: #0b0b0b;
   color: #ffffff;
-  overflow-x: hidden;
+  line-height: 1.6;
 }
 
-/* Scroll fluide */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Fond lumineux subtil */
-body::before {
-  content: "";
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 60%);
-  animation: floatLight 12s infinite alternate ease-in-out;
-  pointer-events: none;
-}
-
-@keyframes floatLight {
-  from { transform: translate(0,0); }
-  to { transform: translate(60px, 40px); }
-}
-
-/* =========================
-   HEADER
-========================= */
-
+/* HEADER */
 header {
-  padding: 90px 20px 50px;
   text-align: center;
+  padding: 100px 20px 40px;
 }
 
 h1 {
-  font-size: 52px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  font-size: 48px;
+  margin: 0;
+  letter-spacing: 2px;
 }
 
 .slogan {
+  color: #aaa;
+  margin-top: 10px;
   font-style: italic;
-  color: #bbbbbb;
-  font-size: 18px;
 }
 
-/* =========================
-   SECTIONS
-========================= */
-
-section {
-  padding: 60px 20px;
-  text-align: center;
-}
-
-/* =========================
-   LIENS / BOUTONS
-========================= */
-
+/* NAVIGATION / BOUTONS */
 .links {
-  margin-top: 40px;
+  text-align: center;
+  margin: 40px 0;
 }
 
 .links a {
   display: inline-block;
   margin: 10px;
-  padding: 14px 26px;
-  border-radius: 10px;
+  padding: 12px 20px;
+  border: 1px solid #333;
   color: white;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.04);
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
 .links a:hover {
   background: white;
   color: black;
-  transform: scale(1.05);
 }
 
-/* =========================
-   BIO
-========================= */
-
-.bio p {
-  max-width: 800px;
-  margin: 20px auto;
-  line-height: 1.8;
-  color: #dddddd;
+/* CONTENU */
+section {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
 }
 
-/* =========================
-   ALBUMS (CARDS)
-========================= */
-
+/* ALBUMS */
 .album {
-  margin: 40px auto;
-  padding: 25px;
-  max-width: 520px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-  transition: 0.4s;
+  margin: 30px auto;
+  padding: 20px;
+  border-bottom: 1px solid #222;
 }
 
-.album:hover {
-  transform: translateY(-6px);
-  border-color: rgba(255,255,255,0.3);
-}
-
-/* COVER IMAGE */
+/* IMAGES */
 .cover {
   width: 100%;
-  border-radius: 12px;
+  max-width: 500px;
+  display: block;
+  margin: 10px auto;
+}
+
+/* BIO */
+.bio p {
   margin-bottom: 15px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-  transition: 0.3s;
-}
-
-.cover:hover {
-  transform: scale(1.02);
-}
-
-/* =========================
-   ANIMATION FADE-IN
-========================= */
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeIn 1s ease forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  color: #ddd;
 }
