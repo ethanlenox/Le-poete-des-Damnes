@@ -1,45 +1,77 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #0d0d0d;
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle at top, #1a1a1a, #000000);
   color: #ffffff;
-  text-align: center;
+  overflow-x: hidden;
 }
 
+/* HEADER STYLE LABEL */
 header {
-  padding: 60px 20px;
+  padding: 90px 20px 50px;
 }
 
 h1 {
-  font-size: 40px;
-  margin-bottom: 10px;
+  font-size: 52px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 .slogan {
   font-style: italic;
   color: #bbbbbb;
+  margin-top: 10px;
 }
 
-.intro {
-  margin: 40px 20px;
-  font-size: 18px;
+/* SECTIONS AÉRÉES */
+section {
+  padding: 60px 20px;
 }
 
-.links {
-  margin-top: 40px;
+/* CARTES (ALBUMS) STYLE LABEL */
+.album {
+  margin: 40px auto;
+  padding: 25px;
+  max-width: 520px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  transition: 0.4s;
 }
 
+.album:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* IMAGES COVER */
+.cover {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  transition: 0.3s;
+}
+
+.cover:hover {
+  transform: scale(1.02);
+}
+
+/* BOUTONS */
 .links a {
   display: inline-block;
   margin: 10px;
-  padding: 12px 20px;
+  padding: 14px 26px;
+  border-radius: 10px;
   color: white;
   text-decoration: none;
-  border: 1px solid white;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
   transition: 0.3s;
 }
 
 .links a:hover {
-  background-color: white;
+  background: white;
   color: black;
 }
