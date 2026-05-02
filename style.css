@@ -72,26 +72,20 @@ body {
   font-weight: 600;
 }
 
-/* GLOW TITRE */
+/* GLOW BLEU (TITRE ORIGINAL) */
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
   animation: pulseBlue 3s infinite;
 }
 
-/* PHRASE FINAL STYLE */
+/* PHRASE = EXACT MEME STYLE MAIS ROUGE/ROSE */
 .glow-phrase {
   font-size: 20px;
   color: #ff4d6d;
-  background: rgba(255,255,255,0.08);
-  padding: 6px 14px;
-  border-radius: 8px;
-  display: inline-block;
-
-  text-shadow: 0 0 10px rgba(255,77,109,0.6),
-               0 0 25px rgba(255,77,109,0.3);
-
-  animation: pulseZoom 3.5s infinite ease-in-out;
+  text-shadow: 0 0 10px rgba(255,77,109,0.4),
+               0 0 25px rgba(255,77,109,0.2);
+  animation: pulseRed 3s infinite;
 }
 
 /* BUTTONS */
@@ -121,12 +115,6 @@ body {
 }
 
 /* ANIMATIONS */
-@keyframes pulseZoom {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
-
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
@@ -141,4 +129,10 @@ body {
   0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
   50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
   100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
+}
+
+@keyframes pulseRed {
+  0% {text-shadow: 0 0 10px rgba(255,77,109,0.3);}
+  50% {text-shadow: 0 0 25px rgba(255,77,109,0.6);}
+  100% {text-shadow: 0 0 10px rgba(255,77,109,0.3);}
 }
