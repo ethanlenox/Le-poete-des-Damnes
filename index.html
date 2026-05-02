@@ -52,10 +52,10 @@ const audio = document.getElementById("introSound");
 
 function startAudio() {
   audio.volume = 0.6;
-  audio.play().catch(() => {});
-  window.removeEventListener("click", startAudio);
+  audio.play();
 }
-window.addEventListener("click", startAudio);
+
+document.addEventListener("pointerdown", startAudio, { once: true });
 
 setTimeout(() => {
   intro.style.opacity = "0";
