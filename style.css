@@ -5,6 +5,7 @@ body {
   font-family: 'Poppins', sans-serif;
   background: #000;
   color: white;
+  overflow: hidden;
   height: 100vh;
 }
 
@@ -27,7 +28,7 @@ body {
   animation: introGlow 2s ease;
 }
 
-/* HERO */
+/* HERO BACKGROUND */
 .hero {
   width: 100%;
   height: 100vh;
@@ -35,6 +36,24 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.hero-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url("img/hero.jpg") center/cover no-repeat;
+  filter: brightness(0.35) saturate(1.2);
+}
+
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
+  animation: lightMove 6s infinite alternate;
+  pointer-events: none;
 }
 
 /* CONTENT */
@@ -53,15 +72,15 @@ body {
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
+  animation: pulseBlue 3s infinite;
 }
 
-/* PHRASE (CORRIGÉE) */
+/* PHRASE */
 .highlight {
   font-size: 20px;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(255,255,255,0.25),
-               0 0 18px rgba(0,229,255,0.15);
-  animation: breathe 3s ease-in-out infinite;
+  color: #ff4d6d;
+  text-shadow: 0 0 10px rgba(255,77,109,0.4),
+               0 0 25px rgba(255,77,109,0.2);
 }
 
 /* BUTTONS */
@@ -90,8 +109,13 @@ body {
   100% {opacity: 1; transform: scale(1);}
 }
 
-@keyframes breathe {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+@keyframes lightMove {
+  from {transform: translate(0,0);}
+  to {transform: translate(60px,40px);}
+}
+
+@keyframes pulseBlue {
+  0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
+  50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
+  100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
 }
