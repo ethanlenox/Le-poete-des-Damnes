@@ -9,17 +9,20 @@
 
 <body>
 
+<audio id="introSound" src="audio/intro.mp3" preload="auto" loop></audio>
+
 <div id="intro">
   <h1 class="intro-title">Le Poète des Damnés</h1>
 </div>
 
 <section class="hero">
 
+  <div class="hero-bg"></div>
+
   <div class="hero-content">
 
     <h1 class="main-title glow">Le Poète des Damnés</h1>
 
-    <!-- PHRASE -->
     <p class="highlight">
       Je cherche à comprendre ce que le monde raconte.
     </p>
@@ -44,6 +47,15 @@
 
 <script>
 const intro = document.getElementById("intro");
+const audio = document.getElementById("introSound");
+
+function startAudio() {
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  window.removeEventListener("click", startAudio);
+}
+
+window.addEventListener("click", startAudio);
 
 setTimeout(() => {
   intro.style.opacity = "0";
@@ -52,6 +64,11 @@ setTimeout(() => {
 setTimeout(() => {
   intro.style.display = "none";
 }, 3200);
+
+window.addEventListener("beforeunload", () => {
+  audio.pause();
+  audio.currentTime = 0;
+});
 </script>
 
 </body>
