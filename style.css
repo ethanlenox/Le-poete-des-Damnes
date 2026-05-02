@@ -5,7 +5,6 @@ body {
   font-family: 'Poppins', sans-serif;
   background: #000;
   color: white;
-  overflow: hidden;
   height: 100vh;
 }
 
@@ -38,26 +37,6 @@ body {
   align-items: center;
 }
 
-/* BACKGROUND */
-.hero-bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: url("img/hero.jpg") center/cover no-repeat;
-  filter: brightness(0.35) saturate(1.2);
-}
-
-/* LIGHT EFFECT */
-.hero-bg::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
-  animation: lightMove 6s infinite alternate;
-  pointer-events: none;
-}
-
 /* CONTENT */
 .hero-content {
   position: relative;
@@ -66,7 +45,7 @@ body {
   max-width: 900px;
 }
 
-/* TITLE */
+/* TITRE */
 .main-title {
   font-size: 46px;
 }
@@ -74,7 +53,6 @@ body {
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
-  animation: pulseBlue 3s infinite;
 }
 
 /* PHRASE */
@@ -101,24 +79,10 @@ body {
   height: 248px;
   margin-top: 20px;
   border-radius: 10px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-/* ANIMATIONS */
+/* ANIMATION */
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
-}
-
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
-}
-
-@keyframes pulseBlue {
-  0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
-  50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
-  100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
 }
