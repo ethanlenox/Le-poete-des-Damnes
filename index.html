@@ -9,12 +9,10 @@
 
 <body>
 
-<!-- INTRO CINÉMATIQUE -->
 <div id="intro">
   <h1 class="glitch" data-text="Le Poète des Damnés">Le Poète des Damnés</h1>
 </div>
 
-<!-- HERO -->
 <section class="hero hidden">
 
   <div class="hero-overlay"></div>
@@ -31,7 +29,6 @@
 
 </section>
 
-<!-- VIDEO -->
 <section class="section-video hidden">
   <h2>Présentation</h2>
 
@@ -42,14 +39,11 @@
 </section>
 
 <script>
-
-/* INTRO DISPARITION */
 setTimeout(() => {
   document.getElementById("intro").style.opacity = "0";
   document.querySelector(".hero").classList.remove("hidden");
 }, 2500);
 
-/* SCROLL ANIMATION */
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if(entry.isIntersecting){
@@ -59,7 +53,6 @@ const observer = new IntersectionObserver(entries => {
 });
 
 document.querySelectorAll('.hidden').forEach(el => observer.observe(el));
-
 </script>
 
 </body>
