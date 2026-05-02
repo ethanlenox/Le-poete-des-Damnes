@@ -47,7 +47,7 @@ body {
   filter: brightness(0.35) saturate(1.2);
 }
 
-/* LIGHT */
+/* LIGHT EFFECT */
 .hero-bg::after {
   content: "";
   position: absolute;
@@ -66,30 +66,21 @@ body {
   max-width: 900px;
 }
 
-/* TITRE */
+/* TITLE */
 .main-title {
   font-size: 46px;
 }
 
-/* GLOW TITRE */
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
   animation: pulseBlue 3s infinite;
 }
 
-/* PHRASE MODIFIÉE */
+/* PHRASE */
 .highlight {
   font-size: 20px;
   color: #ffffff;
-
-  text-shadow:
-    0 0 8px rgba(255,0,0,0.5),
-    0 0 20px rgba(255,0,0,0.35),
-    0 0 40px rgba(255,0,0,0.25);
-
-  animation: redGlowPulse 3s infinite ease-in-out,
-             breathe 4s infinite ease-in-out;
 }
 
 /* BUTTONS */
@@ -130,32 +121,4 @@ body {
   0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
   50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
   100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
-}
-
-/* NOUVELLES ANIMATIONS PHRASE */
-@keyframes redGlowPulse {
-  0% {
-    text-shadow:
-      0 0 6px rgba(255,0,0,0.4),
-      0 0 15px rgba(255,0,0,0.25),
-      0 0 25px rgba(255,0,0,0.15);
-  }
-  50% {
-    text-shadow:
-      0 0 14px rgba(255,0,0,0.7),
-      0 0 30px rgba(255,0,0,0.45),
-      0 0 60px rgba(255,0,0,0.25);
-  }
-  100% {
-    text-shadow:
-      0 0 6px rgba(255,0,0,0.4),
-      0 0 15px rgba(255,0,0,0.25),
-      0 0 25px rgba(255,0,0,0.15);
-  }
-}
-
-@keyframes breathe {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
 }
