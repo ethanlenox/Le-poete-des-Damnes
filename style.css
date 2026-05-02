@@ -19,14 +19,13 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 999;
-  transition: 1.2s;
+  transition: 1.2s ease;
 }
 
 .intro-title {
-  font-size: 58px;
+  font-size: 60px;
   letter-spacing: 4px;
-  font-weight: 300;
-  animation: introGlow 2.5s ease;
+  animation: introGlow 2s ease;
 }
 
 /* HERO */
@@ -39,21 +38,22 @@ body {
   align-items: center;
 }
 
+/* BACKGROUND */
 .hero-bg {
   position: absolute;
   width: 100%;
   height: 100%;
   background: url("img/hero.jpg") center/cover no-repeat;
-  filter: brightness(0.35);
+  filter: brightness(0.35) saturate(1.2);
 }
 
-/* LIGHT */
+/* LIGHT DYNAMIQUE */
 .hero-bg::after {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 60%);
+  background: radial-gradient(circle at 30% 30%, rgba(0,255,255,0.15), transparent 60%);
   animation: lightMove 6s infinite alternate;
 }
 
@@ -65,25 +65,33 @@ body {
   max-width: 900px;
 }
 
-/* TITRE CINÉMATIQUE */
+/* TITRE */
 .main-title {
-  font-size: 44px;
-  font-weight: 500;
-  letter-spacing: 2px;
+  font-size: 46px;
+  font-weight: 600;
   margin-bottom: 10px;
-  opacity: 0;
-  animation: titleFadeGlow 2.5s ease forwards;
 }
 
-/* GLOW PROGRESSIF */
-.glow-title {
-  text-shadow: 0 0 0 rgba(255,255,255,0);
+/* GLOW TITRE */
+.glow {
+  text-shadow: 0 0 10px rgba(0,255,255,0.4),
+               0 0 25px rgba(0,255,255,0.2);
+  animation: pulse 3s infinite;
 }
 
-/* SUBTITLE */
+/* PHRASE MISE EN VALEUR */
 .subtitle {
+  font-size: 18px;
   color: #ccc;
-  font-size: 16px;
+  margin: 15px 0;
+}
+
+.highlight {
+  color: #00e5ff;
+  font-size: 20px;
+  font-weight: 500;
+  text-shadow: 0 0 12px rgba(0,229,255,0.5);
+  animation: fadeUp 2s ease;
 }
 
 /* BUTTONS */
@@ -93,14 +101,14 @@ body {
   padding: 12px 26px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(0,229,255,0.3);
   color: white;
   text-decoration: none;
   transition: 0.3s;
 }
 
 .hero-buttons a:hover {
-  background: white;
+  background: #00e5ff;
   color: black;
 }
 
@@ -115,29 +123,21 @@ body {
 /* ANIMATIONS */
 @keyframes lightMove {
   from {transform: translate(0,0);}
-  to {transform: translate(50px,30px);}
+  to {transform: translate(60px,40px);}
 }
 
-/* INTRO GLOW */
 @keyframes introGlow {
-  0% {opacity: 0; transform: scale(0.9); text-shadow: 0 0 0px white;}
-  50% {opacity: 1; text-shadow: 0 0 25px white;}
-  100% {opacity: 1; text-shadow: 0 0 10px white;}
+  0% {opacity: 0; transform: scale(0.9);}
+  100% {opacity: 1; transform: scale(1);}
 }
 
-/* TITRE FADE + GLOW PROGRESSIF */
-@keyframes titleFadeGlow {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-    text-shadow: 0 0 0px white;
-  }
-  50% {
-    opacity: 1;
-    text-shadow: 0 0 15px white;
-  }
-  100% {
-    opacity: 1;
-    text-shadow: 0 0 25px rgba(255,255,255,0.6);
-  }
+@keyframes pulse {
+  0% {text-shadow: 0 0 10px rgba(0,255,255,0.3);}
+  50% {text-shadow: 0 0 25px rgba(0,255,255,0.6);}
+  100% {text-shadow: 0 0 10px rgba(0,255,255,0.3);}
+}
+
+@keyframes fadeUp {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }
