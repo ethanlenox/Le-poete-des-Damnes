@@ -3,7 +3,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: #000;
   color: white;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* INTRO */
@@ -11,53 +11,59 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: black;
+  background: #000;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
-  transition: 1s;
+  z-index: 10;
+  transition: 0.8s;
+}
+
+.title {
+  font-size: 48px;
+  letter-spacing: 2px;
 }
 
 /* HERO */
 .hero {
   height: 100vh;
-  background: url("img/hero.jpg") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-.hero::before {
+.hero-bg {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: url("img/hero.jpg") center/cover no-repeat;
+  filter: brightness(0.4);
+  z-index: -2;
+}
+
+/* LIGHT EFFECT MODERNE */
+.hero-bg::after {
   content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%);
-  animation: lightMove 8s infinite alternate;
-}
-
-.hero-overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.6), #000);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%);
+  animation: light 6s infinite alternate;
 }
 
 .hero-content {
-  position: relative;
   text-align: center;
-  z-index: 2;
+  max-width: 900px;
 }
 
 /* BUTTONS */
 .hero-buttons a {
   display: inline-block;
   margin: 10px;
-  padding: 14px 28px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.3);
+  padding: 14px 30px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
   color: white;
   text-decoration: none;
   transition: 0.3s;
@@ -66,69 +72,32 @@ body {
 .hero-buttons a:hover {
   background: white;
   color: black;
-  transform: scale(1.05);
 }
 
-/* VIDEO */
-.section-video {
-  text-align: center;
-  padding: 80px 20px;
+/* VIDEO INLINE */
+.video-box {
+  margin-top: 30px;
 }
 
-iframe {
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+.video-box iframe {
+  width: 100%;
+  max-width: 700px;
+  height: 400px;
+  border-radius: 10px;
 }
 
-/* GLITCH */
-.glitch {
-  font-size: 50px;
+/* FIX CLICK */
+.hero-content {
   position: relative;
+  z-index: 2;
 }
 
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-}
-
-.glitch::before {
-  color: red;
-  animation: glitch1 1s infinite;
-}
-
-.glitch::after {
-  color: blue;
-  animation: glitch2 1s infinite;
-}
-
-/* SCROLL */
+/* ANIMATION */
 .hidden {
   opacity: 0;
-  transform: translateY(40px);
 }
 
-.show {
-  opacity: 1;
-  transform: translateY(0);
-  transition: 1s;
-}
-
-/* ANIMATIONS */
-@keyframes glitch1 {
-  0% {transform: translate(2px,0);}
-  50% {transform: translate(-2px,2px);}
-  100% {transform: translate(2px,-2px);}
-}
-
-@keyframes glitch2 {
-  0% {transform: translate(-2px,0);}
-  50% {transform: translate(2px,-2px);}
-  100% {transform: translate(-2px,2px);}
-}
-
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(80px,40px);}
+@keyframes light {
+  from {background-position: 30% 30%;}
+  to {background-position: 70% 70%;}
 }
