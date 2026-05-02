@@ -9,25 +9,6 @@ body {
   height: 100vh;
 }
 
-/* INTRO */
-#intro {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  transition: 1.2s ease;
-}
-
-.intro-title {
-  font-size: 60px;
-  letter-spacing: 4px;
-  animation: introGlow 2s ease;
-}
-
 /* HERO */
 .hero {
   width: 100%;
@@ -54,7 +35,6 @@ body {
   height: 100%;
   background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
   animation: lightMove 6s infinite alternate;
-  pointer-events: none;
 }
 
 /* CONTENT */
@@ -73,19 +53,17 @@ body {
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
-  animation: pulseBlue 3s infinite;
 }
 
-/* TEXT BEAT REACTIVE */
+/* TEXT */
 .highlight {
   font-size: 22px;
   color: #ffffff;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
 
   opacity: 0;
   transform: translateY(40px);
-
-  animation: cinematicIntro 2.8s ease-out forwards;
+  animation: cinematicIntro 2.5s ease-out forwards;
 
   transition: transform 0.1s linear, text-shadow 0.1s linear;
 }
@@ -108,45 +86,24 @@ body {
   height: 248px;
   margin-top: 20px;
   border-radius: 10px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* ANIMATIONS */
-@keyframes introGlow {
-  0% {opacity: 0; transform: scale(0.9);}
-  100% {opacity: 1; transform: scale(1);}
-}
-
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
-}
-
-@keyframes pulseBlue {
-  0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
-  50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
-  100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
-}
-
 @keyframes cinematicIntro {
   0% {
     opacity: 0;
     transform: translateY(40px);
     filter: blur(8px);
-    letter-spacing: 6px;
-  }
-
-  60% {
-    opacity: 1;
-    filter: blur(2px);
   }
 
   100% {
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
-    letter-spacing: 2px;
   }
+}
+
+@keyframes lightMove {
+  from {transform: translate(0,0);}
+  to {transform: translate(60px,40px);}
 }
