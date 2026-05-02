@@ -72,19 +72,26 @@ body {
   font-weight: 600;
 }
 
-/* GLOW BLEU */
+/* GLOW TITRE */
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
   animation: pulseBlue 3s infinite;
 }
 
-/* PHRASE = SAME GLOW AS TITLE */
-.highlight {
+/* PHRASE FINAL STYLE */
+.glow-phrase {
   font-size: 20px;
   color: #ff4d6d;
-  text-shadow: 0 0 10px rgba(0,229,255,0.4),
-               0 0 25px rgba(0,229,255,0.2);
+  background: rgba(255,255,255,0.08);
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: inline-block;
+
+  text-shadow: 0 0 10px rgba(255,77,109,0.6),
+               0 0 25px rgba(255,77,109,0.3);
+
+  animation: pulseZoom 3.5s infinite ease-in-out;
 }
 
 /* BUTTONS */
@@ -105,7 +112,7 @@ body {
   color: black;
 }
 
-/* VIDEO -10% */
+/* VIDEO */
 .video-box iframe {
   width: 540px;
   height: 306px;
@@ -113,7 +120,13 @@ body {
   border-radius: 10px;
 }
 
-/* ANIMATIONS (INCHANGÉES) */
+/* ANIMATIONS */
+@keyframes pulseZoom {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
