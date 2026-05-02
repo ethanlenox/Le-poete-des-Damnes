@@ -9,6 +9,7 @@ body {
   height: 100vh;
 }
 
+/* INTRO */
 #intro {
   position: fixed;
   width: 100%;
@@ -27,6 +28,7 @@ body {
   animation: introGlow 2s ease;
 }
 
+/* HERO */
 .hero {
   width: 100%;
   height: 100vh;
@@ -36,6 +38,7 @@ body {
   align-items: center;
 }
 
+/* BACKGROUND */
 .hero-bg {
   position: absolute;
   width: 100%;
@@ -44,6 +47,7 @@ body {
   filter: brightness(0.35) saturate(1.2);
 }
 
+/* LIGHT EFFECT */
 .hero-bg::after {
   content: "";
   position: absolute;
@@ -54,6 +58,7 @@ body {
   pointer-events: none;
 }
 
+/* CONTENT */
 .hero-content {
   position: relative;
   z-index: 2;
@@ -61,24 +66,38 @@ body {
   max-width: 900px;
 }
 
+/* TITRE */
 .main-title {
   font-size: 46px;
 }
 
+/* BLUE GLOW TITLE */
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
   animation: pulseBlue 3s infinite;
 }
 
+/* CINEMATIC RED TEXT */
 .highlight {
-  font-size: 20px;
+  font-size: 22px;
   color: #ff2b2b;
-  text-shadow: 0 0 10px rgba(255,0,0,0.4),
-               0 0 25px rgba(255,0,0,0.2);
-  animation: pulseRed 3s infinite;
+  letter-spacing: 2px;
+
+  opacity: 0;
+  transform: translateY(20px);
+
+  animation:
+    cinematicText 2.5s ease-out forwards,
+    pulseRed 3s infinite ease-in-out;
+
+  text-shadow:
+    0 0 5px rgba(255,0,0,0.3),
+    0 0 15px rgba(255,0,0,0.4),
+    0 0 30px rgba(255,0,0,0.2);
 }
 
+/* BUTTONS */
 .hero-buttons a {
   display: inline-block;
   margin: 10px;
@@ -90,6 +109,7 @@ body {
   text-decoration: none;
 }
 
+/* VIDEO */
 .video-box iframe {
   width: 440px;
   height: 248px;
@@ -100,6 +120,7 @@ body {
   margin-right: auto;
 }
 
+/* ANIMATIONS */
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
@@ -110,14 +131,38 @@ body {
   to {transform: translate(60px,40px);}
 }
 
+/* BLUE PULSE */
 @keyframes pulseBlue {
   0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
   50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
   100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
 }
 
+/* RED PULSE */
 @keyframes pulseRed {
   0% {text-shadow: 0 0 10px rgba(255,0,0,0.3);}
   50% {text-shadow: 0 0 25px rgba(255,0,0,0.6);}
   100% {text-shadow: 0 0 10px rgba(255,0,0,0.3);}
+}
+
+/* CINEMATIC INTRO TEXT */
+@keyframes cinematicText {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(6px);
+    letter-spacing: 6px;
+  }
+
+  60% {
+    opacity: 1;
+    filter: blur(1px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    letter-spacing: 2px;
+  }
 }
