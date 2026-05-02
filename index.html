@@ -23,7 +23,6 @@
 
     <h1 class="main-title glow">Le Poète des Damnés</h1>
 
-    <!-- PHRASE -->
     <p class="highlight">
       Je cherche à comprendre ce que le monde raconte.
     </p>
@@ -52,7 +51,11 @@ const audio = document.getElementById("introSound");
 
 function startAudio() {
   audio.volume = 0.6;
-  audio.play();
+
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {});
+  }
 }
 
 document.addEventListener("pointerdown", startAudio, { once: true });
