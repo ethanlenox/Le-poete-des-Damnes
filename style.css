@@ -1,109 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Poète des Damnés</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #000;
-  color: white;
-  overflow: hidden;
-  height: 100vh;
+<body>
+
+<audio id="introSound" src="audio/intro.mp3" preload="auto" loop></audio>
+
+<div id="intro">
+  <h1 class="intro-title">Le Poète des Damnés</h1>
+</div>
+
+<section class="hero">
+
+  <div class="hero-bg"></div>
+
+  <div class="hero-content">
+
+    <h1 class="main-title glow">Le Poète des Damnés</h1>
+
+    <!-- PHRASE -->
+    <p class="highlight">
+      Je cherche à comprendre ce que le monde raconte.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="albums.html">Discographie</a>
+      <a href="bio.html">Artiste</a>
+    </div>
+
+    <div class="video-box">
+      <iframe
+        src="https://www.youtube.com/embed/YNPhIaR2n_Q"
+        title="Présentation"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+  </div>
+
+</section>
+
+<script>
+const intro = document.getElementById("intro");
+const audio = document.getElementById("introSound");
+
+function startAudio() {
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  window.removeEventListener("click", startAudio);
 }
+window.addEventListener("click", startAudio);
 
-/* HERO */
-.hero {
-  width: 100%;
-  height: 100vh;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+setTimeout(() => {
+  intro.style.opacity = "0";
+}, 2000);
 
-/* BACKGROUND */
-.hero-bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: url("img/hero.jpg") center/cover no-repeat;
-  filter: brightness(0.35) saturate(1.2);
-}
+setTimeout(() => {
+  intro.style.display = "none";
+}, 3200);
 
-.hero-bg::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
-  animation: lightMove 6s infinite alternate;
-}
+window.addEventListener("beforeunload", () => {
+  audio.pause();
+  audio.currentTime = 0;
+});
+</script>
 
-/* CONTENT */
-.hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  max-width: 900px;
-}
-
-/* TITLE */
-.main-title {
-  font-size: 46px;
-}
-
-.glow {
-  text-shadow: 0 0 10px rgba(0,229,255,0.4),
-               0 0 25px rgba(0,229,255,0.2);
-}
-
-/* TEXT */
-.highlight {
-  font-size: 22px;
-  color: #ffffff;
-  letter-spacing: 2px;
-
-  opacity: 0;
-  transform: translateY(40px);
-  animation: cinematicIntro 2.5s ease-out forwards;
-
-  transition: transform 0.1s linear, text-shadow 0.1s linear;
-}
-
-/* BUTTONS */
-.hero-buttons a {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px 26px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(0,229,255,0.3);
-  color: white;
-  text-decoration: none;
-}
-
-/* VIDEO */
-.video-box iframe {
-  width: 440px;
-  height: 248px;
-  margin-top: 20px;
-  border-radius: 10px;
-}
-
-/* ANIMATIONS */
-@keyframes cinematicIntro {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-    filter: blur(8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
-}
+</body>
+</html>
