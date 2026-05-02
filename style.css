@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -6,8 +8,6 @@ body {
   overflow: hidden;
   height: 100vh;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
 /* INTRO */
 #intro {
@@ -47,14 +47,15 @@ body {
   filter: brightness(0.35) saturate(1.2);
 }
 
-/* LIGHT DYNAMIQUE */
+/* LIGHT EFFECT */
 .hero-bg::after {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(0,255,255,0.15), transparent 60%);
+  background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
   animation: lightMove 6s infinite alternate;
+  pointer-events: none;
 }
 
 /* CONTENT */
@@ -69,27 +70,19 @@ body {
 .main-title {
   font-size: 46px;
   font-weight: 600;
-  margin-bottom: 10px;
 }
 
-/* GLOW TITRE */
+/* GLOW */
 .glow {
-  text-shadow: 0 0 10px rgba(0,255,255,0.4),
-               0 0 25px rgba(0,255,255,0.2);
+  text-shadow: 0 0 10px rgba(0,229,255,0.4),
+               0 0 25px rgba(0,229,255,0.2);
   animation: pulse 3s infinite;
 }
 
-/* PHRASE MISE EN VALEUR */
-.subtitle {
-  font-size: 18px;
-  color: #ccc;
-  margin: 15px 0;
-}
-
+/* PHRASE */
 .highlight {
-  color: #00e5ff;
   font-size: 20px;
-  font-weight: 500;
+  color: #00e5ff;
   text-shadow: 0 0 12px rgba(0,229,255,0.5);
   animation: fadeUp 2s ease;
 }
@@ -121,23 +114,23 @@ body {
 }
 
 /* ANIMATIONS */
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
-}
-
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
 }
 
 @keyframes pulse {
-  0% {text-shadow: 0 0 10px rgba(0,255,255,0.3);}
-  50% {text-shadow: 0 0 25px rgba(0,255,255,0.6);}
-  100% {text-shadow: 0 0 10px rgba(0,255,255,0.3);}
+  0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
+  50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
+  100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
 }
 
 @keyframes fadeUp {
   from {opacity: 0; transform: translateY(10px);}
   to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes lightMove {
+  from {transform: translate(0,0);}
+  to {transform: translate(60px,40px);}
 }
