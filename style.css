@@ -7,7 +7,7 @@ body {
   height: 100vh;
 }
 
-/* INTRO CINÉMATIQUE */
+/* INTRO */
 #intro {
   position: fixed;
   width: 100%;
@@ -23,7 +23,7 @@ body {
 .intro-title {
   font-size: 60px;
   letter-spacing: 4px;
-  animation: introGlow 2s ease;
+  animation: introFade 2s ease;
 }
 
 /* HERO */
@@ -32,8 +32,8 @@ body {
   height: 100vh;
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 /* BACKGROUND */
@@ -43,27 +43,49 @@ body {
   height: 100%;
   background: url("img/hero.jpg") center/cover no-repeat;
   filter: brightness(0.35);
-  transform: scale(1.1);
-  animation: zoomIn 6s ease-out forwards;
   z-index: 0;
+}
+
+/* LIGHT EFFECT MODERNE */
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.12), transparent 60%);
+  animation: lightMove 7s infinite alternate;
   pointer-events: none;
 }
 
-/* CONTENT FADE IN */
+/* CONTENT */
 .hero-content {
   position: relative;
   z-index: 2;
   text-align: center;
-  opacity: 0;
-  animation: fadeIn 2s ease forwards;
-  animation-delay: 2.5s;
+  max-width: 1000px;
+}
+
+/* TITRES */
+.main-title {
+  font-size: 48px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #ccc;
+  margin-top: 10px;
 }
 
 /* BUTTONS */
+.hero-buttons {
+  margin: 20px 0;
+}
+
 .hero-buttons a {
   display: inline-block;
   margin: 10px;
   padding: 14px 28px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.25);
   color: white;
@@ -80,23 +102,17 @@ body {
 .video-box iframe {
   width: 900px;
   height: 500px;
-  margin-top: 20px;
+  margin-top: 25px;
   border-radius: 10px;
 }
 
 /* ANIMATIONS */
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
+@keyframes introFade {
+  from {opacity: 0; transform: scale(0.9);}
+  to {opacity: 1; transform: scale(1);}
 }
 
-@keyframes zoomIn {
-  from {transform: scale(1.2);}
-  to {transform: scale(1.05);}
-}
-
-@keyframes introGlow {
-  0% {opacity: 0; transform: scale(0.9);}
-  50% {opacity: 1;}
-  100% {transform: scale(1);}
+@keyframes lightMove {
+  from {transform: translate(0,0);}
+  to {transform: translate(60px,40px);}
 }
