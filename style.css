@@ -1,11 +1,13 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: #000;
   color: white;
   overflow: hidden;
   height: 100vh;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
 /* INTRO */
 #intro {
@@ -17,13 +19,14 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 999;
-  transition: 1.2s ease;
+  transition: 1.2s;
 }
 
 .intro-title {
-  font-size: 60px;
+  font-size: 58px;
   letter-spacing: 4px;
-  animation: introFade 2s ease;
+  font-weight: 300;
+  animation: introGlow 2.5s ease;
 }
 
 /* HERO */
@@ -36,25 +39,22 @@ body {
   align-items: center;
 }
 
-/* BACKGROUND */
 .hero-bg {
   position: absolute;
   width: 100%;
   height: 100%;
   background: url("img/hero.jpg") center/cover no-repeat;
   filter: brightness(0.35);
-  z-index: 0;
 }
 
-/* LIGHT EFFECT MODERNE */
+/* LIGHT */
 .hero-bg::after {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.12), transparent 60%);
-  animation: lightMove 7s infinite alternate;
-  pointer-events: none;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), transparent 60%);
+  animation: lightMove 6s infinite alternate;
 }
 
 /* CONTENT */
@@ -62,32 +62,38 @@ body {
   position: relative;
   z-index: 2;
   text-align: center;
-  max-width: 1000px;
+  max-width: 900px;
 }
 
-/* TITRES */
+/* TITRE CINÉMATIQUE */
 .main-title {
-  font-size: 48px;
-  margin: 0;
+  font-size: 44px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: titleFadeGlow 2.5s ease forwards;
 }
 
+/* GLOW PROGRESSIF */
+.glow-title {
+  text-shadow: 0 0 0 rgba(255,255,255,0);
+}
+
+/* SUBTITLE */
 .subtitle {
   color: #ccc;
-  margin-top: 10px;
+  font-size: 16px;
 }
 
 /* BUTTONS */
-.hero-buttons {
-  margin: 20px 0;
-}
-
 .hero-buttons a {
   display: inline-block;
   margin: 10px;
-  padding: 14px 28px;
+  padding: 12px 26px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.2);
   color: white;
   text-decoration: none;
   transition: 0.3s;
@@ -100,19 +106,38 @@ body {
 
 /* VIDEO */
 .video-box iframe {
-  width: 900px;
-  height: 500px;
-  margin-top: 25px;
+  width: 650px;
+  height: 360px;
+  margin-top: 20px;
   border-radius: 10px;
 }
 
 /* ANIMATIONS */
-@keyframes introFade {
-  from {opacity: 0; transform: scale(0.9);}
-  to {opacity: 1; transform: scale(1);}
-}
-
 @keyframes lightMove {
   from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
+  to {transform: translate(50px,30px);}
+}
+
+/* INTRO GLOW */
+@keyframes introGlow {
+  0% {opacity: 0; transform: scale(0.9); text-shadow: 0 0 0px white;}
+  50% {opacity: 1; text-shadow: 0 0 25px white;}
+  100% {opacity: 1; text-shadow: 0 0 10px white;}
+}
+
+/* TITRE FADE + GLOW PROGRESSIF */
+@keyframes titleFadeGlow {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    text-shadow: 0 0 0px white;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 15px white;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 25px rgba(255,255,255,0.6);
+  }
 }
