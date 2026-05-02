@@ -46,7 +46,6 @@
 </section>
 
 <script>
-const intro = document.getElementById("intro");
 const audio = document.getElementById("introSound");
 const text = document.querySelector(".highlight");
 
@@ -76,14 +75,15 @@ function initAudio() {
     let sum = dataArray.reduce((a,b)=>a+b,0);
     let intensity = sum / dataArray.length / 255;
 
-    let scale = 1 + intensity * 0.08;
-    let glow = intensity * 40;
+    let scale = 1 + intensity * 0.05;
+    let glow = intensity * 35;
 
     text.style.transform = `scale(${scale})`;
+
     text.style.textShadow = `
-      0 0 ${5 + glow}px rgba(255,0,0,0.4),
-      0 0 ${15 + glow}px rgba(255,0,0,0.3),
-      0 0 ${30 + glow}px rgba(255,0,0,0.2)
+      0 0 ${6 + glow}px rgba(255,0,0,0.35),
+      0 0 ${18 + glow}px rgba(255,0,0,0.25),
+      0 0 ${30 + glow}px rgba(255,0,0,0.15)
     `;
   }
 
@@ -99,14 +99,6 @@ function startAudio() {
 }
 
 window.addEventListener("click", startAudio);
-
-setTimeout(() => {
-  intro.style.opacity = "0";
-}, 2000);
-
-setTimeout(() => {
-  intro.style.display = "none";
-}, 3200);
 
 window.addEventListener("beforeunload", () => {
   audio.pause();
