@@ -23,7 +23,7 @@
 
     <h1 class="main-title glow">Le Poète des Damnés</h1>
 
-    <p class="highlight cinematic">
+    <p class="highlight">
       Je cherche à comprendre ce que le monde raconte.
     </p>
 
@@ -48,12 +48,56 @@
 <script>
 const intro = document.getElementById("intro");
 const audio = document.getElementById("introSound");
+const text = document.querySelector(".highlight");
+
+let audioCtx;
+let analyser;
+let source;
+
+function initAudio() {
+  if (audioCtx) return;
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  analyser.fftSize = 64;
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    let sum = dataArray.reduce((a,b)=>a+b,0);
+    let intensity = sum / dataArray.length / 255;
+
+    let scale = 1 + intensity * 0.08;
+    let glow = intensity * 40;
+
+    text.style.transform = `scale(${scale})`;
+    text.style.textShadow = `
+      0 0 ${5 + glow}px rgba(255,0,0,0.4),
+      0 0 ${15 + glow}px rgba(255,0,0,0.3),
+      0 0 ${30 + glow}px rgba(255,0,0,0.2)
+    `;
+  }
+
+  animate();
+}
 
 function startAudio() {
   audio.volume = 0.6;
   audio.play().catch(() => {});
+  audioCtx.resume();
+  initAudio();
   window.removeEventListener("click", startAudio);
 }
+
 window.addEventListener("click", startAudio);
 
 setTimeout(() => {
