@@ -22,14 +22,13 @@ body {
 /* HERO */
 .hero {
   height: 100vh;
-  background: url("img/album1.jpg") center/cover no-repeat;
+  background: url("img/hero.jpg") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 
-/* LIGHT EFFECT */
 .hero::before {
   content: "";
   position: absolute;
@@ -39,7 +38,6 @@ body {
   animation: lightMove 8s infinite alternate;
 }
 
-/* OVERLAY */
 .hero-overlay {
   position: absolute;
   width: 100%;
@@ -47,7 +45,6 @@ body {
   background: linear-gradient(to bottom, rgba(0,0,0,0.6), #000);
 }
 
-/* CONTENT */
 .hero-content {
   position: relative;
   text-align: center;
