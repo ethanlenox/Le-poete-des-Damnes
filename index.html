@@ -9,15 +9,19 @@
 
 <body>
 
+<!-- INTRO CINÉMATIQUE -->
 <div id="intro">
-  <h1 class="title">Le Poète des Damnés</h1>
+  <h1 class="intro-title">Le Poète des Damnés</h1>
 </div>
 
-<section class="hero hidden">
+<audio id="introSound" src="audio/intro.mp3" preload="auto"></audio>
+
+<section class="hero">
 
   <div class="hero-bg"></div>
 
   <div class="hero-content">
+
     <h1 class="title">Le Poète des Damnés</h1>
     <p>Je cherche à comprendre ce que le monde raconte.</p>
 
@@ -38,10 +42,23 @@
 </section>
 
 <script>
+const intro = document.getElementById("intro");
+const sound = document.getElementById("introSound");
+
+// lancer musique
+sound.volume = 0.6;
+sound.play().catch(() => {});
+
+// fade + zoom intro
 setTimeout(() => {
-  document.getElementById("intro").style.display = "none";
-  document.querySelector(".hero").classList.remove("hidden");
-}, 1500);
+  intro.style.opacity = "0";
+  intro.style.transform = "scale(1.2)";
+}, 2500);
+
+// disparition complète
+setTimeout(() => {
+  intro.style.display = "none";
+}, 3500);
 </script>
 
 </body>
