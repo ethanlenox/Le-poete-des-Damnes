@@ -10,49 +10,38 @@
 <body>
 
 <div id="intro">
-  <h1 class="glitch" data-text="Le Poète des Damnés">Le Poète des Damnés</h1>
+  <h1 class="title">Le Poète des Damnés</h1>
 </div>
 
 <section class="hero hidden">
 
-  <div class="hero-overlay"></div>
+  <div class="hero-bg"></div>
 
   <div class="hero-content">
-    <h1 class="glitch" data-text="Le Poète des Damnés">Le Poète des Damnés</h1>
+    <h1 class="title">Le Poète des Damnés</h1>
     <p>Je cherche à comprendre ce que le monde raconte.</p>
 
     <div class="hero-buttons">
-      <a href="albums.html">🎧 Discographie</a>
-      <a href="bio.html">👤 Artiste</a>
+      <a href="albums.html">Discographie</a>
+      <a href="bio.html">Artiste</a>
     </div>
+
+    <div class="video-box">
+      <iframe
+        src="https://www.youtube.com/embed/YNPhIaR2n_Q"
+        allowfullscreen>
+      </iframe>
+    </div>
+
   </div>
 
-</section>
-
-<section class="section-video hidden">
-  <h2>Présentation</h2>
-
-  <iframe width="560" height="315"
-    src="https://www.youtube.com/embed/YNPhIaR2n_Q"
-    allowfullscreen>
-  </iframe>
 </section>
 
 <script>
 setTimeout(() => {
   document.getElementById("intro").style.opacity = "0";
   document.querySelector(".hero").classList.remove("hidden");
-}, 2500);
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting){
-      entry.target.classList.add("show");
-    }
-  });
-});
-
-document.querySelectorAll('.hidden').forEach(el => observer.observe(el));
+}, 1500);
 </script>
 
 </body>
