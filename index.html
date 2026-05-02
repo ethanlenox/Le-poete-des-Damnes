@@ -9,21 +9,23 @@
 
 <body>
 
+<!-- AUDIO GLOBAL (intro uniquement) -->
+<audio id="introSound" src="audio/intro.mp3" preload="auto" loop></audio>
+
 <!-- INTRO CINÉMATIQUE -->
 <div id="intro">
   <h1 class="intro-title">Le Poète des Damnés</h1>
 </div>
 
-<audio id="introSound" src="audio/intro.mp3" preload="auto"></audio>
-
+<!-- HERO -->
 <section class="hero">
 
   <div class="hero-bg"></div>
 
   <div class="hero-content">
 
-    <h1 class="title">Le Poète des Damnés</h1>
-    <p>Je cherche à comprendre ce que le monde raconte.</p>
+    <h1 class="main-title">Le Poète des Damnés</h1>
+    <p class="subtitle">Je cherche à comprendre ce que le monde raconte.</p>
 
     <div class="hero-buttons">
       <a href="albums.html">Discographie</a>
@@ -43,22 +45,28 @@
 
 <script>
 const intro = document.getElementById("intro");
-const sound = document.getElementById("introSound");
+const audio = document.getElementById("introSound");
 
-// lancer musique
-sound.volume = 0.6;
-sound.play().catch(() => {});
+/* AUDIO START */
+audio.volume = 0.5;
+audio.play().catch(() => {});
 
-// fade + zoom intro
+/* INTRO FADE OUT */
 setTimeout(() => {
   intro.style.opacity = "0";
-  intro.style.transform = "scale(1.2)";
-}, 2500);
+  intro.style.transform = "scale(1.15)";
+}, 2000);
 
-// disparition complète
+/* REMOVE INTRO */
 setTimeout(() => {
   intro.style.display = "none";
-}, 3500);
+}, 3200);
+
+/* STOP AUDIO PROPREMENT SI ON CHANGE DE PAGE */
+window.addEventListener("beforeunload", () => {
+  audio.pause();
+  audio.currentTime = 0;
+});
 </script>
 
 </body>
