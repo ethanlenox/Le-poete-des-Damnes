@@ -5,8 +5,8 @@ body {
   font-family: 'Poppins', sans-serif;
   background: #000;
   color: white;
-  overflow: hidden;
   height: 100vh;
+  overflow: hidden;
 }
 
 /* INTRO */
@@ -32,7 +32,6 @@ body {
 .hero {
   width: 100%;
   height: 100vh;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -47,71 +46,15 @@ body {
   filter: brightness(0.35) saturate(1.2);
 }
 
-/* LIGHT EFFECT */
-.hero-bg::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(0,229,255,0.15), transparent 60%);
-  animation: lightMove 6s infinite alternate;
-  pointer-events: none;
-}
-
 /* CONTENT */
 .hero-content {
   position: relative;
   z-index: 2;
   text-align: center;
-  max-width: 900px;
-}
-
-/* TITLE */
-.main-title {
-  font-size: 46px;
-}
-
-.glow {
-  text-shadow: 0 0 10px rgba(0,229,255,0.4),
-               0 0 25px rgba(0,229,255,0.2);
-  animation: pulseBlue 3s infinite;
-}
-
-/* PHRASE */
-.highlight {
-  font-size: 20px;
-  color: #ffffff;
-
-  text-shadow:
-    0 0 8px rgba(255,0,0,0.5),
-    0 0 20px rgba(255,0,0,0.35),
-    0 0 40px rgba(255,0,0,0.25);
-
-  animation: redGlowPulse 3s infinite ease-in-out,
-             breathe 4s infinite ease-in-out;
-}
-
-/* BUTTONS */
-.hero-buttons a {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px 26px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(0,229,255,0.3);
-  color: white;
-  text-decoration: none;
-}
-
-/* VIDEO */
-.video-box iframe {
-  width: 440px;
-  height: 248px;
-  margin-top: 20px;
-  border-radius: 10px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 /* BANNIÈRE */
@@ -123,33 +66,69 @@ body {
 }
 
 .banner {
-  width: 700px;
+  width: 720px;
   max-width: 95%;
   display: block;
 }
 
+/* TEXTE SUR BANNIÈRE */
 .title-banner .main-title {
   position: absolute;
-  top: 60%;
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
-  margin: 0;
   width: 100%;
   text-align: center;
-
   white-space: nowrap;
+
+  color: white;
+  z-index: 5;
+
+  text-shadow:
+    0 0 10px rgba(0,229,255,0.7),
+    0 0 25px rgba(0,229,255,0.5),
+    0 0 50px rgba(0,229,255,0.3);
+
+  animation: pulseBlue 3s infinite;
+}
+
+/* PHRASE */
+.highlight {
+  font-size: 20px;
+  color: white;
+  text-shadow:
+    0 0 8px rgba(255,0,0,0.5),
+    0 0 20px rgba(255,0,0,0.35),
+    0 0 40px rgba(255,0,0,0.25);
+  animation: redGlowPulse 3s infinite, breathe 4s infinite;
+}
+
+/* BOUTONS */
+.hero-buttons {
+  display: flex;
+  gap: 30px;
+}
+
+.hero-buttons a {
+  padding: 12px 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(0,229,255,0.3);
+  color: white;
+  text-decoration: none;
+}
+
+/* VIDEO */
+.video-box iframe {
+  width: 460px;
+  height: 260px;
+  border-radius: 10px;
 }
 
 /* ANIMATIONS */
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
-}
-
-@keyframes lightMove {
-  from {transform: translate(0,0);}
-  to {transform: translate(60px,40px);}
 }
 
 @keyframes pulseBlue {
@@ -159,28 +138,13 @@ body {
 }
 
 @keyframes redGlowPulse {
-  0% {
-    text-shadow:
-      0 0 6px rgba(255,0,0,0.4),
-      0 0 15px rgba(255,0,0,0.25),
-      0 0 25px rgba(255,0,0,0.15);
-  }
-  50% {
-    text-shadow:
-      0 0 14px rgba(255,0,0,0.7),
-      0 0 30px rgba(255,0,0,0.45),
-      0 0 60px rgba(255,0,0,0.25);
-  }
-  100% {
-    text-shadow:
-      0 0 6px rgba(255,0,0,0.4),
-      0 0 15px rgba(255,0,0,0.25),
-      0 0 25px rgba(255,0,0,0.15);
-  }
+  0% {text-shadow: 0 0 10px rgba(255,0,0,0.4);}
+  50% {text-shadow: 0 0 25px rgba(255,0,0,0.6);}
+  100% {text-shadow: 0 0 10px rgba(255,0,0,0.4);}
 }
 
 @keyframes breathe {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {transform: scale(1);}
+  50% {transform: scale(1.05);}
+  100% {transform: scale(1);}
 }
