@@ -74,10 +74,10 @@ body {
 /* TEXTE SUR BANNIÈRE */
 .title-banner .main-title {
   position: absolute;
-  top: 90%;
+  top: 99%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100%;
+  width: 130%;
   text-align: center;
   white-space: nowrap;
 
@@ -113,7 +113,7 @@ body {
   padding: 12px 28px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(0,229,255,0.3);
+  border: 2px solid rgba(0,229,255,0.3);
   color: white;
   text-decoration: none;
 }
@@ -122,7 +122,7 @@ body {
 .video-box iframe {
   width: 320px;
   height: 180px;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 /* ANIMATIONS */
