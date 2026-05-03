@@ -2,34 +2,41 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Album 01</title>
+<title>Albums</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <h1>Album 01</h1>
-  <p>Premier projet</p>
+<header class="bio-header">
+  <h1>Discographie</h1>
+  <p class="slogan">Albums disponibles</p>
 </header>
 
-<!-- COVER -->
-<div style="text-align:center;">
-  <img src="img/album1.jpg" style="width:280px; border-radius:14px;">
-</div>
+<section class="albums-grid">
 
-<!-- TRACKLIST (future audio ready) -->
-<div class="track">01 - Intro</div>
-<div class="track">02 - Track 1</div>
-<div class="track">03 - Track 2</div>
+  <!-- ALBUM 1 -->
+  <a href="album1.html" class="album-card">
+    <img src="img/album1.jpg" class="album-cover">
+    <p>Album 01</p>
+  </a>
 
-<!-- FUTUR BANDCAMP -->
-<div class="video">
-  <p style="color:#777;">Lecteur audio / Bandcamp bientôt</p>
-</div>
+  <!-- ALBUM 2 -->
+  <a href="album2.html" class="album-card">
+    <img src="img/album2.jpg" class="album-cover">
+    <p>Album 02</p>
+  </a>
+
+  <!-- ALBUM 3 -->
+  <a href="album3.html" class="album-card">
+    <img src="img/album3.jpg" class="album-cover">
+    <p>Album 03</p>
+  </a>
+
+</section>
 
 <div class="links">
-  <a href="albums.html">Retour</a>
+  <a href="index.html">⬅ Retour</a>
 </div>
 
 </body>
