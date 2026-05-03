@@ -47,7 +47,7 @@ body {
   filter: brightness(0.35) saturate(1.2);
 }
 
-/* LIGHT */
+/* LIGHT EFFECT */
 .hero-bg::after {
   content: "";
   position: absolute;
@@ -66,12 +66,11 @@ body {
   max-width: 900px;
 }
 
-/* TITRE */
+/* TITLE */
 .main-title {
   font-size: 46px;
 }
 
-/* GLOW TITRE */
 .glow {
   text-shadow: 0 0 10px rgba(0,229,255,0.4),
                0 0 25px rgba(0,229,255,0.2);
@@ -106,16 +105,16 @@ body {
 
 /* VIDEO */
 .video-box iframe {
-  width: 320px;
-  height: 180px;
-  margin-top: 02px;
-  border-radius: 05px;
+  width: 440px;
+  height: 248px;
+  margin-top: 20px;
+  border-radius: 10px;
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* ===== BANNIÈRE FIX ===== */
+/* BANNIÈRE */
 .title-banner {
   position: relative;
   display: flex;
@@ -124,14 +123,14 @@ body {
 }
 
 .banner {
-  width: 640px;
-  max-width: 89%;
+  width: 700px;
+  max-width: 95%;
   display: block;
 }
 
 .title-banner .main-title {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   
