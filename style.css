@@ -78,7 +78,7 @@ body {
   animation: pulseBlue 3s infinite;
 }
 
-/* PHRASE MODIFIÉE */
+/* PHRASE */
 .highlight {
   font-size: 20px;
   color: #ffffff;
@@ -115,6 +115,28 @@ body {
   margin-right: auto;
 }
 
+/* ===== BANNIÈRE + TEXTE ===== */
+.title-banner {
+  position: relative;
+  display: inline-block;
+}
+
+.banner {
+  width: 420px;
+  max-width: 90%;
+  display: block;
+  z-index: 1;
+}
+
+.title-banner .main-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  z-index: 2;
+}
+
 /* ANIMATIONS */
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
@@ -132,7 +154,6 @@ body {
   100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
 }
 
-/* NOUVELLES ANIMATIONS PHRASE */
 @keyframes redGlowPulse {
   0% {
     text-shadow:
