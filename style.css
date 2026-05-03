@@ -148,6 +148,11 @@ body {
   50% {transform: scale(1.05);}
   100% {transform: scale(1);}
 }
+
+/* ===================== */
+/*       BIO SECTION     */
+/* ===================== */
+
 .bio-header {
   text-align: center;
   margin-top: 40px;
@@ -171,6 +176,8 @@ body {
   padding: 20px;
   line-height: 1.7;
   color: #ddd;
+  position: relative;
+  z-index: 2;
 }
 
 .bio p {
@@ -184,28 +191,28 @@ body {
   justify-content: center;
   gap: 25px;
   margin: 30px 0;
+  flex-wrap: wrap;
 }
 
-/* IMAGE STYLE */
+/* IMAGES CORRIGÉES (PROBLÈME RÉSOLU) */
 .bio-img {
-  width: 320px;
-  max-width: 90%;
+  width: 160px;
+  max-width: 35vw;
   height: auto;
   border-radius: 12px;
 
-  /* GLOW NEON SOFT */
   box-shadow:
-    0 0 10px rgba(0,229,255,0.4),
-    0 0 25px rgba(0,229,255,0.2);
+    0 0 6px rgba(0,229,255,0.35),
+    0 0 15px rgba(0,229,255,0.2);
 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .bio-img:hover {
-  transform: scale(1.03);
+  transform: scale(1.05);
   box-shadow:
     0 0 15px rgba(0,229,255,0.6),
-    0 0 35px rgba(0,229,255,0.3);
+    0 0 30px rgba(0,229,255,0.3);
 }
 
 /* NAV ICONES */
