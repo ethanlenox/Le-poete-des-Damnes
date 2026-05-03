@@ -95,7 +95,7 @@ body {
 /* BUTTONS */
 .hero-buttons a {
   display: inline-block;
-  margin: 05px;
+  margin: 02px;
   padding: 12px 26px;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
@@ -107,8 +107,8 @@ body {
 /* VIDEO */
 .video-box iframe {
   width: 320px;
-  height: 240px;
-  margin-top: 05px;
+  height: 180px;
+  margin-top: 02px;
   border-radius: 05px;
   display: block;
   margin-left: auto;
