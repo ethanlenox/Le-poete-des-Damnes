@@ -106,8 +106,8 @@ body {
 
 /* VIDEO */
 .video-box iframe {
-  width: 320px;
-  height: 240px;
+  width: 440px;
+  height: 248px;
   margin-top: 20px;
   border-radius: 10px;
   display: block;
@@ -115,17 +115,18 @@ body {
   margin-right: auto;
 }
 
-/* ===== BANNIÈRE + TEXTE ===== */
+/* ===== BANNIÈRE FIX ===== */
 .title-banner {
   position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .banner {
-  width: 960px;
-  max-width: 90%;
+  width: 700px;
+  max-width: 95%;
   display: block;
-  z-index: 1;
 }
 
 .title-banner .main-title {
@@ -133,8 +134,12 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  
   margin: 0;
-  z-index: 2;
+  width: 100%;
+  text-align: center;
+
+  white-space: nowrap;
 }
 
 /* ANIMATIONS */
