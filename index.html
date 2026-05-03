@@ -9,8 +9,6 @@
 
 <body>
 
-<audio id="introSound" src="audio/intro.mp3" preload="auto" loop></audio>
-
 <div id="intro">
   <h1 class="intro-title">Le Poète des Damnés</h1>
 </div>
@@ -21,7 +19,6 @@
 
   <div class="hero-content">
 
-    <!-- BANNIÈRE + TEXTE -->
     <div class="title-banner">
       <img src="img/banner.jpg" class="banner">
       <h1 class="main-title glow">Le Poète des Damnés</h1>
@@ -48,26 +45,6 @@
   </div>
 
 </section>
-
-<script>
-const intro = document.getElementById("intro");
-const audio = document.getElementById("introSound");
-
-function startAudio() {
-  audio.volume = 0.6;
-  audio.play().catch(() => {});
-  window.removeEventListener("click", startAudio);
-}
-window.addEventListener("click", startAudio);
-
-setTimeout(() => {
-  intro.style.opacity = "0";
-}, 2000);
-
-setTimeout(() => {
-  intro.style.display = "none";
-}, 3200);
-</script>
 
 </body>
 </html>
