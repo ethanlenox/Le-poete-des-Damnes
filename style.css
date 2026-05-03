@@ -194,11 +194,12 @@ body {
   flex-wrap: wrap;
 }
 
-/* IMAGES CORRIGÉES (PROBLÈME RÉSOLU) */
+/* ✅ CORRECTION PRINCIPALE (TAILLE RÉDUITE) */
 .bio-img {
-  width: 160px;
-  max-width: 35vw;
+  width: 160px;        /* ↓ réduit fortement */
+  max-width: 40vw;     /* responsive */
   height: auto;
+
   border-radius: 12px;
 
   box-shadow:
