@@ -66,11 +66,6 @@ setTimeout(() => {
 setTimeout(() => {
   intro.style.display = "none";
 }, 3200);
-
-window.addEventListener("beforeunload", () => {
-  audio.pause();
-  audio.currentTime = 0;
-});
 </script>
 
 </body>
