@@ -66,8 +66,7 @@ body {
 }
 
 .banner {
-  width: 960px;
-  height: 480px;
+  width: 500px;
   max-width: 89%;
   display: block;
 }
@@ -121,8 +120,8 @@ body {
 
 /* VIDEO */
 .video-box iframe {
-  width: 460px;
-  height: 260px;
+  width: 320px;
+  height: 180px;
   border-radius: 10px;
 }
 
