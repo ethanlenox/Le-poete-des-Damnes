@@ -132,10 +132,7 @@ body {
   border-radius: 20px;
 }
 
-/* ===================== */
 /* BIO */
-/* ===================== */
-
 .bio-header {
   text-align: center;
   margin-top: 40px;
@@ -167,7 +164,7 @@ body {
   margin-bottom: 18px;
 }
 
-/* IMAGES */
+/* IMAGES BIO */
 .bio-images-top,
 .bio-images-bottom {
   display: flex;
@@ -197,10 +194,7 @@ body {
     0 0 30px rgba(0,229,255,0.3);
 }
 
-/* ===================== */
-/* ALBUMS (AJOUT) */
-/* ===================== */
-
+/* ALBUMS */
 .albums-grid {
   display: flex;
   justify-content: center;
@@ -212,6 +206,7 @@ body {
 .album-card {
   text-align: center;
   text-decoration: none;
+  color: white;
 }
 
 .album-cover {
@@ -238,10 +233,7 @@ body {
   color: white;
 }
 
-/* ===================== */
-/* TRACKLIST (AJOUT) */
-/* ===================== */
-
+/* TRACKLIST */
 .tracklist {
   max-width: 700px;
   margin: 40px auto;
@@ -310,4 +302,16 @@ body {
   0% {transform: scale(1);}
   50% {transform: scale(1.05);}
   100% {transform: scale(1);}
+}
+
+/* ===================== */
+/* SCROLL GLOBAL AJOUT */
+/* ===================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overscroll-behavior: none;
 }
