@@ -7,9 +7,10 @@ body {
   color: white;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
-/* INTRO */
+/* ===== INTRO ===== */
 #intro {
   position: fixed;
   width: 100%;
@@ -19,7 +20,6 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 999;
-  transition: 1.2s ease;
 }
 
 .intro-title {
@@ -28,7 +28,7 @@ body {
   animation: introGlow 2s ease;
 }
 
-/* HERO */
+/* ===== HERO ===== */
 .hero {
   width: 100%;
   height: 100vh;
@@ -57,12 +57,13 @@ body {
   gap: 16px;
 }
 
-/* BANNIÈRE */
+/* ===== BANNIÈRE ===== */
 .title-banner {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .banner {
@@ -71,39 +72,45 @@ body {
   display: block;
 }
 
-/* TEXTE SUR BANNIÈRE */
+/* ===== TEXTE CYBER GLITCH ===== */
 .title-banner .main-title {
   position: absolute;
   top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100%;
-  text-align: center;
+
+  width: 110%;
   white-space: nowrap;
+  text-align: center;
+
+  margin: 0;
+  z-index: 10;
 
   color: white;
-  z-index: 5;
 
   text-shadow:
-    0 0 10px rgba(0,229,255,0.7),
+    -2px 0 cyan,
+    2px 0 red,
+    0 0 10px rgba(0,229,255,0.6),
     0 0 25px rgba(0,229,255,0.5),
     0 0 50px rgba(0,229,255,0.3);
 
-  animation: pulseBlue 3s infinite;
+  animation: cyberFlicker 3s infinite;
 }
 
-/* PHRASE */
+/* ===== PHRASE ===== */
 .highlight {
   font-size: 20px;
-  color: white;
+
   text-shadow:
     0 0 8px rgba(255,0,0,0.5),
     0 0 20px rgba(255,0,0,0.35),
     0 0 40px rgba(255,0,0,0.25);
+
   animation: redGlowPulse 3s infinite, breathe 4s infinite;
 }
 
-/* BOUTONS */
+/* ===== BOUTONS ===== */
 .hero-buttons {
   display: flex;
   gap: 30px;
@@ -118,23 +125,88 @@ body {
   text-decoration: none;
 }
 
-/* VIDEO */
+/* ===== VIDÉO ===== */
 .video-box iframe {
   width: 460px;
   height: 260px;
   border-radius: 10px;
 }
 
-/* ANIMATIONS */
-@keyframes introGlow {
-  0% {opacity: 0; transform: scale(0.9);}
-  100% {opacity: 1; transform: scale(1);}
+/* ===== VHS GLOBAL VISUEL ===== */
+
+/* SCANLINES */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.03) 0px,
+    rgba(0,0,0,0.03) 2px,
+    transparent 4px
+  );
+
+  mix-blend-mode: overlay;
+  animation: scanlines 0.2s infinite;
 }
 
-@keyframes pulseBlue {
-  0% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
-  50% {text-shadow: 0 0 25px rgba(0,229,255,0.6);}
-  100% {text-shadow: 0 0 10px rgba(0,229,255,0.3);}
+/* NOISE VISUEL (CSS ONLY) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+
+  background: repeating-radial-gradient(
+    circle,
+    rgba(255,255,255,0.04) 0px,
+    rgba(0,0,0,0.04) 1px,
+    transparent 2px
+  );
+
+  opacity: 0.08;
+  animation: noiseMove 0.2s infinite;
+}
+
+/* shake global */
+.hero, .hero-bg, .hero-content {
+  animation: vhsShake 6s infinite;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes cyberFlicker {
+  0% {opacity: 1;}
+  2% {opacity: 0.8;}
+  4% {opacity: 1;}
+  50% {transform: translate(-50%, -50%) scale(1.05);}
+  100% {transform: translate(-50%, -50%) scale(1);}
+}
+
+@keyframes scanlines {
+  0% {transform: translateY(0);}
+  100% {transform: translateY(4px);}
+}
+
+@keyframes noiseMove {
+  0% {transform: translate(0,0);}
+  25% {transform: translate(-1px,1px);}
+  50% {transform: translate(1px,-1px);}
+  75% {transform: translate(-1px,-1px);}
+  100% {transform: translate(0,0);}
+}
+
+@keyframes vhsShake {
+  0% {transform: translate(0,0);}
+  20% {transform: translate(-1px,1px);}
+  40% {transform: translate(1px,-1px);}
+  60% {transform: translate(-1px,0);}
+  80% {transform: translate(1px,-1px);}
+  100% {transform: translate(0,0);}
 }
 
 @keyframes redGlowPulse {
@@ -147,4 +219,9 @@ body {
   0% {transform: scale(1);}
   50% {transform: scale(1.05);}
   100% {transform: scale(1);}
+}
+
+@keyframes introGlow {
+  0% {opacity: 0; transform: scale(0.9);}
+  100% {opacity: 1; transform: scale(1);}
 }
