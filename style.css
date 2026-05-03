@@ -148,3 +148,83 @@ body {
   50% {transform: scale(1.05);}
   100% {transform: scale(1);}
 }
+.bio-header {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.bio-header h1 {
+  font-size: 42px;
+  color: white;
+  text-shadow: 0 0 15px rgba(0,229,255,0.5);
+}
+
+.slogan {
+  color: #aaa;
+  letter-spacing: 2px;
+}
+
+/* TEXTE BIO */
+.bio {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  line-height: 1.7;
+  color: #ddd;
+}
+
+.bio p {
+  margin-bottom: 18px;
+}
+
+/* IMAGES */
+.bio-images-top,
+.bio-images-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 30px 0;
+}
+
+/* IMAGE STYLE */
+.bio-img {
+  width: 320px;
+  max-width: 90%;
+  height: auto;
+  border-radius: 12px;
+
+  /* GLOW NEON SOFT */
+  box-shadow:
+    0 0 10px rgba(0,229,255,0.4),
+    0 0 25px rgba(0,229,255,0.2);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bio-img:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 0 15px rgba(0,229,255,0.6),
+    0 0 35px rgba(0,229,255,0.3);
+}
+
+/* NAV ICONES */
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 40px 0;
+}
+
+.links a {
+  font-size: 26px;
+  text-decoration: none;
+  color: white;
+  opacity: 0.8;
+  transition: 0.3s;
+}
+
+.links a:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(0,229,255,0.6);
+}
