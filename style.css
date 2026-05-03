@@ -10,11 +10,11 @@ body {
   position: relative;
 }
 
-/* ===== INTRO (FIX BLOQUAGE) ===== */
+/* ===== INTRO FIX ===== */
 #intro {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 1000;
   background: black;
   display: flex;
   justify-content: center;
@@ -39,8 +39,7 @@ body {
 
 .hero-bg {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: url("img/hero.jpg") center/cover no-repeat;
   filter: brightness(0.35) saturate(1.2);
 }
@@ -70,7 +69,7 @@ body {
   max-width: 95%;
 }
 
-/* TEXTE CYBER */
+/* TEXTE GLITCH CYBER */
 .title-banner .main-title {
   position: absolute;
   top: 70%;
@@ -78,18 +77,17 @@ body {
   transform: translate(-50%, -50%);
   width: 110%;
   white-space: nowrap;
-  text-align: center;
+
+  margin: 0;
+  z-index: 5;
 
   color: white;
-  margin: 0;
-  z-index: 10;
 
   text-shadow:
     -2px 0 cyan,
     2px 0 red,
     0 0 10px rgba(0,229,255,0.6),
-    0 0 25px rgba(0,229,255,0.5),
-    0 0 50px rgba(0,229,255,0.3);
+    0 0 25px rgba(0,229,255,0.5);
 
   animation: cyberFlicker 3s infinite;
 }
@@ -99,10 +97,7 @@ body {
   font-size: 20px;
   text-shadow:
     0 0 8px rgba(255,0,0,0.5),
-    0 0 20px rgba(255,0,0,0.35),
-    0 0 40px rgba(255,0,0,0.25);
-
-  animation: redGlowPulse 3s infinite, breathe 4s infinite;
+    0 0 20px rgba(255,0,0,0.35);
 }
 
 /* BOUTONS */
@@ -127,22 +122,22 @@ body {
   border-radius: 10px;
 }
 
-/* ===== VHS VISUEL ===== */
+/* ===== VHS STABLE (IMPORTANT FIX) ===== */
+
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9998;
   pointer-events: none;
+  z-index: 1;
 
   background: repeating-linear-gradient(
     0deg,
-    rgba(255,255,255,0.03),
-    rgba(0,0,0,0.03) 2px,
+    rgba(255,255,255,0.02),
+    rgba(0,0,0,0.02) 2px,
     transparent 4px
   );
 
-  mix-blend-mode: overlay;
   animation: scanlines 2s infinite;
 }
 
@@ -150,21 +145,22 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9997;
   pointer-events: none;
+  z-index: 2;
 
   background: repeating-radial-gradient(
     circle,
-    rgba(255,255,255,0.04),
-    rgba(0,0,0,0.04) 1px,
+    rgba(255,255,255,0.03),
+    rgba(0,0,0,0.03) 1px,
     transparent 2px
   );
 
-  opacity: 0.08;
+  opacity: 0.06;
   animation: noiseMove 3s infinite;
 }
 
-/* ANIMATIONS */
+/* ===== ANIMATIONS ===== */
+
 @keyframes cyberFlicker {
   0% {opacity: 1;}
   50% {transform: translate(-50%, -50%) scale(1.05);}
@@ -178,22 +174,8 @@ body::after {
 
 @keyframes noiseMove {
   0% {transform: translate(0,0);}
-  25% {transform: translate(-1px,1px);}
   50% {transform: translate(1px,-1px);}
-  75% {transform: translate(-1px,-1px);}
   100% {transform: translate(0,0);}
-}
-
-@keyframes redGlowPulse {
-  0% {text-shadow: 0 0 10px rgba(255,0,0,0.4);}
-  50% {text-shadow: 0 0 25px rgba(255,0,0,0.6);}
-  100% {text-shadow: 0 0 10px rgba(255,0,0,0.4);}
-}
-
-@keyframes breathe {
-  0% {transform: scale(1);}
-  50% {transform: scale(1.05);}
-  100% {transform: scale(1);}
 }
 
 @keyframes introGlow {
