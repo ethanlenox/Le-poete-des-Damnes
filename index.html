@@ -21,6 +21,7 @@
 
   <div class="hero-content">
 
+    <!-- BANNIÈRE + TEXTE -->
     <div class="title-banner">
       <img src="img/banner.jpg" class="banner">
       <h1 class="main-title glow">Le Poète des Damnés</h1>
@@ -66,11 +67,6 @@ setTimeout(() => {
 setTimeout(() => {
   intro.style.display = "none";
 }, 3200);
-
-window.addEventListener("beforeunload", () => {
-  audio.pause();
-  audio.currentTime = 0;
-});
 </script>
 
 </body>
