@@ -36,7 +36,6 @@
     <div class="video-box">
       <iframe
         src="https://www.youtube.com/embed/YNPhIaR2n_Q"
-        title="Présentation"
         frameborder="0"
         allowfullscreen>
       </iframe>
@@ -48,17 +47,18 @@
 
 <script>
 window.addEventListener("load", () => {
+  const intro = document.getElementById("intro");
+
   setTimeout(() => {
-    const intro = document.getElementById("intro");
     if (intro) {
       intro.style.opacity = "0";
-      intro.style.transition = "1s ease";
+      intro.style.pointerEvents = "none";
 
       setTimeout(() => {
-        intro.style.display = "none";
+        intro.remove(); // 🔥 suppression totale = plus de blocage
       }, 1000);
     }
-  }, 1500);
+  }, 1200);
 });
 </script>
 
