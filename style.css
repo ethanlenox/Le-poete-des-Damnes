@@ -66,15 +66,16 @@ body {
 }
 
 .banner {
-  width: 720px;
-  max-width: 95%;
+  width: 960px;
+  height: 480px;
+  max-width: 89%;
   display: block;
 }
 
 /* TEXTE SUR BANNIÈRE */
 .title-banner .main-title {
   position: absolute;
-  top: 70%;
+  top: 90%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
