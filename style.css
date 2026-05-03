@@ -106,9 +106,9 @@ body {
 
 /* VIDEO */
 .video-box iframe {
-  width: 440px;
-  height: 248px;
-  margin-top: 20px;
+  width: 320px;
+  height: 240px;
+  margin-top: 10px;
   border-radius: 10px;
   display: block;
   margin-left: auto;
@@ -125,7 +125,7 @@ body {
 
 .banner {
   width: 700px;
-  max-width: 95%;
+  max-width: 100%;
   display: block;
 }
 
