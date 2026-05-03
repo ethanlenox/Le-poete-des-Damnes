@@ -46,5 +46,21 @@
 
 </section>
 
+<script>
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const intro = document.getElementById("intro");
+    if (intro) {
+      intro.style.opacity = "0";
+      intro.style.transition = "1s ease";
+
+      setTimeout(() => {
+        intro.style.display = "none";
+      }, 1000);
+    }
+  }, 1500);
+});
+</script>
+
 </body>
 </html>
