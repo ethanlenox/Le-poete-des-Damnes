@@ -112,23 +112,35 @@ const muteBtn = document.getElementById("muteBtn");
 const title = document.getElementById("trackTitle");
 const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
+const waveform = document.getElementById("waveform");
 
 const tracks = document.querySelectorAll(".track");
+const player = document.getElementById("miniPlayer");
 
 let currentIndex = 0;
+let lastScroll = 0;
 
-/* volume mémoire */
+/* ===================== */
+/* 🔊 VOLUME MÉMOIRE */
+/* ===================== */
+
 let savedVolume = localStorage.getItem("volume");
 audio.volume = savedVolume !== null ? savedVolume : 1;
 volumeBar.value = audio.volume;
 
-/* ACTIVE TRACK UI */
+/* ===================== */
+/* 🎵 ACTIVE TRACK */
+/* ===================== */
+
 function setActiveTrack(i) {
   tracks.forEach(t => t.classList.remove("active", "playing"));
   if (tracks[i]) tracks[i].classList.add("active", "playing");
 }
 
-/* PLAY TRACK */
+/* ===================== */
+/* ▶ PLAY TRACK */
+/* ===================== */
+
 function playTrack(i) {
   const t = tracks[i];
   if (!t) return;
@@ -140,7 +152,6 @@ function playTrack(i) {
   playBtn.textContent = "⏸";
 
   currentIndex = i;
-
   setActiveTrack(i);
 }
 
@@ -161,27 +172,48 @@ playBtn.addEventListener("click", () => {
   }
 });
 
-/* PROGRESS */
+/* ===================== */
+/* 🎚 PROGRESS */
+/* ===================== */
+
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
   progress.value = (audio.currentTime / audio.duration) * 100;
 });
 
-/* SEEK */
 progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* NEXT AUTO */
+/* ===================== */
+/* 🎧 FADE NEXT TRACK */
+/* ===================== */
+
+function fadeOutAndNext(nextIndex) {
+  let fade = setInterval(() => {
+    if (audio.volume > 0.05) {
+      audio.volume -= 0.05;
+    } else {
+      clearInterval(fade);
+      audio.pause();
+      audio.volume = volumeBar.value;
+      playTrack(nextIndex);
+    }
+  }, 50);
+}
+
 audio.addEventListener("ended", () => {
   if (currentIndex + 1 < tracks.length) {
-    playTrack(currentIndex + 1);
+    fadeOutAndNext(currentIndex + 1);
   } else {
     playBtn.textContent = "▶";
   }
 });
 
-/* VOLUME */
+/* ===================== */
+/* 🔊 VOLUME */
+/* ===================== */
+
 volumeBar.addEventListener("input", () => {
   audio.volume = volumeBar.value;
   localStorage.setItem("volume", audio.volume);
@@ -200,9 +232,32 @@ muteBtn.addEventListener("click", () => {
   }
 });
 
-/* PAUSE RESET UI */
+/* ===================== */
+/* 🎵 WAVEFORM */
+/* ===================== */
+
+audio.addEventListener("play", () => {
+  waveform.classList.remove("paused");
+});
+
 audio.addEventListener("pause", () => {
-  playBtn.textContent = "▶";
+  waveform.classList.add("paused");
+});
+
+/* ===================== */
+/* 📱 AUTO HIDE PLAYER */
+/* ===================== */
+
+window.addEventListener("scroll", () => {
+  let currentScroll = window.scrollY;
+
+  if (currentScroll > lastScroll) {
+    player.style.transform = "translateY(100%)";
+  } else {
+    player.style.transform = "translateY(0)";
+  }
+
+  lastScroll = currentScroll;
 });
 </script>
 
