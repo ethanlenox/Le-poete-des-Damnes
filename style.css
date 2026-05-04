@@ -243,7 +243,8 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin: 10px 0;
+  margin: 10px auto;    
+  width: fit-content;   
   padding: 10px;
   border-radius: 10px;
   background: rgba(255,255,255,0.05);
