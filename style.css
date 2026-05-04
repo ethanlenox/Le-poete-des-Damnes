@@ -336,8 +336,9 @@ html {
 body {
   overscroll-behavior: none;
 }
+
 /* ===================== */
-/* 🎧 MINI PLAYER PRO */
+/* 🎧 MINI PLAYER FIXE */
 /* ===================== */
 
 #miniPlayer {
@@ -346,81 +347,138 @@ body {
   left: 0;
   width: 100%;
 
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
-  padding: 12px;
-  text-align: center;
+  padding: 10px;
 
-  color: white;
-  font-size: 14px;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(12px);
 
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,255,0.08);
+
   z-index: 999;
 }
 
 /* ===================== */
-/* ▶ PLAY BUTTON */
+/* ▶ BOUTON PLAY */
 /* ===================== */
 
-.play-btn {
-  background: rgba(0,229,255,0.2);
-  border: none;
-  color: white;
-  font-size: 16px;
-
+.play-btn,
+#muteBtn {
   width: 36px;
   height: 36px;
+
   border-radius: 50%;
+  border: none;
+
+  background: rgba(0,229,255,0.2);
+  color: white;
 
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.2s ease;
 }
 
-.play-btn:hover {
+.play-btn:hover,
+#muteBtn:hover {
   transform: scale(1.1);
   background: rgba(0,229,255,0.4);
 }
 
 /* ===================== */
-/* 📱 MOBILE ULTRA CLEAN */
+/* 🎚 SLIDERS (volume + progress) */
 /* ===================== */
 
-@media screen and (max-width: 768px) {
+#progressBar,
+#volumeBar {
+  -webkit-appearance: none;
+  appearance: none;
+
+  height: 4px;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.2);
+  outline: none;
+}
+
+/* thumb */
+#progressBar::-webkit-slider-thumb,
+#volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+  background: #00e5ff;
+
+  cursor: pointer;
+}
+
+/* ===================== */
+/* 🎵 TRACK ACTIF / HOVER */
+/* ===================== */
+
+.track {
+  transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.track:hover {
+  transform: scale(1.04);
+  background: rgba(0,229,255,0.1);
+}
+
+/* track en lecture */
+.track.active {
+  border: 1px solid rgba(0,229,255,0.6);
+  box-shadow: 0 0 15px rgba(0,229,255,0.3);
+}
+
+/* ===================== */
+/* 📱 MOBILE OPTIMISÉ */
+/* ===================== */
+
+@media (max-width: 768px) {
+
+  #trackTitle {
+    display: none;
+  }
+
+  #miniPlayer {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .play-btn,
+  #muteBtn {
+    width: 30px;
+    height: 30px;
+  }
+
+  #volumeBar {
+    width: 60px;
+  }
 
   .track {
     width: 95%;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
   }
 
   .track img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .track span {
-    font-size: 13px;
-  }
-
-  .play-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
-  }
-
-  .bio-header h1 {
-    font-size: 32px;
+    width: 70px;
+    height: 70px;
   }
 }
 
 /* ===================== */
-/* 🔥 ANIMATION FLUIDE */
+/* 🔥 ANIMATION TRACK APPARITION */
 /* ===================== */
 
 .track {
-  animation: fadeUp 0.3s ease;
+  animation: fadeUp 0.25s ease;
 }
 
 @keyframes fadeUp {
