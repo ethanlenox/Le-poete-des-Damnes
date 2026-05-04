@@ -202,34 +202,30 @@ body {
   flex-wrap: wrap;
   margin-top: 50px;
 }
-
 .album-card {
-  text-align: center;
   text-decoration: none;
   color: white;
+  text-align: center;
+  transition: 0.3s;
 }
 
 .album-cover {
   width: 220px;
+  height: 220px;
+  object-fit: cover;
   border-radius: 14px;
-
-  box-shadow:
-    0 0 10px rgba(0,229,255,0.4),
-    0 0 25px rgba(0,229,255,0.2);
-
   transition: 0.3s;
+  box-shadow: 0 0 10px rgba(0,229,255,0.3);
 }
 
-.album-cover:hover {
+.album-card:hover .album-cover {
   transform: scale(1.05);
-  box-shadow:
-    0 0 20px rgba(0,229,255,0.6),
-    0 0 40px rgba(0,229,255,0.3);
+  box-shadow: 0 0 25px rgba(0,229,255,0.6);
 }
 
 .album-title {
-  margin-top: 12px;
-  font-size: 18px;
+  margin-top: 10px;
+  font-size: 16px;
   color: white;
 }
 
