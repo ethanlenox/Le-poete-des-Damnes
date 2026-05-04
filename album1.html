@@ -117,18 +117,26 @@ let savedVolume = localStorage.getItem("volume");
 audio.volume = savedVolume !== null ? savedVolume : 1;
 volumeBar.value = audio.volume;
 
+/* ACTIVE TRACK UI */
+function setActiveTrack(i) {
+  tracks.forEach(t => t.classList.remove("active", "playing"));
+  if (tracks[i]) tracks[i].classList.add("active", "playing");
+}
+
 /* PLAY TRACK */
 function playTrack(i) {
   const t = tracks[i];
   if (!t) return;
 
   audio.src = t.dataset.src;
-  title.textContent = t.dataset.title;
+  title.textContent = t.dataset.title || "Lecture...";
 
   audio.play();
   playBtn.textContent = "⏸";
 
   currentIndex = i;
+
+  setActiveTrack(i);
 }
 
 /* CLICK TRACK */
@@ -141,6 +149,7 @@ playBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
     playBtn.textContent = "⏸";
+    setActiveTrack(currentIndex);
   } else {
     audio.pause();
     playBtn.textContent = "▶";
@@ -158,7 +167,7 @@ progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* NEXT TRACK AUTO */
+/* NEXT AUTO */
 audio.addEventListener("ended", () => {
   if (currentIndex + 1 < tracks.length) {
     playTrack(currentIndex + 1);
@@ -184,6 +193,11 @@ muteBtn.addEventListener("click", () => {
     volumeBar.value = 1;
     muteBtn.textContent = "🔊";
   }
+});
+
+/* PAUSE RESET UI */
+audio.addEventListener("pause", () => {
+  playBtn.textContent = "▶";
 });
 </script>
 
