@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Second Album</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="bio-header">
+  <h1>Second Album</h1>
+  <p class="slogan">Bientôt en ligne</p>
+</header>
+
+<!-- COVER -->
+<div style="text-align:center;">
+  <img src="img/album2.jpg" style="width:280px; border-radius:14px;">
+</div>
+
+<!-- TRACKLIST -->
+<section>
+
+  <div class="track">
+    <img src="img/album2/cover1.jpg">
+    <span>01 - Intro</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover2.jpg">
+    <span>02 - Titre 2</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover3.jpg">
+    <span>03 - Titre 3</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover4.jpg">
+    <span>04 - Titre 4</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover5.jpg">
+    <span>05 - Titre 5</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover6.jpg">
+    <span>06 - Titre 6</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover7.jpg">
+    <span>07 - Titre 7</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover8.jpg">
+    <span>08 - Titre 8</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover9.jpg">
+    <span>09 - Titre 9</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover10.jpg">
+    <span>10 - Titre 10</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover11.jpg">
+    <span>11 - Titre 11</span>
+  </div>
+
+<div class="track">
+    <img src="img/album2/cover12.jpg">
+    <span>12 - Titre 12</span>
+  </div>
+
+<div class="track">
+    <img src="img/album2/cover13.jpg">
+    <span>13 - Titre 13</span>
+  </div>
+
+<div class="track">
+    <img src="img/album2/cover14.jpg">
+    <span>14 - Titre 14</span>
+  </div>
+
+<div class="track">
+    <img src="img/album2/cover15.jpg">
+    <span>15 - Titre 15</span>
+  </div>
+
+  <div class="track">
+    <img src="img/album2/cover16.jpg">
+    <span>16 - Outro</span>
+  </div>
+
+</section>
+
+<!-- BANDCAMP FUTUR -->
+<div class="video">
+  <p style="color:#777;">Lecteur audio / Bandcamp futur</p>
+</div>
+
+<!-- RETOUR -->
+<div class="links">
+  <a href="albums.html">⬅ Retour</a>
+</div>
+
+</body>
+</html>
