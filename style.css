@@ -243,11 +243,16 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin: 10px auto;
-  width: 400px; 
+  width: 450px;        
+  margin: 10px auto;   
   padding: 10px;
   border-radius: 10px;
   background: rgba(255,255,255,0.05);
+  transition: 0.3s;
+}
+
+.track span {
+  flex: 1; 
 }
 
 .track img {
