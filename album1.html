@@ -243,22 +243,6 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
   waveform.classList.add("paused");
 });
-
-/* ===================== */
-/* 📱 AUTO HIDE PLAYER */
-/* ===================== */
-
-window.addEventListener("scroll", () => {
-  let currentScroll = window.scrollY;
-
-  if (currentScroll > lastScroll) {
-    player.style.transform = "translateY(100%)";
-  } else {
-    player.style.transform = "translateY(0)";
-  }
-
-  lastScroll = currentScroll;
-});
 </script>
 
 </body>
