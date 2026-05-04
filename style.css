@@ -596,3 +596,9 @@ body {
   animation: none;
   height: 6px;
 }
+#currentTime,
+#duration {
+  font-size: 12px;
+  color: #ccc;
+  margin: 0 4px;
+}
