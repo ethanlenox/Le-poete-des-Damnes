@@ -205,9 +205,9 @@ body {
 
 .album-card {
   text-decoration: none;
-  color: white;
   text-align: center;
-  transition: 0.3s;
+  color: white;
+  transition: 0.3s ease;
 }
 
 .album-cover {
@@ -215,19 +215,22 @@ body {
   height: 220px;
   object-fit: cover;
   border-radius: 14px;
-  transition: 0.3s;
   box-shadow: 0 0 10px rgba(0,229,255,0.3);
+  transition: 0.3s ease;
 }
 
 .album-card:hover .album-cover {
   transform: scale(1.05);
   box-shadow: 0 0 25px rgba(0,229,255,0.6);
+  transform: translateY(-5px);
 }
 
 .album-title {
   margin-top: 10px;
   font-size: 16px;
   color: white;
+  letter-spacing: 1px;
+  opacity: 0.9;
 }
 
 .tracklist {
@@ -240,28 +243,41 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 20px 0;
-  padding: 10px;
-  border-radius: 10px;
+  margin: 20px auto;
+  padding: 12px;
+  width: 180px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.05);
-  transition: 0.3s;
+  transition: 0.25s ease;
+  cursor: pointer;
 }
+
+/* IMAGE */
 .track img {
   width: 128px;
   height: 128px;
   object-fit: cover;
   border-radius: 10px;
   margin-top: 10px;
+  transition: 0.25s ease;
 }
 
+/* TEXTE */
 .track span {
   color: white;
   font-size: 14px;
+  margin-top: 8px;
 }
 
+/* HOVER GLOBAL */
 .track:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
   background: rgba(0,229,255,0.1);
+}
+
+/* HOVER IMAGE */
+.track:hover img {
+  transform: scale(1.05);
 }
 
 /* NAV */
