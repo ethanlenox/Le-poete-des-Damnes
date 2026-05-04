@@ -452,22 +452,70 @@ body {
 }
 
 /* ===================== */
-/* 🎵 TRACK ACTIF */
+/* 🎵 TRACK ACTIVE + PULSE */
 /* ===================== */
-
-.track {
-  transition: 0.25s ease;
-  cursor: pointer;
-}
-
-.track:hover {
-  transform: scale(1.04);
-  background: rgba(0,229,255,0.1);
-}
 
 .track.active {
   border: 1px solid rgba(0,229,255,0.6);
   box-shadow: 0 0 15px rgba(0,229,255,0.3);
+}
+
+.track.playing img {
+  animation: pulseCover 1.8s infinite ease-in-out;
+  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+
+@keyframes pulseCover {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ===================== */
+/* 🎚 SLIDERS CLEAN */
+/* ===================== */
+
+#progressBar,
+#volumeBar {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 10px;
+  outline: none;
+}
+
+/* progress */
+#progressBar {
+  width: 140px;
+  background: linear-gradient(90deg, #00e5ff, #7c4dff);
+}
+
+#progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #00e5ff;
+  box-shadow: 0 0 10px rgba(0,229,255,0.6);
+}
+
+/* volume */
+#volumeBar {
+  width: 80px;
+  background: rgba(255,255,255,0.2);
+  opacity: 0.7;
+}
+
+#volumeBar:hover {
+  opacity: 1;
+}
+
+#volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #aaa;
 }
 
 /* ===================== */
@@ -478,17 +526,6 @@ body {
 
   #trackTitle {
     display: none;
-  }
-
-  #miniPlayer {
-    gap: 6px;
-    padding: 8px;
-  }
-
-  .play-btn,
-  #muteBtn {
-    width: 30px;
-    height: 30px;
   }
 
   #progressBar {
@@ -508,7 +545,6 @@ body {
     height: 70px;
   }
 }
-
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
 /* ===================== */
