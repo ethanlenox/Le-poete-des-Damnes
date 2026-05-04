@@ -13,112 +13,163 @@
   <p class="slogan">Album 1</p>
 </header>
 
-<!-- AUDIO PLAYER GLOBAL -->
+<!-- COVER -->
+<div class="album-cover-main">
+  <img src="img/album1.jpg">
+</div>
+
+<!-- AUDIO -->
 <audio id="player"></audio>
 
 <!-- MINI PLAYER -->
 <div id="miniPlayer">
-  <span id="miniTitle">Aucune musique</span>
+
+  <div id="miniInfo">
+    <span id="miniTitle">Aucune musique</span>
+  </div>
+
+  <div class="controls">
+
+    <button id="prevBtn">⏮</button>
+    <button id="playBtn">▶</button>
+    <button id="nextBtn">⏭</button>
+
+    <input type="range" id="progress" value="0">
+
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+
+  </div>
 </div>
 
 <!-- TRACKLIST -->
 
 <div class="track" data-src="audio/album1/track1.mp3" data-title="Le King de la Night">
-  <button class="play-btn">▶</button>
-  <img src="img/cover1.jpg">
-  <span>01 - Le King de la Night</span>
+  <img src="img/cover1.jpg"><span>01 - Le King de la Night</span>
 </div>
 
 <div class="track" data-src="audio/album1/track2.mp3" data-title="Lucide Inconscient">
-  <button class="play-btn">▶</button>
-  <img src="img/cover2.jpg">
-  <span>02 - Lucide Inconscient</span>
+  <img src="img/cover2.jpg"><span>02 - Lucide Inconscient</span>
 </div>
 
 <div class="track" data-src="audio/album1/track3.mp3" data-title="Encore Nous">
-  <button class="play-btn">▶</button>
-  <img src="img/cover3.jpg">
-  <span>03 - Encore Nous</span>
+  <img src="img/cover3.jpg"><span>03 - Encore Nous</span>
 </div>
 
 <div class="track" data-src="audio/album1/track4.mp3" data-title="Capitaine Binnaire">
-  <button class="play-btn">▶</button>
-  <img src="img/cover4.jpg">
-  <span>04 - Capitaine Binnaire</span>
+  <img src="img/cover4.jpg"><span>04 - Capitaine Binnaire</span>
 </div>
 
 <div class="track" data-src="audio/album1/track5.mp3" data-title="Je Scroll">
-  <button class="play-btn">▶</button>
-  <img src="img/cover5.jpg">
-  <span>05 - Je Scroll</span>
+  <img src="img/cover5.jpg"><span>05 - Je Scroll</span>
 </div>
 
 <div class="track" data-src="audio/album1/track6.mp3" data-title="Plus Fort">
-  <button class="play-btn">▶</button>
-  <img src="img/cover6.jpg">
-  <span>06 - Plus Fort</span>
+  <img src="img/cover6.jpg"><span>06 - Plus Fort</span>
 </div>
 
 <div class="track" data-src="audio/album1/track7.mp3" data-title="Wait">
-  <button class="play-btn">▶</button>
-  <img src="img/cover7.jpg">
-  <span>07 - Wait</span>
+  <img src="img/cover7.jpg"><span>07 - Wait</span>
 </div>
 
 <div class="track" data-src="audio/album1/track8.mp3" data-title="Ce Soir">
-  <button class="play-btn">▶</button>
-  <img src="img/cover8.jpg">
-  <span>08 - Ce Soir</span>
+  <img src="img/cover8.jpg"><span>08 - Ce Soir</span>
 </div>
 
 <div class="track" data-src="audio/album1/track9.mp3" data-title="Connexion">
-  <button class="play-btn">▶</button>
-  <img src="img/cover9.jpg">
-  <span>09 - Connexion</span>
+  <img src="img/cover9.jpg"><span>09 - Connexion</span>
 </div>
 
 <div class="track" data-src="audio/album1/track10.mp3" data-title="Soirée folle">
-  <button class="play-btn">▶</button>
-  <img src="img/cover10.jpg">
-  <span>10 - Soirée folle</span>
+  <img src="img/cover10.jpg"><span>10 - Soirée folle</span>
 </div>
 
 <div class="track" data-src="audio/album1/track11.mp3" data-title="Beyond the Dark">
-  <button class="play-btn">▶</button>
-  <img src="img/cover11.jpg">
-  <span>11 - Beyond the Dark</span>
+  <img src="img/cover11.jpg"><span>11 - Beyond the Dark</span>
 </div>
 
 <div class="track" data-src="audio/album1/track12.mp3" data-title="Magnétique">
-  <button class="play-btn">▶</button>
-  <img src="img/cover12.jpg">
-  <span>12 - Magnétique</span>
+  <img src="img/cover12.jpg"><span>12 - Magnétique</span>
 </div>
 
-<!-- RETOUR -->
-<div class="links">
-  <a href="albums.html">⬅ Retour</a>
-</div>
-
-<!-- JS AUDIO -->
+<!-- JS -->
 <script>
 const player = document.getElementById("player");
+const tracks = document.querySelectorAll(".track");
+
 const miniTitle = document.getElementById("miniTitle");
+const playBtn = document.getElementById("playBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
 
-document.querySelectorAll(".track").forEach(track => {
-  const btn = track.querySelector(".play-btn");
+const progress = document.getElementById("progress");
+const volume = document.getElementById("volume");
 
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
+let currentIndex = 0;
+let isPlaying = false;
 
-    const src = track.dataset.src;
-    const title = track.dataset.title;
+// PLAY TRACK
+function playTrack(index) {
+  const track = tracks[index];
+  if (!track) return;
 
-    player.src = src;
-    player.play();
+  currentIndex = index;
 
-    miniTitle.textContent = "▶ " + title;
+  player.src = track.dataset.src;
+  player.play();
+
+  miniTitle.textContent = track.dataset.title;
+  isPlaying = true;
+  playBtn.textContent = "⏸";
+}
+
+// CLICK TRACK
+tracks.forEach((t, i) => {
+  t.addEventListener("click", () => {
+    playTrack(i);
   });
+});
+
+// PLAY / PAUSE
+playBtn.addEventListener("click", () => {
+  if (isPlaying) {
+    player.pause();
+    playBtn.textContent = "▶";
+  } else {
+    player.play();
+    playBtn.textContent = "⏸";
+  }
+  isPlaying = !isPlaying;
+});
+
+// NEXT / PREV
+nextBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex + 1) % tracks.length;
+  playTrack(currentIndex);
+});
+
+prevBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+  playTrack(currentIndex);
+});
+
+// AUTOPLAY NEXT
+player.addEventListener("ended", () => {
+  currentIndex = (currentIndex + 1) % tracks.length;
+  playTrack(currentIndex);
+});
+
+// PROGRESS BAR
+player.addEventListener("timeupdate", () => {
+  progress.value = (player.currentTime / player.duration) * 100;
+});
+
+progress.addEventListener("input", () => {
+  player.currentTime = (progress.value / 100) * player.duration;
+});
+
+// VOLUME
+volume.addEventListener("input", () => {
+  player.volume = volume.value;
 });
 </script>
 
