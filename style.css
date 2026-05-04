@@ -251,8 +251,8 @@ body {
 }
 
 .track img {
-  width: 50px;
-  border-radius: 6px;
+  width: 128px;
+  border-radius: 10px;
 }
 
 .track:hover {
