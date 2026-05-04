@@ -253,10 +253,12 @@ body {
 .track img {
   width: 128px;
   border-radius: 10px;
+  transition: 0.3s;
 }
 
-.track:hover {
-  background: rgba(0,229,255,0.1);
+.track:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0,229,255,0.6);
 }
 
 /* NAV */
