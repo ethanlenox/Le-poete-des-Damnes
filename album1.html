@@ -90,11 +90,16 @@
 
   <span id="trackTitle">Aucune piste</span>
 
+  <!-- TEMPS -->
+  <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+
   <button id="muteBtn">🔊</button>
 
   <input type="range" id="volumeBar" min="0" max="1" step="0.01">
 
   <input type="range" id="progressBar" value="0" min="0" max="100">
+
+  <audio id="audioPlayer"></audio>
 
   <!-- WAVEFORM -->
   <div id="waveform">
