@@ -363,7 +363,7 @@ body {
 }
 
 /* ===================== */
-/* ▶ BOUTON PLAY */
+/* ▶ BOUTONS */
 /* ===================== */
 
 .play-btn,
@@ -388,7 +388,7 @@ body {
 }
 
 /* ===================== */
-/* 🎚 SLIDERS (volume + progress) */
+/* 🎚 SLIDERS BASE */
 /* ===================== */
 
 #progressBar,
@@ -399,27 +399,60 @@ body {
   height: 4px;
   border-radius: 10px;
 
-  background: rgba(255,255,255,0.2);
   outline: none;
 }
 
-/* thumb */
-#progressBar::-webkit-slider-thumb,
-#volumeBar::-webkit-slider-thumb {
+/* ===================== */
+/* ⏱ PROGRESS BAR (PRINCIPAL) */
+/* ===================== */
+
+#progressBar {
+  width: 140px;
+  background: linear-gradient(90deg, #00e5ff, #7c4dff);
+}
+
+/* thumb progress */
+#progressBar::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
-
-  width: 10px;
-  height: 10px;
-
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+
   background: #00e5ff;
+  box-shadow: 0 0 10px rgba(0,229,255,0.6);
 
   cursor: pointer;
 }
 
 /* ===================== */
-/* 🎵 TRACK ACTIF / HOVER */
+/* 🔊 VOLUME (SECONDARY) */
+/* ===================== */
+
+#volumeBar {
+  width: 80px;
+  background: rgba(255,255,255,0.2);
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+#volumeBar:hover {
+  opacity: 1;
+}
+
+/* thumb volume */
+#volumeBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+  background: #aaa;
+
+  cursor: pointer;
+}
+
+/* ===================== */
+/* 🎵 TRACK ACTIF */
 /* ===================== */
 
 .track {
@@ -432,14 +465,13 @@ body {
   background: rgba(0,229,255,0.1);
 }
 
-/* track en lecture */
 .track.active {
   border: 1px solid rgba(0,229,255,0.6);
   box-shadow: 0 0 15px rgba(0,229,255,0.3);
 }
 
 /* ===================== */
-/* 📱 MOBILE OPTIMISÉ */
+/* 📱 MOBILE CLEAN */
 /* ===================== */
 
 @media (max-width: 768px) {
@@ -459,6 +491,10 @@ body {
     height: 30px;
   }
 
+  #progressBar {
+    width: 90px;
+  }
+
   #volumeBar {
     width: 60px;
   }
@@ -474,7 +510,7 @@ body {
 }
 
 /* ===================== */
-/* 🔥 ANIMATION TRACK APPARITION */
+/* 🔥 ANIMATION TRACK */
 /* ===================== */
 
 .track {
