@@ -233,21 +233,20 @@ body {
   color: white;
 }
 
-/* TRACKLIST */
 .tracklist {
-  max-width: 700px;
-  margin: 40px auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 20px;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 .track {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 150px;
+  text-align: center;
   padding: 10px;
   border-radius: 10px;
   background: rgba(255,255,255,0.05);
@@ -256,9 +255,9 @@ body {
 
 .track img {
   width: 128px;
+  height: 128px;   
+  object-fit: cover;
   border-radius: 10px;
-  margin-top: 10px;
-  transition: 0.3s;
 }
 
 .track span {
