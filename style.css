@@ -564,11 +564,6 @@ body {
   }
 }
 
-/* transition auto-hide */
-#miniPlayer {
-  transition: transform 0.3s ease;
-}
-
 /* ===================== */
 /* 🎵 WAVEFORM */
 /* ===================== */
