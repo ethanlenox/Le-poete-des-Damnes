@@ -111,6 +111,7 @@
 </div>
 <!-- JS PLAYER -->
 <script>
+<script>
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
 const muteBtn = document.getElementById("muteBtn");
@@ -119,11 +120,30 @@ const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
 const waveform = document.getElementById("waveform");
 
+/* 🆕 TEMPS */
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+
 const tracks = document.querySelectorAll(".track");
 const player = document.getElementById("miniPlayer");
 
 let currentIndex = 0;
 let lastScroll = 0;
+
+/* ===================== */
+/* ⏱ FORMAT TEMPS */
+/* ===================== */
+
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+
+  let minutes = Math.floor(sec / 60);
+  let seconds = Math.floor(sec % 60);
+
+  if (seconds < 10) seconds = "0" + seconds;
+
+  return minutes + ":" + seconds;
+}
 
 /* ===================== */
 /* 🔊 VOLUME MÉMOIRE */
@@ -178,14 +198,24 @@ playBtn.addEventListener("click", () => {
 });
 
 /* ===================== */
-/* 🎚 PROGRESS */
+/* 🎚 PROGRESS + TEMPS */
 /* ===================== */
 
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
+
   progress.value = (audio.currentTime / audio.duration) * 100;
+
+  /* 🆕 update temps */
+  currentTimeEl.textContent = formatTime(audio.currentTime);
 });
 
+/* 🆕 durée totale */
+audio.addEventListener("loadedmetadata", () => {
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+/* SEEK */
 progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
