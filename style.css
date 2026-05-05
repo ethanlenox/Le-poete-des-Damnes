@@ -526,30 +526,31 @@ body {
 
   #trackTitle {
     display: block;
-    font-size: 16px;
+    font-size: 14px;
     text-align: center;
   }
 
   #progressBar {
-    width: 130px;
+    width: 110px;
   }
 
   #volumeBar {
-    width: 85px;
+    width: 75px;
   }
 
   .track {
     width: 100%;
-    max-width: 300px;
+    max-width: 260px;
+    padding: 10px;
   }
 
   .track img {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
   }
 
   .track span {
-    font-size: 16px;
+    font-size: 14px;
   }
 
 }
