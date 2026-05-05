@@ -524,25 +524,42 @@ body {
 
 @media (max-width: 768px) {
 
+  /* TITRE IMPORTANT → visible et lisible */
   #trackTitle {
-    display: none;
+    display: block;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  /* LECTEUR PLUS CONFORT */
+  #miniPlayer {
+    padding: 14px;
   }
 
   #progressBar {
-    width: 90px;
+    width: 160px;
   }
 
   #volumeBar {
-    width: 60px;
+    width: 110px;
   }
 
+  /* TRACK = plus grande zone tactile */
   .track {
-    width: 95%;
+    width: 100%;
+    max-width: 360px;
+    padding: 16px;
   }
 
+  /* COVER = VRAI FOCUS */
   .track img {
-    width: 90px;
-    height: 90px;
+    width: 170px;
+    height: 170px;
+  }
+
+  /* TEXTE plus lisible */
+  .track span {
+    font-size: 18px;
   }
 
 }
