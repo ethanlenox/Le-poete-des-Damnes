@@ -78,7 +78,7 @@ body {
 }
 
 /* TEXTE SUR BANNIÈRE */
-.title-banner .main-title {
+.main-title {
   position: relative;
   margin-bottom: 10px;
   font-size: 34px;
