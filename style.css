@@ -107,6 +107,7 @@ body {
 
 /* PHRASE */
 .highlight {
+  transform: translateZ(0);
   font-size: 20px;
   color: white;
   text-shadow:
