@@ -37,13 +37,13 @@ body {
 
 /* HERO */
 .hero {
-  width: 100%;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 /* BACKGROUND */
@@ -63,6 +63,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-height: 100vh;
+  overflow: hidden;
   gap: 16px;
 }
 
