@@ -61,14 +61,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 22px;
 }
 
 /* BANNIÈRE */
 .title-banner {
-  position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
 }
 
@@ -80,13 +79,13 @@ body {
 
 /* TEXTE SUR BANNIÈRE */
 .title-banner .main-title {
-  position: absolute;
-  top: 99%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 125%;
+  position: relative;
+  margin-bottom: 10px;
+  font-size: 34px;
+  letter-spacing: 2px;
+  max-width: 90%;
   text-align: center;
-  white-space: nowrap;
+}
 
   color: white;
   z-index: 5;
@@ -111,20 +110,22 @@ body {
 }
 
 /* BOUTONS */
-.hero-buttons {
-  display: flex;
-  gap: 30px;
-}
-
 .hero-buttons a {
   padding: 12px 28px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(0,229,255,0.3);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(0,229,255,0.25);
   color: white;
   text-decoration: none;
+  transition: 0.25s ease;
 }
 
+.hero-buttons a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0,229,255,0.6),
+              0 0 30px rgba(0,229,255,0.2);
+  text-shadow: 0 0 8px rgba(0,229,255,0.6);
+}
 /* VIDEO */
 .video-box iframe {
   width: 320px;
