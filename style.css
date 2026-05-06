@@ -524,33 +524,38 @@ body {
 
 @media (max-width: 768px) {
 
+  /* PLAYER GLOBAL SAFE HEIGHT */
   #miniPlayer {
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
+    max-height: 35vh;
+    overflow: hidden;
   }
 
+  /* MODE EXPANDED MOBILE */
+  #miniPlayer.expanded {
+    max-height: 35vh;
+    overflow-y: auto;
+  }
+
+  /* TRACK TITLE PLUS LISIBLE */
   #trackTitle {
     font-size: 13px;
-    text-align: center;
   }
 
-  #progressBar {
-    width: 90%;
-  }
-
-  #volumeBar {
-    display: none;
-  }
-
-  #currentTime,
-  #duration {
-    font-size: 11px;
-  }
-
+  /* BOUTONS BIEN SPACÉS */
   .play-btn {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* PROGRESS BAR SAFE */
+  #progressBar {
+    width: 100%;
+  }
+
+  /* SUPPRESSION ÉLÉMENTS NON ESSENTIELS MOBILE */
+  #volumeBar,
+  #waveform {
+    display: none;
   }
 }
 /* ===================== */
