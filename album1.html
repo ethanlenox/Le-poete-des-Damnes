@@ -121,6 +121,18 @@ const title = document.getElementById("trackTitle");
 const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
 const waveform = document.getElementById("waveform");
+ 
+const toggleBtn = document.getElementById("togglePlayer");
+const player = document.getElementById("miniPlayer");
+
+/* mode initial */
+player.classList.remove("expanded");
+player.classList.add("compact");
+
+toggleBtn.addEventListener("click", () => {
+  player.classList.toggle("compact");
+  player.classList.toggle("expanded");
+}); 
 
 /* 🆕 TEMPS */
 const currentTimeEl = document.getElementById("currentTime");
