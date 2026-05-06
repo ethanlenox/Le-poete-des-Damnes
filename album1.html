@@ -115,24 +115,23 @@
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");  
+const prevBtn = document.getElementById("prevBtn");
 const muteBtn = document.getElementById("muteBtn");
 const title = document.getElementById("trackTitle");
 const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
 const waveform = document.getElementById("waveform");
- 
 const toggleBtn = document.getElementById("togglePlayer");
-const player = document.getElementById("miniPlayer");
-
+  
 /* mode initial */
-player.classList.remove("expanded");
-player.classList.add("compact");
+if (toggleBtn && player) {
+  player.classList.add("compact");
 
-toggleBtn.addEventListener("click", () => {
-  player.classList.toggle("compact");
-  player.classList.toggle("expanded");
-}); 
+  toggleBtn.addEventListener("click", () => {
+    player.classList.toggle("compact");
+    player.classList.toggle("expanded");
+  });
+}
 
 /* 🆕 TEMPS */
 const currentTimeEl = document.getElementById("currentTime");
