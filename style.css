@@ -368,10 +368,10 @@ body {
 
 .play-btn,
 #muteBtn {
-  width: 36px;
-  height: 36px;
-
-  border-radius: 50%;
+  width: 44px;  
+  height: 36px; 
+  border-radius: 18px;
+  
   border: none;
 
   background: rgba(0,229,255,0.2);
