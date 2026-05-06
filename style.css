@@ -558,6 +558,38 @@ body {
     display: none;
   }
 }
+/* mode par défaut = compact */
+#miniPlayer {
+  transition: all 0.3s ease;
+}
+
+/* état compact */
+#miniPlayer.compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 💻 FIX PC UNIQUEMENT */
+@media (min-width: 769px) {
+  #miniPlayer.compact {
+    justify-content: center;
+    gap: 6px;
+  }
+}
+/* état expand */
+#miniPlayer.expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* en mode compact */
+.compact #trackTitle {
+  display: none;
+}
+
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
 /* ===================== */
@@ -614,29 +646,4 @@ body {
   font-size: 12px;
   color: #ccc;
   margin: 0 4px;
-}
-
-/* mode par défaut = compact */
-#miniPlayer {
-  transition: all 0.3s ease;
-}
-
-/* état compact */
-#miniPlayer.compact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* état expand */
-#miniPlayer.expanded {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* en mode compact */
-.compact #trackTitle {
-  display: none;
 }
