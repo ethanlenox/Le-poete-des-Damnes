@@ -121,7 +121,9 @@ const title = document.getElementById("trackTitle");
 const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
 const waveform = document.getElementById("waveform");
+
 const toggleBtn = document.getElementById("togglePlayer");
+const player = document.getElementById("miniPlayer");
   
 /* mode initial */
 if (toggleBtn && player) {
@@ -136,9 +138,7 @@ if (toggleBtn && player) {
 /* 🆕 TEMPS */
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
-
 const tracks = document.querySelectorAll(".track");
-const player = document.getElementById("miniPlayer");
 
 let currentIndex = 0;
 let lastScroll = 0;
