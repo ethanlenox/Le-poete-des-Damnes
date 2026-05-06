@@ -280,6 +280,23 @@ muteBtn.addEventListener("click", () => {
   }
 });
 
+nextBtn.addEventListener("click", () => {
+  if (currentIndex + 1 < tracks.length) {
+    playTrack(currentIndex + 1);
+  } else {
+    playTrack(0);
+  }
+});
+
+prevBtn.addEventListener("click", () => {
+  if (currentIndex - 1 >= 0) {
+    playTrack(currentIndex - 1);
+  } else {
+    playTrack(tracks.length - 1);
+  }
+});
+  
+
 /* ===================== */
 /* 🎵 WAVEFORM */
 /* ===================== */
