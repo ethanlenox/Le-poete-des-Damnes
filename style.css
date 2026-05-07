@@ -511,10 +511,13 @@ body {
   }
 }
 
-.album-cover {
-  width: 90vw;
-  height: auto;
-}
+  .album-cover {
+    width: 90vw;
+    height: auto;
+    max-width: 420px;
+    margin: 0 auto;
+    display: block;
+  }
 
 /* mode par défaut = compact */
 #miniPlayer {
