@@ -509,10 +509,16 @@ body {
   #waveform {
     display: none;
   }
-.album-cover {
-  width: 60vw;
-  height: 60vw;
+
+  .bio-header h1 {
+    font-size: 36px;
+    line-height: 1.2;
 }
+  
+  .album-cover {
+    width: 60vw;
+    height: 60vw;
+  }
 
 }
 /* mode par défaut = compact */
