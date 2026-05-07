@@ -513,10 +513,7 @@ body {
 
 .album-cover {
   width: 90vw;
-  height: 90vw;
-
-  max-width: 320px;
-  max-height: 320px;
+  height: auto;
 }
 
 /* mode par défaut = compact */
