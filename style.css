@@ -510,6 +510,15 @@ body {
     display: none;
   }
 }
+
+.album-cover {
+  width: 78vw;
+  height: 78vw;
+
+  max-width: 320px;
+  max-height: 320px;
+}
+
 /* mode par défaut = compact */
 #miniPlayer {
   transition: all 0.3s ease;
