@@ -510,15 +510,14 @@ body {
     display: none;
   }
   .album-cover {
-    width: 99vw;
-    height: 99vw;
+    width: 90vw;
+    height: 90vw;
 
-    max-width: 420px;
-    max-height: 420px;
+    max-width: 450px;
+    max-height: 450px;
   }
 
 }
-
 /* mode par défaut = compact */
 #miniPlayer {
   transition: all 0.3s ease;
