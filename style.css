@@ -227,8 +227,8 @@ body {
 }
 
 .album-cover {
-  width: 500px;
-  height: 500px;
+  width: 450px;
+  height: 450px;
   object-fit: cover;
   border-radius: 14px;
   box-shadow: 0 0 10px rgba(0,229,255,0.3);
