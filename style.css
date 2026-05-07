@@ -509,16 +509,10 @@ body {
   #waveform {
     display: none;
   }
- .album-cover {
-   width: 99vw !important;
-   height: 99vw !important;
-
-   max-width: none !important;
-   max-height: none !important;
-
-   display: block;
-   margin: 0 auto;
-  }
+.album-cover {
+  width: 80vw;
+  height: 80vw;
+}
 
 }
 /* mode par défaut = compact */
