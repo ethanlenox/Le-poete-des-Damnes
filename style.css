@@ -512,9 +512,9 @@ body {
 }
 
   .album-cover {
-    width: 90vw;
+    width: 89vw;
     height: auto;
-    max-width: 525px;
+    max-width: 520px;
     margin: 0 auto;
     display: block;
   }
