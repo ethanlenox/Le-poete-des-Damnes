@@ -552,6 +552,30 @@ body {
 .compact #trackTitle {
   display: none;
   }
+/* ===================== */
+/* 🎧 ALBUMS PAGE MOBILE */
+/* ===================== */
+
+.albums-grid-page {
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.album-card {
+  width: 85vw;
+  max-width: 320px;
+}
+
+.album-cover {
+  width: 100%;
+  height: auto;
+}
+
+.album-title {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
 
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
