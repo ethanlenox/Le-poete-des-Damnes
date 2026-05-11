@@ -610,3 +610,23 @@ body {
   color: #ccc;
   margin: 0 4px;
 }
+/* ===================== */
+/* 🎵 ICONES HEADER */
+/* ===================== */
+
+.bio-header i,
+.links i {
+  margin-right: 8px;
+  color: #00e5ff;
+}
+
+/* animation légère */
+.bio-header i {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
