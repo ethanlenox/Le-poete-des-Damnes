@@ -611,22 +611,258 @@ body {
   margin: 0 4px;
 }
 /* ===================== */
-/* 🎵 ICONES HEADER */
+/* 🎧 ALBUMS PAGE HEADER */
 /* ===================== */
 
-.bio-header i,
-.links i {
-  margin-right: 8px;
-  color: #00e5ff;
+.albums-header {
+  text-align: center;
+  margin-top: 40px;
 }
 
-/* animation légère */
-.bio-header i {
-  animation: iconFloat 3s ease-in-out infinite;
+.albums-header h1 {
+  font-size: 52px;
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 15px rgba(0,229,255,0.4),
+    0 0 30px rgba(0,229,255,0.2);
 }
 
-@keyframes iconFloat {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
+.albums-header p {
+  color: #aaa;
+  letter-spacing: 2px;
+}
+
+/* ===================== */
+/* 🎧 GRID ALBUMS */
+/* ===================== */
+
+.albums-grid-page {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+
+  margin-top: 50px;
+  padding: 20px;
+}
+
+/* ===================== */
+/* 💿 CARD ALBUM */
+/* ===================== */
+
+.album-card {
+  width: 260px;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+
+  position: relative;
+
+  transition: 0.3s ease;
+}
+
+/* cover */
+.album-cover {
+  width: 100%;
+  border-radius: 16px;
+
+  box-shadow: 0 0 12px rgba(0,229,255,0.25);
+
+  transition: 0.3s ease;
+}
+
+/* titre */
+.album-title {
+  margin-top: 12px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* hover effet */
+.album-card:hover .album-cover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 25px rgba(0,229,255,0.6),
+    0 0 50px rgba(0,229,255,0.2);
+}
+
+/* déplacement léger */
+.album-card:hover {
+  transform: translateY(-6px);
+}
+
+/* ===================== */
+/* 🔒 ALBUMS LOCKED */
+/* ===================== */
+
+.album-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+/* badge "coming soon" */
+.album-disabled::after {
+  content: "COMING SOON";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+
+  padding: 5px 10px;
+  border-radius: 8px;
+
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* ===================== */
+/* 🔙 RETOUR */
+/* ===================== */
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 18px;
+  opacity: 0.8;
+  transition: 0.3s ease;
+}
+
+.links a:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(0,229,255,0.6);
+}
+/* ===================== */
+/* 🎧 ALBUMS PAGE HEADER */
+/* ===================== */
+
+.albums-header {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.albums-header h1 {
+  font-size: 52px;
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 15px rgba(0,229,255,0.4),
+    0 0 30px rgba(0,229,255,0.2);
+}
+
+.albums-header p {
+  color: #aaa;
+  letter-spacing: 2px;
+}
+
+/* ===================== */
+/* 🎧 GRID ALBUMS */
+/* ===================== */
+
+.albums-grid-page {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+
+  margin-top: 50px;
+  padding: 20px;
+}
+
+/* ===================== */
+/* 💿 CARD ALBUM */
+/* ===================== */
+
+.album-card {
+  width: 260px;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+
+  position: relative;
+
+  transition: 0.3s ease;
+}
+
+/* cover */
+.album-cover {
+  width: 100%;
+  border-radius: 16px;
+
+  box-shadow: 0 0 12px rgba(0,229,255,0.25);
+
+  transition: 0.3s ease;
+}
+
+/* titre */
+.album-title {
+  margin-top: 12px;
+  font-size: 16px;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* hover effet */
+.album-card:hover .album-cover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 25px rgba(0,229,255,0.6),
+    0 0 50px rgba(0,229,255,0.2);
+}
+
+/* déplacement léger */
+.album-card:hover {
+  transform: translateY(-6px);
+}
+
+/* ===================== */
+/* 🔒 ALBUMS LOCKED */
+/* ===================== */
+
+.album-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(1);
+}
+
+/* badge "coming soon" */
+.album-disabled::after {
+  content: "COMING SOON";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+
+  padding: 5px 10px;
+  border-radius: 8px;
+
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* ===================== */
+/* 🔙 RETOUR */
+/* ===================== */
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 18px;
+  opacity: 0.8;
+  transition: 0.3s ease;
+}
+
+.links a:hover {
+  opacity: 1;
+  text-shadow: 0 0 10px rgba(0,229,255,0.6);
 }
