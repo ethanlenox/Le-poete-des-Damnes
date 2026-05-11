@@ -576,6 +576,14 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
+.albums-grid-page {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+}
+.album-card {
+  scroll-snap-align: center;
+  scroll-margin: 20px;
+}
 
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
