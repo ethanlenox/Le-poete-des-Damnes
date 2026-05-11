@@ -236,7 +236,7 @@ body {
 }
 
 .album-card:hover .album-cover {
-  transform: scale(1.05);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: 0 0 25px rgba(0,229,255,0.6);
   transform: translateY(-5px);
 }
@@ -706,20 +706,26 @@ body {
 .album-disabled::after {
   content: "COMING SOON";
   position: absolute;
-  top: 12px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
 
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,255,255,0.2);
-
-  padding: 5px 10px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
 
   font-size: 11px;
-  letter-spacing: 1px;
-}
+  letter-spacing: 2px;
 
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(0,229,255,0.3);
+
+  color: #00e5ff;
+
+  box-shadow:
+    0 0 10px rgba(0,229,255,0.3);
+
+  backdrop-filter: blur(8px);
+}
 /* ===================== */
 /* 🔙 RETOUR */
 /* ===================== */
@@ -865,4 +871,39 @@ body {
 .links a:hover {
   opacity: 1;
   text-shadow: 0 0 10px rgba(0,229,255,0.6);
+}
+/* ===================== */
+/* ✨ ANIMATED GLOW */
+/* ===================== */
+
+.album-card::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+
+  background: radial-gradient(
+    circle,
+    rgba(0,229,255,0.25),
+    transparent 70%
+  );
+
+  opacity: 0;
+  transition: 0.4s ease;
+  filter: blur(10px);
+
+  z-index: -1;
+}
+
+.album-card:hover::before {
+  opacity: 1;
+  animation: glowMove 2.5s infinite alternate;
+}
+
+@keyframes glowMove {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
 }
