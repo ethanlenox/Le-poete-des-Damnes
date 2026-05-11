@@ -566,7 +566,7 @@ body {
 }
 
 .album-card {
-  width: 85vw;
+  width: 82vw;
   max-width: 320px;
 
   scroll-snap-align: center;
