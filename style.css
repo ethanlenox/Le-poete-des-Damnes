@@ -584,7 +584,8 @@ body {
   scroll-snap-align: center;
   scroll-margin: 20px;
 }
-  /* état normal */
+
+  /* état normal */ 
   .album-card {
     transition: 0.3s ease;
     opacity: 0.6;
@@ -597,7 +598,7 @@ body {
   .album-card:hover {
     opacity: 1;
     transform: scale(1.05);
-  }
+  }  
  .album-card {
     filter: brightness(0.9);
   }
