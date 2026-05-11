@@ -557,14 +557,32 @@ body {
 /* ===================== */
 
 .albums-grid-page {
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+
+  scroll-snap-type: y mandatory;
 }
 
 .album-card {
   width: 85vw;
   max-width: 320px;
+
+  scroll-snap-align: center;
+  scroll-margin: 20px;
+
+  transition: 0.3s ease;
+
+  opacity: 0.6;
+  transform: scale(0.95);
+  filter: brightness(0.9);
+}
+
+.album-card:active {
+  opacity: 1;
+  transform: scale(1.05);
+  filter: brightness(1.1);
 }
 
 .album-cover {
@@ -576,36 +594,6 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
-.albums-grid-page {
-  scroll-snap-type: y mandatory;
-  overflow-y: auto;
-}
-.album-card {
-  scroll-snap-align: center;
-  scroll-margin: 20px;
-}
-
-  /* état normal */ 
-  .album-card {
-    transition: 0.3s ease;
-    opacity: 0.6;
-    transform: scale(0.95);
-  }
-
-  /* quand actif (centre visuel) */
-  .album-card:active,
-  .album-card:focus,
-  .album-card:hover {
-    opacity: 1;
-    transform: scale(1.05);
-  }  
- .album-card {
-    filter: brightness(0.9);
-  }
-
-  .album-card:hover {
-    filter: brightness(1.1);
-  }
 
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
