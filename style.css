@@ -1127,7 +1127,3 @@ body {
       blur(5px);
   }
 }
-body.fade-out {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
