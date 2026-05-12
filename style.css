@@ -790,9 +790,25 @@ body {
 /* ===================== */
 
 .album-disabled {
-  opacity: 0.4;
+
+  opacity: 0.35 !important;
+
   pointer-events: none;
-  filter: grayscale(1);
+
+  filter:
+    grayscale(1)
+    brightness(0.6);
+
+  transform: scale(0.96);
+
+  transition: 0.3s ease;
+}
+
+.album-disabled:hover {
+
+  transform: scale(0.96);
+
+  box-shadow: none;
 }
 
 /* badge "coming soon" */
@@ -839,6 +855,10 @@ body {
   content: "";
   position: absolute;
   inset: -10px;
+
+  .album-disabled::before {
+  display: none;
+}
 
   background: radial-gradient(
     circle,
