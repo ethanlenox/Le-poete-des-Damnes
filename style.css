@@ -791,24 +791,22 @@ body {
 
 .album-disabled {
 
-  opacity: 0.35 !important;
-
   pointer-events: none;
-
-  filter:
-    grayscale(1)
-    brightness(0.6);
-
-  transform: scale(0.96);
-
-  transition: 0.3s ease;
 }
 
-.album-disabled:hover {
+.album-disabled .album-cover {
 
-  transform: scale(0.96);
+  filter: grayscale(1);
 
-  box-shadow: none;
+  opacity: 0.65;
+}
+
+.album-disabled:hover .album-cover {
+
+  transform: none;
+
+  box-shadow:
+    0 0 12px rgba(0,229,255,0.25);
 }
 
 /* badge "coming soon" */
