@@ -27,6 +27,12 @@ const durationEl = document.getElementById("duration");
 const tracks = document.querySelectorAll(".track");
 
 let currentIndex = 0;
+const savedTrack =
+  localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+  currentIndex = parseInt(savedTrack);
+}
 let lastScroll = 0;
 
 /* ===================== */
@@ -57,8 +63,29 @@ volumeBar.value = audio.volume;
 /* ===================== */
 
 function setActiveTrack(i) {
-  tracks.forEach(t => t.classList.remove("active", "playing"));
-  if (tracks[i]) tracks[i].classList.add("active", "playing");
+
+  tracks.forEach(t =>
+    t.classList.remove(
+      "active",
+      "playing"
+    )
+  );
+
+  if (tracks[i]) {
+
+    tracks[i].classList.add(
+      "active",
+      "playing"
+    );
+
+    tracks[i].scrollIntoView({
+
+      behavior: "smooth",
+
+      block: "center"
+
+    });
+  }
 }
 
 /* ===================== */
@@ -76,6 +103,10 @@ function playTrack(i) {
   playBtn.textContent = "⏸";
 
   currentIndex = i;
+  localStorage.setItem(
+  "lastTrack",
+  currentIndex
+);
   setActiveTrack(i);
 }
 
