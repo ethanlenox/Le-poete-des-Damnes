@@ -35,6 +35,11 @@ if (savedTrack !== null) {
   currentIndex = parseInt(savedTrack);
 }
 let lastScroll = 0;
+const savedTime = localStorage.getItem("trackTime");
+
+if (savedTime) {
+  audio.currentTime = parseFloat(savedTime);
+}
 
 /* ===================== */
 /* ⏱ FORMAT TEMPS */
@@ -134,6 +139,8 @@ playBtn.addEventListener("click", () => {
 
 audio.addEventListener("timeupdate", () => {
   if (!audio.duration) return;
+
+  localStorage.setItem("trackTime",audio.currentTime);
 
   progress.value = (audio.currentTime / audio.duration) * 100;
 
