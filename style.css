@@ -177,6 +177,7 @@ body {
   isolation: isolate;
 transform: translateZ(0);
 will-change: transform;
+  contain: paint;
 }
 .hero-buttons a:hover {
   transform: translateY(-2px);
@@ -186,25 +187,34 @@ will-change: transform;
 }
 
 .hero-buttons a::before {
+
   content: "";
 
   position: absolute;
-  inset: 0;
+
+  top: 0;
+  left: 0;
+
+  width: 50%;
+  height: 100%;
 
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255,255,255,0.18),
+    rgba(255,255,255,0.22),
     transparent
   );
 
-  transform: translateX(-120%);
-  transition: transform 0.5s ease;
+  transform: skewX(-20deg) translateX(-250%);
+
+  transition: transform 0.55s ease;
 
   pointer-events: none;
 }
+
+
 .hero-buttons a:hover::before {
-  transform: translateX(120%);
+  transform: skewX(-20deg) translateX(420%);
 }
 
 /* VIDEO */
