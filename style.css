@@ -238,9 +238,13 @@ body {
 }
 
 .album-card:hover .album-cover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 0 25px rgba(0,229,255,0.6);
-  transform: translateY(-5px);
+
+  transform:
+    translateY(-5px)
+    scale(1.02);
+
+  box-shadow:
+    0 0 25px rgba(0,229,255,0.6);
 }
 
 .album-title {
