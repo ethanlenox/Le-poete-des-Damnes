@@ -1,1 +1,200 @@
+<!-- JS PLAYER -->
+<script>
+const audio = document.getElementById("audioPlayer");
+const playBtn = document.getElementById("playPauseBtn");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const muteBtn = document.getElementById("muteBtn");
+const title = document.getElementById("trackTitle");
+const progress = document.getElementById("progressBar");
+const volumeBar = document.getElementById("volumeBar");
+const waveform = document.getElementById("waveform");
+
+const toggleBtn = document.getElementById("togglePlayer");
+const player = document.getElementById("miniPlayer");
+  
+/* mode initial */
+if (toggleBtn && player) {
+  player.classList.add("compact");
+
+  toggleBtn.addEventListener("click", () => {
+    player.classList.toggle("compact");
+    player.classList.toggle("expanded");
+  });
+}
+
+/* 🆕 TEMPS */
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+const tracks = document.querySelectorAll(".track");
+
+let currentIndex = 0;
+let lastScroll = 0;
+
+/* ===================== */
+/* ⏱ FORMAT TEMPS */
+/* ===================== */
+
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+
+  let minutes = Math.floor(sec / 60);
+  let seconds = Math.floor(sec % 60);
+
+  if (seconds < 10) seconds = "0" + seconds;
+
+  return minutes + ":" + seconds;
+}
+
+/* ===================== */
+/* 🔊 VOLUME MÉMOIRE */
+/* ===================== */
+
+let savedVolume = localStorage.getItem("volume");
+audio.volume = savedVolume !== null ? savedVolume : 1;
+volumeBar.value = audio.volume;
+
+/* ===================== */
+/* 🎵 ACTIVE TRACK */
+/* ===================== */
+
+function setActiveTrack(i) {
+  tracks.forEach(t => t.classList.remove("active", "playing"));
+  if (tracks[i]) tracks[i].classList.add("active", "playing");
+}
+
+/* ===================== */
+/* ▶ PLAY TRACK */
+/* ===================== */
+
+function playTrack(i) {
+  const t = tracks[i];
+  if (!t) return;
+
+  audio.src = t.dataset.src;
+  title.textContent = t.dataset.title || "Lecture...";
+
+  audio.play();
+  playBtn.textContent = "⏸";
+
+  currentIndex = i;
+  setActiveTrack(i);
+}
+
+/* CLICK TRACK */
+tracks.forEach((t, i) => {
+  t.addEventListener("click", () => playTrack(i));
+});
+
+/* PLAY / PAUSE */
+playBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playBtn.textContent = "⏸";
+    setActiveTrack(currentIndex);
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
+  }
+});
+
+/* ===================== */
+/* 🎚 PROGRESS + TEMPS */
+/* ===================== */
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+
+  progress.value = (audio.currentTime / audio.duration) * 100;
+
+  /* 🆕 update temps */
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+/* 🆕 durée totale */
+audio.addEventListener("loadedmetadata", () => {
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+/* SEEK */
+progress.addEventListener("input", () => {
+  audio.currentTime = (progress.value / 100) * audio.duration;
+});
+
+/* ===================== */
+/* 🎧 FADE NEXT TRACK */
+/* ===================== */
+
+function fadeOutAndNext(nextIndex) {
+  let fade = setInterval(() => {
+    if (audio.volume > 0.05) {
+      audio.volume -= 0.05;
+    } else {
+      clearInterval(fade);
+      audio.pause();
+      audio.volume = volumeBar.value;
+      playTrack(nextIndex);
+    }
+  }, 50);
+}
+
+audio.addEventListener("ended", () => {
+  if (currentIndex + 1 < tracks.length) {
+    fadeOutAndNext(currentIndex + 1);
+  } else {
+    playBtn.textContent = "▶";
+  }
+});
+
+/* ===================== */
+/* 🔊 VOLUME */
+/* ===================== */
+
+volumeBar.addEventListener("input", () => {
+  audio.volume = volumeBar.value;
+  localStorage.setItem("volume", audio.volume);
+});
+
+/* MUTE */
+muteBtn.addEventListener("click", () => {
+  if (audio.volume > 0) {
+    audio.volume = 0;
+    volumeBar.value = 0;
+    muteBtn.textContent = "🔇";
+  } else {
+    audio.volume = 1;
+    volumeBar.value = 1;
+    muteBtn.textContent = "🔊";
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  if (currentIndex + 1 < tracks.length) {
+    playTrack(currentIndex + 1);
+  } else {
+    playTrack(0);
+  }
+});
+
+prevBtn.addEventListener("click", () => {
+  if (currentIndex - 1 >= 0) {
+    playTrack(currentIndex - 1);
+  } else {
+    playTrack(tracks.length - 1);
+  }
+});
+  
+
+/* ===================== */
+/* 🎵 WAVEFORM */
+/* ===================== */
+
+audio.addEventListener("play", () => {
+  waveform.classList.remove("paused");
+});
+
+audio.addEventListener("pause", () => {
+  waveform.classList.add("paused");
+});
+</script>
 
