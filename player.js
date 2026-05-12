@@ -1,5 +1,3 @@
-<!-- JS PLAYER -->
-<script>
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -196,5 +194,4 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
   waveform.classList.add("paused");
 });
-</script>
 
