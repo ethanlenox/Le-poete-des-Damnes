@@ -58,6 +58,7 @@ body {
   padding: 0;
   margin: 0;
   overflow: hidden;
+  position: relative;
 }
 
 /* BACKGROUND */
@@ -166,8 +167,10 @@ body {
   transition: 0.25s ease;
   position: relative;
   overflow: hidden;
-}
 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 .hero-buttons a:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 15px rgba(0,229,255,0.6),
