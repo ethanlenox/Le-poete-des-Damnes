@@ -369,7 +369,7 @@ body {
   text-shadow: 0 0 10px rgba(0,229,255,0.6);
 }
 
-/* ANIMATIONS */
+/* ANIMATIONS glow*/
 @keyframes introGlow {
   0% {opacity: 0; transform: scale(0.9);}
   100% {opacity: 1; transform: scale(1);}
@@ -688,7 +688,7 @@ body {
 /* ===================== */
 
 .track {
-  animation: fadeUp 0.25s ease;
+  animation: fadeUp 0.6s ease;
 }
 
 @keyframes fadeUp {
