@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
 
 html {
@@ -56,6 +60,7 @@ body {
   height: 100%;
   background: url("img/hero.jpg") center/cover no-repeat;
   filter: brightness(0.35) saturate(1.2);
+  animation: slowZoom 18s infinite alternate ease-in-out;
 }
 
 /* CONTENT */
@@ -282,6 +287,7 @@ body {
   border-radius: 10px;
   margin-top: 10px;
   transition: 0.25s ease;
+  will-change: transform;
 }
 
 /* TEXTE */
@@ -293,8 +299,16 @@ body {
 
 /* HOVER GLOBAL */
 .track:hover {
-  transform: scale(1.04);
-  background: rgba(0,229,255,0.1);
+
+  transform:
+    scale(1.04)
+    translateY(-4px);
+
+  background:
+    rgba(0,229,255,0.1);
+
+  box-shadow:
+    0 0 20px rgba(0,229,255,0.15);
 }
 
 /* HOVER IMAGE */
@@ -380,7 +394,7 @@ body {
   backdrop-filter: blur(12px);
 
   border-top: 1px solid rgba(255,255,255,0.08);
-
+  box-shadow: 0 -5px 30px rgba(0,0,0,0.35);
   z-index: 999;
 }
 
@@ -390,16 +404,26 @@ body {
 
 .play-btn,
 #muteBtn {
-  width: 44px;  
-  height: 36px; 
+
+  width: 44px;
+  height: 36px;
+
   border-radius: 18px;
-  
+
   border: none;
 
-  background: rgba(0,229,255,0.2);
+  background:
+    rgba(0,229,255,0.2);
+
   color: white;
 
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 0 10px rgba(0,229,255,0.15);
+
   cursor: pointer;
+
   transition: 0.2s ease;
 }
 
@@ -414,8 +438,18 @@ body {
 /* ===================== */
 
 .track.active {
-  border: 1px solid rgba(0,229,255,0.6);
-  box-shadow: 0 0 15px rgba(0,229,255,0.3);
+
+  border:
+    1px solid rgba(0,229,255,0.6);
+
+  box-shadow:
+    0 0 20px rgba(0,229,255,0.25);
+
+  background:
+    rgba(0,229,255,0.08);
+
+  transform:
+    scale(1.03);
 }
 
 .track.playing img {
@@ -483,10 +517,20 @@ body {
 @media (max-width: 768px) {
 
   /* PLAYER GLOBAL SAFE HEIGHT */
-  #miniPlayer {
-    max-height: 35vh;
-    overflow: hidden;
-  }
+#miniPlayer {
+
+  max-height: 40vh;
+
+  overflow: hidden;
+
+  padding:
+    14px
+    12px;
+
+  border-top-left-radius: 18px;
+
+  border-top-right-radius: 18px;
+}
 
   /* MODE EXPANDED MOBILE */
   #miniPlayer.expanded {
@@ -834,9 +878,27 @@ body {
 
 /* animation globale */
 @keyframes cardEnter {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(30px)
+      scale(0.96);
+
+    filter: blur(8px);
+  }
+
   to {
+
     opacity: 1;
-    transform: translateY(0);
+
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter: blur(0);
   }
 }
 .albums-grid-page .album-card:nth-child(1) {
@@ -872,4 +934,18 @@ body::before {
   pointer-events: none;
 
   z-index: -1;
+}
+
+/* ===================== */
+/* 🎬 ZOOM */
+/* ===================== */
+@keyframes slowZoom {
+
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
 }
