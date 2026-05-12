@@ -850,3 +850,26 @@ body {
 .albums-grid-page .album-card:nth-child(3) {
   animation-delay: 0.4s;
 }
+
+/* ===================== */
+/* 🎬 PAGE DE FOND */
+/* ===================== */
+body::before {
+
+  content: "";
+
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(0,229,255,0.08),
+      transparent 40%
+    );
+
+  pointer-events: none;
+
+  z-index: -1;
+}
