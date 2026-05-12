@@ -7,7 +7,7 @@ const title = document.getElementById("trackTitle");
 const progress = document.getElementById("progressBar");
 const volumeBar = document.getElementById("volumeBar");
 const waveform = document.getElementById("waveform");
-
+const repeatBtn = document.getElementById("repeatBtn");
 const toggleBtn = document.getElementById("togglePlayer");
 const player = document.getElementById("miniPlayer");
   
@@ -27,6 +27,7 @@ const durationEl = document.getElementById("duration");
 const tracks = document.querySelectorAll(".track");
 
 let currentIndex = 0;
+let repeatMode = false;
 const savedTrack =
   localStorage.getItem("lastTrack");
 
@@ -167,13 +168,34 @@ function fadeOutAndNext(nextIndex) {
   }, 50);
 }
 
-audio.addEventListener("ended", () => {
-  if (currentIndex + 1 < tracks.length) {
-    fadeOutAndNext(currentIndex + 1);
-  } else {
-    playBtn.textContent = "▶";
+audio.addEventListener(
+  "ended",
+  () => {
+
+    if (repeatMode) {
+
+      audio.currentTime = 0;
+
+      audio.play();
+
+      return;
+    }
+
+    if (
+      currentIndex + 1 <
+      tracks.length
+    ) {
+
+      fadeOutAndNext(
+        currentIndex + 1
+      );
+
+    } else {
+
+      playBtn.textContent = "▶";
+    }
   }
-});
+);
 
 /* ===================== */
 /* 🔊 VOLUME */
@@ -225,4 +247,13 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
   waveform.classList.add("paused");
 });
+repeatBtn.addEventListener(
+  "click",
+  () => {
 
+    repeatMode = !repeatMode;
+
+    repeatBtn.style.opacity =
+      repeatMode ? "1" : "0.5";
+  }
+);
