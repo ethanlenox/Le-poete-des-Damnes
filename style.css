@@ -162,22 +162,26 @@ body {
 
 /* BOUTONS */
 .hero-buttons a {
+  display: inline-flex;
+  isolation: isolate;
+  z-index: 0;
+  
   padding: 12px 28px;
   border-radius: 10px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(0,229,255,0.25);
   color: white;
   text-decoration: none;
+  
   transition: 0.25s ease;
   position: relative;
   overflow: hidden;
-
+  transform: translateZ(0);
+  will-change: transform;
+  contain: paint;
+  
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  isolation: isolate;
-transform: translateZ(0);
-will-change: transform;
-  contain: paint;
 }
 .hero-buttons a:hover {
   transform: translateY(-2px);
@@ -187,6 +191,7 @@ will-change: transform;
 }
 
 .hero-buttons a::before {
+  z-index: -1;
 
   content: "";
 
