@@ -1111,6 +1111,13 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
+
+.track img {
+  width: 78vw;
+  max-width: 340px;
+  height: auto;
+}
+  
 }
 
 /* 💻 FIX PC UNIQUEMENT */
