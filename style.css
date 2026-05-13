@@ -1133,24 +1133,45 @@ body {
     gap: 6px;
   }
 
-    .track-center {
+  /* track reste normal */
+  .track {
+    position: relative;
     display: flex;
-    flex-direction: row;
-    align-items: center;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
   }
 
-  .music-links {
+  /* centre inchangé (cover + titre) */
+  .track-center {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 0;
+    align-items: center;
   }
 
+  /* ON SORT LES BOUTONS DU FLOW NORMAL */
+  .music-links {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+
+    display: flex;
+    justify-content: space-between;
+
+    padding: 0 20px;
+    pointer-events: none; 
+  }
+
+  /* les boutons redeviennent cliquables */
+  .music-btn {
+    pointer-events: auto;
+  }
+
+  /* taille cover PC inchangée */
   .track img {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
   }
 }
 
