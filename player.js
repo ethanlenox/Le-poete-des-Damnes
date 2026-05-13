@@ -264,3 +264,72 @@ repeatBtn.addEventListener(
       repeatMode ? "1" : "0.5";
   }
 );
+/* ===================== */
+/* 🖼 LIGHTBOX GALERIE */
+/* ===================== */
+
+const galleryImages =
+  document.querySelectorAll(".gallery-img");
+
+const lightbox =
+  document.getElementById("lightbox");
+
+const lightboxImg =
+  document.getElementById("lightboxImg");
+
+const closeLightbox =
+  document.getElementById("closeLightbox");
+
+/* OUVERTURE IMAGE */
+
+galleryImages.forEach(img => {
+
+  img.addEventListener("click", () => {
+
+    lightbox.classList.add("active");
+
+    lightboxImg.src = img.src;
+
+    document.body.style.overflow = "hidden";
+
+  });
+
+});
+
+/* FERMETURE BOUTON */
+
+closeLightbox.addEventListener("click", () => {
+
+  lightbox.classList.remove("active");
+
+  document.body.style.overflow = "auto";
+
+});
+
+/* FERMETURE FOND */
+
+lightbox.addEventListener("click", (e) => {
+
+  if (e.target === lightbox) {
+
+    lightbox.classList.remove("active");
+
+    document.body.style.overflow = "auto";
+
+  }
+
+});
+
+/* TOUCHE ESC */
+
+document.addEventListener("keydown", (e) => {
+
+  if (e.key === "Escape") {
+
+    lightbox.classList.remove("active");
+
+    document.body.style.overflow = "auto";
+
+  }
+
+});
