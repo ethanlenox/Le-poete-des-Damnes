@@ -593,10 +593,82 @@ body {
 }
 
 /* ===================== */
-/* 📱 MOBILE CLEAN */
+/* 📱    MOBILE */
 /* ===================== */
 
 @media (max-width: 768px) {
+
+/* ===================== */
+/* 🎭     BIO */
+/* ===================== */
+
+  .bio-hero {
+
+    min-height: 42vh;
+
+    padding:
+      20px
+      16px;
+  }
+
+  .bio-container {
+
+    padding:
+      25px
+      16px
+      120px;
+  }
+
+  .bio-text {
+
+    padding:
+      28px
+      22px;
+
+    border-radius: 18px;
+  }
+
+  .bio-text p {
+
+    line-height: 1.9;
+
+    font-size: 16px;
+
+    margin-bottom: 24px;
+  }
+
+  .bio-text blockquote {
+
+    line-height: 1.5;
+  }
+
+  /* galerie mobile */
+
+  .gallery-img {
+
+    width: 95px;
+
+    height: 95px;
+
+    border-radius: 12px;
+  }
+
+  /* image ouverte */
+
+  #lightbox img {
+
+    max-width: 96vw;
+
+    max-height: 80vh;
+  }
+
+  #closeLightbox {
+
+    top: 16px;
+    right: 20px;
+
+    font-size: 28px;
+  }
 
   /* PLAYER GLOBAL SAFE HEIGHT */
 #miniPlayer {
@@ -642,22 +714,6 @@ body {
     display: none;
   }
 
-  .bio-header h1 {
-    font-size: 36px;
-    line-height: 1.2;
-}
-  
-  .album-cover {
-    width: 82vw;
-    height: 82vw;
-  }
-
-}
-/* mode par défaut = compact */
-#miniPlayer {
-  transition: all 0.3s ease;
-}
-
 /* état compact */
 #miniPlayer.compact {
   display: flex;
@@ -666,13 +722,6 @@ body {
   gap: 8px;
 }
 
-/* 💻 FIX PC UNIQUEMENT */
-@media (min-width: 769px) {
-  #miniPlayer.compact {
-    justify-content: center;
-    gap: 6px;
-  }
-}
 /* état expand */
 #miniPlayer.expanded {
   display: flex;
@@ -732,6 +781,20 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
+}
+
+/* 💻 FIX PC UNIQUEMENT */
+@media (min-width: 769px) {
+  #miniPlayer.compact {
+    justify-content: center;
+    gap: 6px;
+  }
+}
+
+/* mode par défaut = compact */
+#miniPlayer {
+  transition: all 0.3s ease;
+}
 
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
@@ -771,18 +834,11 @@ body {
 
   border-radius: 12px;
 
-  background:
-    linear-gradient(
-      to top,
-      #00e5ff,
-      #7c4dff
-    );
+  background: linear-gradient(to top,#00e5ff,#7c4dff);
 
-  animation:
-    wave 1s infinite ease-in-out;
+  animation: wave 1s infinite ease-in-out;
 
-  box-shadow:
-    0 0 10px rgba(0,229,255,0.4);
+  box-shadow: 0 0 10px rgba(0,229,255,0.4);
 }
 
 #waveform span:nth-child(2) { animation-delay: 0.1s; }
