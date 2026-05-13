@@ -693,8 +693,8 @@ body {
 
 /* IMAGE */
 .track img {
-  width: 180px;
-  height: 180px;
+  width: 126px;
+  height: 126px;
   object-fit: cover;
   border-radius: 10px;
   margin-top: 10px;
@@ -1163,6 +1163,12 @@ body {
   /* on force gauche/droite visuellement */
   .music-links {
     min-width: 120px;
+  }
+
+  /* agrandissement cover track */
+  .track img {
+    width: 180px;
+    height: 180px;
   }
 }
 
