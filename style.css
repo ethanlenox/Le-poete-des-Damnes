@@ -1199,3 +1199,62 @@ body {
       blur(5px);
   }
 }
+/* ===================== */
+/* ✨ REVEAL CINÉMA */
+/* ===================== */
+
+.reveal {
+
+  opacity: 0;
+
+  transform:
+    translateY(35px);
+
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+
+  will-change:
+    opacity,
+    transform;
+}
+
+/* visible */
+
+.reveal.visible {
+
+  opacity: 1;
+
+  transform:
+    translateY(0);
+}
+
+/* léger délai progressif */
+
+.bio-text .reveal:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.bio-text .reveal:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+.bio-text .reveal:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+.bio-text .reveal:nth-child(4) {
+  transition-delay: 0.4s;
+}
+
+.bio-text .reveal:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+.bio-text .reveal:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+.bio-text .reveal:nth-child(7) {
+  transition-delay: 0.7s;
+}
