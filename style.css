@@ -1112,10 +1112,16 @@ body {
   letter-spacing: 1px;
 }
 
+/* COVER PLUS GRAND MOBILE */
 .track img {
   width: 78vw;
   max-width: 340px;
   height: auto;
+}
+
+/* BOUTONS PLUS AÉRÉS */
+.music-links {
+  justify-content: center;
 }
   
 }
@@ -1535,4 +1541,56 @@ body {
       saturate(1.2)
       blur(5px);
   }
+}
+
+
+
+
+/* ===================== */
+/* 🎵 TRACK STRUCTURE */
+/* ===================== */
+
+.track-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===================== */
+/* 🔘 BOUTONS */
+/* ===================== */
+
+.music-links {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.music-btn {
+
+  padding: 8px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  letter-spacing: 1px;
+
+  color: white;
+  text-decoration: none;
+
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(8px);
+
+  transition: 0.25s ease;
+}
+
+.music-btn.bandcamp:hover {
+  border-color: rgba(0,229,255,0.5);
+  box-shadow: 0 0 15px rgba(0,229,255,0.35);
+}
+
+.music-btn.spotify:hover {
+  border-color: rgba(30,215,96,0.5);
+  box-shadow: 0 0 15px rgba(30,215,96,0.35);
 }
