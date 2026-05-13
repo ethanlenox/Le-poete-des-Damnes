@@ -333,39 +333,3 @@ document.addEventListener("keydown", (e) => {
   }
 
 });
-/* ===================== */
-/* ✨ REVEAL AU SCROLL */
-/* ===================== */
-
-const reveals =
-  document.querySelectorAll(".reveal");
-
-const revealOnScroll = () => {
-
-  const triggerBottom =
-    window.innerHeight * 0.9;
-
-  reveals.forEach(el => {
-
-    const rect =
-      el.getBoundingClientRect();
-
-    if (rect.top < triggerBottom) {
-
-      el.classList.add("visible");
-
-    }
-
-  });
-
-};
-
-window.addEventListener(
-  "scroll",
-  revealOnScroll
-);
-
-window.addEventListener(
-  "load",
-  revealOnScroll
-);
