@@ -1123,6 +1123,15 @@ body {
 .music-links {
   justify-content: center;
 } 
+
+/* entete  track */
+.bio-header h1 {
+  font-size: 38px;
+}
+
+.bio-header .slogan {
+  font-size: 16px;
+}
 }
 
 
@@ -1612,25 +1621,52 @@ body {
     align-items: center;
   }
 
-  /* BOUTONS = colonne gauche */
+  /* BOUTONS = colonne haut centre */
   .music-links {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  /* on force gauche/droite visuellement */
+  /* on force dimension */
   .music-links {
     min-width: 120px;
   }
 
   /* agrandissement cover track */
   .track img {
-    width: 220px !important;
-    height: 220px !important;
+    width: 250px !important;
+    height: 250px !important;
   }
 
   .track img:hover {
     transform: scale(1.05);
   }
+  /* ===================== */
+/* 🎵 HEADER ALBUM */
+/* ===================== */
+
+.bio-header {
+  text-align: center;
+  padding-top: 40px;
+}
+
+.bio-header h1 {
+  font-size: 52px;
+  letter-spacing: 4px;
+
+  margin-bottom: 10px;
+
+  text-shadow:
+    0 0 15px rgba(0,229,255,0.4),
+    0 0 30px rgba(0,229,255,0.2);
+}
+
+.bio-header .slogan {
+  color: #aaa;
+  font-size: 20px;
+  letter-spacing: 3px;
+
+  text-align: center;
+}
 }
