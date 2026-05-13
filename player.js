@@ -264,3 +264,13 @@ repeatBtn.addEventListener(
       repeatMode ? "1" : "0.5";
   }
 );
+
+/* ===================== */
+/* 🎵   ANTICLICK */
+/* ===================== */
+
+document.querySelectorAll(".music-btn").forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+  });
+});
