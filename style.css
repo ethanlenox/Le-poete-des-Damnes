@@ -1132,6 +1132,26 @@ body {
     justify-content: center;
     gap: 6px;
   }
+
+    .track-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .music-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .track img {
+    width: 140px;
+    height: 140px;
+  }
 }
 
 /* mode par défaut = compact */
