@@ -1529,3 +1529,6 @@ body {
       blur(5px);
   }
 }
+.bio-hero {
+  background: red !important;
+}
