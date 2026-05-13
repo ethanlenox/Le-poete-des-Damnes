@@ -1147,12 +1147,6 @@ body {
     align-items: center;
   }
 
-  /* cover inchangé */
-  .track img {
-    width: 150px;
-    height: 150px;
-  }
-
   /* BOUTONS = colonne gauche */
   .music-links {
     display: flex;
@@ -1167,9 +1161,8 @@ body {
 
   /* agrandissement cover track */
   .track img {
-    width: 180px;
-    height: 180px;
-    transition: transform 0.25s ease;
+    width: 180px !important;
+    height: 180px !important;
   }
 
   .track img:hover {
