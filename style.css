@@ -1122,53 +1122,10 @@ body {
 /* BOUTONS PLUS AÉRÉS */
 .music-links {
   justify-content: center;
+} 
 }
-  
-}
 
-/* 💻 FIX PC UNIQUEMENT */
-@media (min-width: 769px) {
-  #miniPlayer.compact {
-    justify-content: center;
-    gap: 6px;
-  }
 
-  .track {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-  }
-
-  /* centre = cover + titre */
-  .track-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* BOUTONS = colonne gauche */
-  .music-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  /* on force gauche/droite visuellement */
-  .music-links {
-    min-width: 120px;
-  }
-
-  /* agrandissement cover track */
-  .track img {
-    width: 180px !important;
-    height: 180px !important;
-  }
-
-  .track img:hover {
-    transform: scale(1.05);
-  }
-}
 
 /* mode par défaut = compact */
 #miniPlayer {
@@ -1629,4 +1586,51 @@ body {
 .music-btn.spotify:hover {
   border-color: rgba(30,215,96,0.5);
   box-shadow: 0 0 15px rgba(30,215,96,0.35);
+}
+
+
+
+
+/* 💻 FIX PC UNIQUEMENT */
+@media (min-width: 769px) {
+  #miniPlayer.compact {
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .track {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+  }
+
+  /* centre = cover + titre */
+  .track-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* BOUTONS = colonne gauche */
+  .music-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* on force gauche/droite visuellement */
+  .music-links {
+    min-width: 120px;
+  }
+
+  /* agrandissement cover track */
+  .track img {
+    width: 220px !important;
+    height: 220px !important;
+  }
+
+  .track img:hover {
+    transform: scale(1.05);
+  }
 }
