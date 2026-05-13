@@ -693,8 +693,8 @@ body {
 
 /* IMAGE */
 .track img {
-  width: 126px;
-  height: 126px;
+  width: 128px;
+  height: 128px;
   object-fit: cover;
   border-radius: 10px;
   margin-top: 10px;
@@ -1169,6 +1169,11 @@ body {
   .track img {
     width: 180px;
     height: 180px;
+    transition: transform 0.25s ease;
+  }
+
+  .track img:hover {
+    transform: scale(1.05);
   }
 }
 
