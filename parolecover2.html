@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paroles - Lucide Inconscient</title>
 
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="lyrics-page">
+
+<header class="bio-header">
+  <h1>Lucide Inconscient</h1>
+  <p class="slogan">PAROLES</p>
+</header>
+
+<section class="lyrics-container">
+
+  <div class="lyrics-box">
+
+  <h3>Intro</h3>
+  <p> 
+    On avance souvent,<br>
+    sans voir clair dans le noir.<br>
+    Lucides inconscient,<br>
+    c'est souvent trop tard.<br>
+  </p>
+
+  <h3>Couplet</h3>
+  <p>
+    Dans les rues pavées j’vois les rêves partir en fumée.<br>
+    On danse sur un fil, en équilibre, habitués.<br>
+    Les mots s’envolent comme des papiers froissés.<br>
+    L’inconscience tisse des pièges sous nos pieds.<br>
+    On parle trop vite, on agit sans regarder<br>
+    Les conséquences disparaissent, évaporées<br>
+    Dans le miroir du quotidien tout devient flou.<br>
+    On avance en silence mais le cœur n’écoute plus.<br>
+    On vit vite, on esquive, on baisse les yeux.<br>
+    On croit tout maîtriser mais on joue avec le feu.<br>
+    Les erreurs se répètent, on appelle ça le destin.<br>
+    Mais souvent c’est nos choix, déguisés en chemin.<br>
+  </p>
+
+  <h3>Refrain</h3>
+  <p>
+    L’inconscience est dans la vie de tous les jours.<br>
+    Comme un refrain sans fin qui revient toujours.<br>
+    Des mots qui blessent, des gestes qu’on regrette.<br>
+    L’inconscience est dans la vie de tous les jours.<br>
+    On sait, mais on fait semblant de ne pas voir.<br>
+    On avance droit… mais sans vraiment savoir.<br>
+  </p>
+
+  <h3>Couplet</h3>
+  <p>
+    On navigue dans l’ombre à la recherche d’une lueur.<br>
+    Les souvenirs d’hier nous serrent encore le cœur.<br>
+    Les rêves défunts dansent sur les cendres du passé.<br>
+    Chaque instant est fragile, prêt à se casser.<br>
+    Les erreurs nous hantent en écho permanent.<br>
+    Mais le cœur bat encore malgré le temps qui ment.<br>
+    Les promesses oubliées s’envolent dans le vent.<br>
+    On construit des châteaux sur du sable mouvant.<br>
+    La vie s’échappe entre les doigts du destin.<br>
+    On court après demain sans comprendre le chemin.<br>
+    Lucide mais humain, coincé dans le décor.<br>
+    On apprend trop souvent quand il est trop tard encore.<br>
+  </p>
+
+  <p>
+    L’inconscience est dans la vie de tous les jours.<br>
+    Comme un refrain sans fin qui revient toujours.<br>
+    Des mots qui blessent, des gestes qu’on regrette.<br>
+    L’inconscience est dans la vie de tous les jours.<br>
+    On sait, mais on fait semblant de ne pas voir.<br>
+    On avance droit… mais sans vraiment savoir.<br>
+  </p>
+
+  <h3>Pont</h3>
+  <p>
+    Si on prenait le temps de peser chaque mot.<br>
+    Avant qu’ils deviennent des cicatrices dans le dos.<br>
+    Mais l’humain tombe avant d’apprendre à marcher.<br>
+    Il comprend la leçon quand tout est déjà brisé.<br>
+    On vit d’instinct, souvent à l’aveugle.<br>
+    On appelle ça la vie, même quand ça nous heurte.<br>
+  </p>
+
+  <h3>Final</h3>
+  <p>
+    L’inconscience est dans la vie de tous les jours.<br>
+    Même quand on le sait, elle revient toujours.<br>
+    Des mots qui blessent, des gestes qu’on regrette.<br>
+    On avance lucides… la vie est ainsi faite.<br>
+  </p>
+
+  </div>
+
+</section>
+
+<!-- MINI PLAYER -->
+<div id="miniPlayer">
+
+  <button id="prevBtn" class="play-btn">⏮</button>
+  <button id="playPauseBtn" class="play-btn">▶</button>
+  <button id="nextBtn" class="play-btn">⏭</button>
+  <button id="repeatBtn" class="play-btn">🔁</button>
+
+  <span id="trackTitle">Lucide Inconscient</span>
+
+  <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+
+  <button id="muteBtn">🔊</button>
+
+  <input type="range" id="volumeBar" min="0" max="1" step="0.01">
+  <input type="range" id="progressBar">
+
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+</div>
+
+<script src="player.js"></script>
+
+<script>
+
+const savedTrack =
+localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+
+  const tracks = [
+
+    "audio/cover1.mp3",
+    "audio/cover2.mp3",
+    "audio/cover3.mp3",
+    "audio/cover4.mp3",
+    "audio/cover5.mp3",
+    "audio/cover6.mp3",
+    "audio/cover7.mp3",
+    "audio/cover8.mp3",
+    "audio/cover9.mp3",
+    "audio/cover10.mp3",
+    "audio/cover11.mp3",
+    "audio/cover12.mp3"
+
+  ];
+
+  audio.src = tracks[savedTrack];
+
+  audio.load();
+
+}
+
+</script>
+
+</body>
+</html>
