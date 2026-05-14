@@ -1718,4 +1718,94 @@ body {
 
   text-align: center;
 }
+
+  
+/* ========================= */
+/* 🎧 PAGE PAROLES design */
+/* ========================= */
+
+body.lyrics-page {
+  background: #000;
+}
+
+/* glow cinématique comme bio */
+body.lyrics-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(0,229,255,0.10), transparent 55%),
+    radial-gradient(circle at bottom, rgba(124,77,255,0.08), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* HEADER style bio */
+body.lyrics-page .bio-header {
+  text-align: center;
+  padding: 60px 20px 20px;
+}
+
+body.lyrics-page .bio-header h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 15px rgba(0,229,255,0.45),
+    0 0 35px rgba(0,229,255,0.2);
+}
+
+/* bloc paroles style glass */
+body.lyrics-page .bio-text {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px 30px;
+
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: 0 0 30px rgba(0,229,255,0.08);
+}
+
+/* texte des paroles */
+body.lyrics-page .bio-text p {
+  color: #d7d7d7;
+  font-size: 17px;
+  line-height: 2;
+  letter-spacing: 0.3px;
+}
+
+/* citation style bio */
+body.lyrics-page .bio-text blockquote {
+  text-align: center;
+  font-size: 22px;
+  color: white;
+  margin-top: 40px;
+  text-shadow: 0 0 12px rgba(0,229,255,0.4);
+}
+
+/* NAV simple clean */
+body.lyrics-page .links {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 40px 0;
+}
+
+body.lyrics-page .links a {
+  font-size: 22px;
+  color: white;
+  opacity: 0.8;
+  transition: 0.3s;
+}
+
+body.lyrics-page .links a:hover {
+  opacity: 1;
+  text-shadow: 0 0 12px rgba(0,229,255,0.6);
+}
+  
 }
