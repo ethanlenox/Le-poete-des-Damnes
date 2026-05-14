@@ -1068,17 +1068,35 @@ body {
 #miniPlayer.compact {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* état expand */
 #miniPlayer.expanded {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 22px;
+  padding-bottom: 24px;
+  background: linear-gradient(
+  180deg,rgba(15,15,15,0.96),rgba(0,0,0,0.99));  
+  animation: playerExpand 0.35s ease;
+  backdrop-filter: blur(18px);
 }
-
+@keyframes playerExpand {
+  from { 
+  opacity: 0.9;
+  transform: translateY(10px);
+  }
+  to {
+  opacity: 1; transform: translateY(0);
+  }
+}
 /* en mode compact */
 .compact #trackTitle {
   display: none;
@@ -1185,7 +1203,11 @@ body {
 
 /* mode par défaut = compact */
 #miniPlayer {
-  transition: all 0.3s ease;
+  transition:
+  max-height 0.35s cubic-bezier(.22,.61,.36,1),
+  padding 0.35s ease,
+  gap 0.35s ease,
+  background 0.35s ease;
 }
 
 /* ===================== */
