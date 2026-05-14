@@ -1755,7 +1755,7 @@ body.lyrics-page .bio-header h1 {
 }
 
 /* bloc paroles style glass */
-body.lyrics-page .bio-text {
+body.lyrics-page .lyrics-box {
   max-width: 900px;
   margin: 40px auto;
   padding: 40px 30px;
@@ -1772,7 +1772,7 @@ body.lyrics-page .bio-text {
 }
 
 /* texte des paroles */
-body.lyrics-page .bio-text p {
+body.lyrics-page .lyrics-box p {
   color: #d7d7d7;
   font-size: 17px;
   line-height: 2;
@@ -1780,7 +1780,7 @@ body.lyrics-page .bio-text p {
 }
 
 /* citation style bio */
-body.lyrics-page .bio-text blockquote {
+body.lyrics-page .lyrics-box blockquote {
   text-align: center;
   font-size: 22px;
   color: white;
@@ -1806,6 +1806,4 @@ body.lyrics-page .links a {
 body.lyrics-page .links a:hover {
   opacity: 1;
   text-shadow: 0 0 12px rgba(0,229,255,0.6);
-}
-  
 }
