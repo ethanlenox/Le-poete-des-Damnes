@@ -291,12 +291,83 @@ prevBtn.addEventListener("click", () => {
 /* 🎵 WAVEFORM */
 /* ===================== */
 
-audio.addEventListener("play", () => {
+const audioContext =
+  new (window.AudioContext ||
+  window.webkitAudioContext)();
+
+const source =
+  audioContext.createMediaElementSource(audio);
+
+const analyser =
+  audioContext.createAnalyser();
+
+source.connect(analyser);
+analyser.connect(audioContext.destination);
+
+analyser.fftSize = 64;
+
+const bufferLength =
+  analyser.frequencyBinCount;
+
+const dataArray =
+  new Uint8Array(bufferLength);
+
+const bars =
+  waveform.querySelectorAll("span");
+
+/* animation waveform */
+
+function animateWaveform() {
+
+  requestAnimationFrame(
+    animateWaveform
+  );
+
+  analyser.getByteFrequencyData(
+    dataArray
+  );
+
+  bars.forEach((bar, i) => {
+
+    const value =
+      dataArray[i * 2];
+
+    const height =
+      Math.max(6, value / 3);
+
+    bar.style.height =
+      `${height}px`;
+  });
+}
+
+/* lancement */
+
+animateWaveform();
+
+/* reprise audio context */
+
+audio.addEventListener("play", async () => {
+
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
+
   waveform.classList.remove("paused");
+
+  tracks[currentIndex]?.classList.add(
+    "playing"
+  );
 });
 
+/* pause */
+
 audio.addEventListener("pause", () => {
+
   waveform.classList.add("paused");
+
+  tracks[currentIndex]?.classList.remove(
+    "playing"
+  );
 });
 repeatBtn.addEventListener(
   "click",
