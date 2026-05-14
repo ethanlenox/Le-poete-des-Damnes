@@ -10,7 +10,22 @@ const waveform = document.getElementById("waveform");
 const repeatBtn = document.getElementById("repeatBtn");
 const toggleBtn = document.getElementById("togglePlayer");
 const player = document.getElementById("miniPlayer");
+
+/* lecteur pages paroles */
+const savedSrc = localStorage.getItem("lastSrc");
+const savedTitle = localStorage.getItem("lastTitle");
+
+if (savedSrc) {
+  audio.src = savedSrc;
+  title.textContent = savedTitle || "Lecture...";
+  audio.play().catch(() => {
+// sécurité navigateur (autoplay bloqué parfois)
+  console.log("Autoplay bloqué, attente clic utilisateur");
+  });
   
+  playBtn.textContent = "⏸";
+}
+
 /* mode initial */
 if (toggleBtn && player) {
   player.classList.add("compact");
@@ -280,5 +295,9 @@ document.querySelectorAll(".music-btn").forEach(btn => {
 /* ===================== */
 
 function saveTrack(i) {
+  const t = tracks[i];
+
   localStorage.setItem("lastTrack", i);
+  localStorage.setItem("lastSrc", t.dataset.src);
+  localStorage.setItem("lastTitle", t.dataset.title);
 }
