@@ -137,5 +137,37 @@ right… night… right…
 
 <script src="player.js"></script>
 
+<script>
+
+const savedTrack =
+localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+
+  const tracks = [
+
+    "audio/cover1.mp3",
+    "audio/cover2.mp3",
+    "audio/cover3.mp3",
+    "audio/cover4.mp3",
+    "audio/cover5.mp3",
+    "audio/cover6.mp3",
+    "audio/cover7.mp3",
+    "audio/cover8.mp3",
+    "audio/cover9.mp3",
+    "audio/cover10.mp3",
+    "audio/cover11.mp3",
+    "audio/cover12.mp3"
+
+  ];
+
+  audio.src = tracks[savedTrack];
+
+  audio.load();
+
+}
+
+</script>
+
 </body>
 </html>
