@@ -274,3 +274,11 @@ document.querySelectorAll(".music-btn").forEach(btn => {
     e.stopPropagation();
   });
 });
+
+/* ===================== */
+/* 🎵  SAVE TRACK */
+/* ===================== */
+
+function saveTrack(i) {
+  localStorage.setItem("lastTrack", i);
+}
