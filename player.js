@@ -333,7 +333,7 @@ function animateWaveform() {
       dataArray[i * 2];
 
     const height =
-      Math.max(6, value / 3);
+      Math.max(5, value / 5);
 
     bar.style.height =
       `${height}px`;
