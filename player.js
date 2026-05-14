@@ -53,7 +53,15 @@ let lastScroll = 0;
 const savedTime = localStorage.getItem("trackTime");
 
 if (savedTime) {
-  audio.currentTime = parseFloat(savedTime);
+ audio.addEventListener("loadedmetadata", () => {
+  const savedTime = localStorage.getItem("trackTime");
+
+  if (savedTime) {
+    audio.currentTime = parseFloat(savedTime);
+  }
+
+  durationEl.textContent = formatTime(audio.duration);
+});
 }
 
 /* ===================== */
@@ -85,27 +93,29 @@ volumeBar.value = audio.volume;
 
 function setActiveTrack(i) {
 
-  tracks.forEach(t =>
-    t.classList.remove(
-      "active",
-      "playing"
-    )
-  );
+  tracks.forEach(t => t.classList.remove("active","playing"));
 
   if (tracks[i]) {
 
-    tracks[i].classList.add(
-      "active",
-      "playing"
-    );
+    tracks[i].classList.add("active","playing");
 
-    tracks[i].scrollIntoView({
+    audio.addEventListener("pause", () => {
+  waveform.classList.add("paused");
 
-      behavior: "smooth",
+  tracks[currentIndex]?.classList.remove(
+    "playing"
+  );
+});
 
-      block: "center"
+audio.addEventListener("play", () => {
+  waveform.classList.remove("paused");
 
-    });
+  tracks[currentIndex]?.classList.add(
+    "playing"
+  );
+});
+
+    tracks[i].scrollIntoView({behavior: "smooth",block: "center"});
   }
 }
 
@@ -153,14 +163,33 @@ playBtn.addEventListener("click", () => {
 /* ===================== */
 
 audio.addEventListener("timeupdate", () => {
+
   if (!audio.duration) return;
 
-  localStorage.setItem("trackTime",audio.currentTime);
+  localStorage.setItem(
+    "trackTime",
+    audio.currentTime
+  );
 
-  progress.value = (audio.currentTime / audio.duration) * 100;
+  /* progression */
+  const percent =
+    (audio.currentTime / audio.duration) * 100;
 
-  /* 🆕 update temps */
-  currentTimeEl.textContent = formatTime(audio.currentTime);
+  progress.value = percent;
+
+  /* glow dynamique */
+  progress.style.background =
+    `linear-gradient(
+      90deg,
+      #00e5ff 0%,
+      #00e5ff ${percent}%,
+      rgba(255,255,255,0.12) ${percent}%,
+      rgba(255,255,255,0.12) 100%
+    )`;
+
+  /* temps actuel */
+  currentTimeEl.textContent =
+    formatTime(audio.currentTime);
 });
 
 /* 🆕 durée totale */
