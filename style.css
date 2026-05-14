@@ -1773,13 +1773,23 @@ body.lyrics-page .lyrics-box {
 
 /* texte des paroles */
 body.lyrics-page .lyrics-box p {
-  color: #d7d7d7;
-  font-size: 17px;
+  margin-top: 10px;
+  margin-bottom: 20px;
   line-height: 2;
-  letter-spacing: 0.3px;
+  color: #d7d7d7;
+  font-size: 16px;
 }
 
-/* citation style bio */
+/* Titre */
+ body.lyrics-page .lyrics-box h3 {
+  margin-top: 30px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0,229,255,0.4);
+}  
+  
+/* citation style neon */
 body.lyrics-page .lyrics-box blockquote {
   text-align: center;
   font-size: 22px;
