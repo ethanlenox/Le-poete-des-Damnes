@@ -1127,7 +1127,7 @@ body {
 /* entete  track */
   .bio-header {
     text-align: center;
-    padding-top: 10px;
+    padding-top: 0px;
   }
 
   .bio-header h1 {
