@@ -1215,7 +1215,7 @@ body {
   display: flex;
   gap: 3px;
   align-items: flex-end;
-  height: 16px;
+  height: 14px;
 }
 
 #waveform span {
