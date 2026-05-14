@@ -1566,7 +1566,49 @@ body {
 }
 
 /* ===================== */
-/* 🔘 BOUTONS */
+/* 📖 PAROLES BUTTON */
+/* ===================== */
+
+.cover-wrapper {
+  position: relative;
+}
+
+.lyrics-btn {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.72);
+  border: 1px solid rgba(0,229,255,0.35);
+  color: white;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  box-shadow:
+    0 0 15px rgba(0,229,255,0.15);
+}
+
+/* visible pendant lecture */
+.track.playing .lyrics-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* hover */
+.lyrics-btn:hover {
+  background: rgba(0,229,255,0.2);
+  box-shadow:
+    0 0 18px rgba(0,229,255,0.4);
+}
+
+/* ===================== */
+/* 🔘 BOUTONS BC SF */
 /* ===================== */
 
 .music-links {
