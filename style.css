@@ -890,8 +890,28 @@ body {
 
 /* progress */
 #progressBar {
+
   width: 140px;
-  background: linear-gradient(90deg, #00e5ff, #7c4dff);
+  height: 4px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.12);
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s linear;
+
+  box-shadow:
+    0 0 10px rgba(0,229,255,0.12);
+}
+
+#progressBar:hover {
+
+  box-shadow:
+    0 0 18px rgba(0,229,255,0.35);
 }
 
 #progressBar::-webkit-slider-thumb {
