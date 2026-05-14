@@ -1759,16 +1759,13 @@ body.lyrics-page .lyrics-box {
   max-width: 900px;
   margin: 40px auto;
   padding: 40px 30px;
-
   border-radius: 20px;
-
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
   box-shadow: 0 0 30px rgba(0,229,255,0.08);
+  text-align: center;
 }
 
 /* texte des paroles */
