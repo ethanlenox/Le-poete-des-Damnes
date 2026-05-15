@@ -18,38 +18,40 @@ const player = document.getElementById("miniPlayer");
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
 const tracks = document.querySelectorAll(".track");
-let currentIndex = 0;
+
 /* player systeme */
-function restorePlayer() {
+let currentIndex = 0;
+
+function restoreState() {
+
   const savedTrack = localStorage.getItem("lastTrack");
   const savedTime = localStorage.getItem("trackTime");
 
-  if (!tracks.length) return;
   if (savedTrack === null) return;
+  if (!tracks.length) return;
 
   currentIndex = parseInt(savedTrack);
-  const t = tracks[currentIndex];
 
+  const t = tracks[currentIndex];
   if (!t) return;
 
-  audio.src = t.dataset.src;
   title.textContent = t.dataset.title || "Lecture...";
 
+  audio.src = t.dataset.src;
   audio.load();
 
   audio.addEventListener("loadedmetadata", () => {
-
     if (savedTime) {
       audio.currentTime = parseFloat(savedTime);
     }
-
   }, { once: true });
+
+  playBtn.textContent = "▶"; 
+  audio.pause(); // IMPORTANT : pas autoplay
 }
 
-restorePlayer();
+restoreState();
 
-
-let currentIndex = 0;
 let repeatMode = false;
 const savedTrack =
   localStorage.getItem("lastTrack");
@@ -123,29 +125,18 @@ function setActiveTrack(i) {
 async function playTrack(i) {
 
   const t = tracks[i];
-
   if (!t) return;
 
-  /* réveil audio context */
-  if (audioContext.state === "suspended") {
-    await audioContext.resume();
-  }
+  currentIndex = i;
 
   audio.src = t.dataset.src;
-
-  title.textContent =
-    t.dataset.title || "Lecture...";
+  title.textContent = t.dataset.title || "Lecture...";
 
   await audio.play();
 
   playBtn.textContent = "⏸";
 
-  currentIndex = i;
-
-  localStorage.setItem(
-    "lastTrack",
-    currentIndex
-  );
+  localStorage.setItem("lastTrack", i);
 
   setActiveTrack(i);
 }
