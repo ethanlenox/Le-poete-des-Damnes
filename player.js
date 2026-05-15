@@ -514,9 +514,9 @@ const Engine = {
 
     const a = AudioCore.current();
 
-    if (a.src !== src) {
-      a.src = src;
-  }
+    if (!a.src || !a.src.includes(src)) {
+  a.src = src;
+}
     State.index = i;
 
     a.onloadedmetadata = ()=>{
