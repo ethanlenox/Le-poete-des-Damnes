@@ -93,28 +93,18 @@ volumeBar.value = audio.volume;
 
 function setActiveTrack(i) {
 
-  tracks.forEach(t => t.classList.remove("active","playing"));
+  tracks.forEach(t =>
+    t.classList.remove("active","playing"));
 
   if (tracks[i]) {
 
     tracks[i].classList.add("active","playing");
 
-    audio.addEventListener("pause", () => {
-  waveform.classList.add("paused");
-
-  tracks[currentIndex]?.classList.remove(
-    "playing"
-  );
-});
-
-audio.addEventListener("play", () => {
-  waveform.classList.remove("paused");
-
-  tracks[currentIndex]?.classList.add(
-    "playing"
-  );
-});
-
+    tracks[i].scrollIntoView({
+      behavior: "smooth",block: "center"
+    });
+  }
+}
     tracks[i].scrollIntoView({behavior: "smooth",block: "center"});
   }
 }
@@ -344,19 +334,31 @@ function animateWaveform() {
 
 animateWaveform();
 
-/* reprise audio context */
+/* ===================== */
+/* 🎵 GLOBAL AUDIO STATE */
+/* ===================== */
+
+audio.addEventListener("play", () => {
+
+  waveform.classList.remove("paused");
+
+  tracks[currentIndex]?.classList.add("playing");
+  
+});
+
+audio.addEventListener("pause", () => {
+
+  waveform.classList.add("paused");
+
+  tracks[currentIndex]?.classList.remove("playing");
+  
+});
 
 audio.addEventListener("play", async () => {
 
   if (audioContext.state === "suspended") {
     await audioContext.resume();
   }
-
-  waveform.classList.remove("paused");
-
-  tracks[currentIndex]?.classList.add(
-    "playing"
-  );
 });
 
 /* pause */
