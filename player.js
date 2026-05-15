@@ -1053,4 +1053,20 @@ document.addEventListener("DOMContentLoaded", init);
 // ===============================
 window.PlayerAPI = API;
 
+  // PAROLES BUTTON COVERS (navigation + save)
+document.querySelectorAll(".lyrics-btn").forEach(btn=>{
+  btn.addEventListener("click",(e)=>{
+    const i = btn.dataset.track;
+    if(i !== undefined){
+      const t = Playlist.list[i];
+      if(t){
+        localStorage.setItem("lastTrack", i);
+        localStorage.setItem("lastSrc", t.src);
+        localStorage.setItem("lastTitle", t.title);
+        localStorage.setItem("trackTime", AudioCore.current().currentTime);
+      }
+    }
+  });
+});
+
 })();
