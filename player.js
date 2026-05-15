@@ -1,15 +1,16 @@
 // ===============================
-// PRO PLAYER v4 - PART 1 / 4
+//         PRO PLAYER
 // CORE + STATE + AUDIO ENGINE
 // ===============================
 
 (function(){
+
 if (window.__ULTRA_PRO_PLAYER_V4__) return;
 window.__ULTRA_PRO_PLAYER_V4__ = true;
 
-// =================
-// STATE MANAGER 
-// =================
+// ===============================
+//          STATE MANAGER
+// ===============================
 const State = {
   index: 0,
   playing: false,
@@ -30,9 +31,9 @@ const State = {
   maxRetries: 3
 };
 
-// ===================
-// EVENT BUS (FULL)
-// ===================
+// ===============================
+//          EVENT BUS
+// ===============================
 const Events = {
   events: new Map(),
 
@@ -64,7 +65,7 @@ const Events = {
 };
 
 // ===============================
-// AUDIO CORE (DOUBLE ENGINE)
+//          AUDIO CORE 
 // ===============================
 const AudioCore = {
 
@@ -176,7 +177,7 @@ const AudioCore = {
 };
 
 // ===============================
-// ERROR HANDLER + RETRY
+//     ERROR HANDLER + RETRY
 // ===============================
 const ErrorHandler = {
 
@@ -200,7 +201,7 @@ const ErrorHandler = {
 };
 
 // ===============================
-// AUDIO LOADER (SMART)
+//          AUDIO LOADER 
 // ===============================
 const Loader = {
 
@@ -238,7 +239,32 @@ const Loader = {
 };
 
 // ===============================
-// CLEANUP / MEMORY CONTROL
+//       CROSSFADE ENGINE 
+// ===============================
+const Crossfade = {
+
+  duration: 2,
+
+  apply(g1, g2){
+
+    const ctx = AudioCore.ctx;
+    const now = ctx.currentTime;
+
+    g1.gain.cancelScheduledValues(now);
+    g2.gain.cancelScheduledValues(now);
+
+    // courbe plus smooth (expo)
+    g1.gain.setValueAtTime(g1.gain.value, now);
+    g2.gain.setValueAtTime(g2.gain.value, now);
+
+    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
+    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
+  }
+
+};
+
+// ===============================
+//    CLEANUP / MEMORY CONTROL
 // ===============================
 const Memory = {
 
@@ -258,6 +284,7 @@ const Memory = {
 };
 
 // expose part1
+  
 window.__PLAYER_PART1__ = {
   State,
   Events,
@@ -272,9 +299,8 @@ window.__PLAYER_PART1__ = {
 
 
 
-
 // ===============================
-// PRO PLAYER v4 - PART 2 / 4
+//         PRO PLAYER
 // ENGINE + CONTROLS + PLAYLIST
 // ===============================
 
@@ -291,7 +317,7 @@ const {
 } = window.__PLAYER_PART1__;
 
 // ===============================
-// DOM BINDER
+//          DOM BINDER
 // ===============================
 const DOM = {
   play: null,
@@ -316,7 +342,7 @@ const DOM = {
 };
 
 // ===============================
-// CACHE AUDIO (SMART LIMIT)
+//          CACHE AUDIO
 // ===============================
 const Cache = {
   map: new Map(),
@@ -342,7 +368,7 @@ const Cache = {
 };
 
 // ===============================
-// PRELOAD QUEUE (ASYNC)
+//      PRELOAD QUEUE (ASYNC)
 // ===============================
 const Preload = {
 
@@ -374,7 +400,7 @@ const Preload = {
 };
 
 // ===============================
-// PLAYLIST MANAGER
+//        PLAYLIST MANAGER
 // ===============================
 const Playlist = {
 
@@ -405,7 +431,7 @@ const Playlist = {
 };
 
 // ===============================
-// ENGINE (FULL CONTROL)
+//      ENGINE (FULL CONTROL)
 // ===============================
 const Engine = {
 
@@ -497,7 +523,7 @@ const Engine = {
 };
 
 // ===============================
-// CONTROLS BIND
+//         CONTROLS BIND
 // ===============================
 function bindControls(){
 
@@ -525,7 +551,7 @@ function bindControls(){
 }
 
 // ===============================
-// AUTO NEXT / REPEAT
+//       AUTO NEXT / REPEAT
 // ===============================
 function bindAudioLogic(){
 
@@ -550,7 +576,7 @@ function bindAudioLogic(){
 }
 
 // ===============================
-// INIT PART 2
+//          INIT PART 2
 // ===============================
 function initPart2(){
 
@@ -576,9 +602,8 @@ window.__PLAYER_PART2__ = {
 
 
 
-
 // ===============================
-// PRO PLAYER v4 - PART 3 / 4
+//          PRO PLAYER
 // WAVEFORM + LYRICS + ANIMATIONS
 // ===============================
 
@@ -595,7 +620,7 @@ const {
 } = window.__PLAYER_PART2__;
 
 // ===============================
-// RAF MANAGER (PERF CONTROL)
+//   RAF MANAGER (PERF CONTROL)
 // ===============================
 const RAF = {
   tasks: new Map(),
@@ -625,7 +650,48 @@ const RAF = {
 };
 
 // ===============================
-// LYRICS ENGINE (SYNC PRECIS)
+//    WAVEFORM ENGINE (REAL)
+// ===============================
+const Waveform = {
+
+  bars: [],
+  resolution: 64,
+
+  init(){
+    if(!DOM.wave) return;
+
+    DOM.wave.innerHTML = "";
+
+    for(let i=0;i<this.resolution;i++){
+      const bar = document.createElement("span");
+      bar.style.display = "inline-block";
+      bar.style.width = "2px";
+      bar.style.marginRight = "1px";
+      bar.style.height = "5px";
+      DOM.wave.appendChild(bar);
+      this.bars.push(bar);
+    }
+
+    RAF.add("waveform", ()=>this.draw());
+  },
+
+  draw(){
+    const analyser = AudioCore.analyser;
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(AudioCore.dataArray);
+
+    for(let i=0;i<this.bars.length;i++){
+      const v = AudioCore.dataArray[i] / 255;
+      const h = v * 100;
+      this.bars[i].style.height = h + "%";
+    }
+  }
+
+};
+
+// ===============================
+//   LYRICS ENGINE (SYNC PRECIS)
 // ===============================
 const Lyrics = {
 
@@ -671,7 +737,7 @@ const Lyrics = {
 };
 
 // ===============================
-// ANIMATIONS ENGINE
+//       ANIMATIONS ENGINE
 // ===============================
 const UIEffects = {
 
@@ -704,7 +770,7 @@ const UIEffects = {
 };
 
 // ===============================
-// PROGRESS SYNC ENGINE
+//      PROGRESS SYNC ENGINE
 // ===============================
 const Progress = {
 
@@ -719,7 +785,7 @@ const Progress = {
 };
 
 // ===============================
-// GLOBAL LOOP (CENTRAL)
+//      GLOBAL LOOP (CENTRAL)
 // ===============================
 const Loop = {
 
@@ -731,7 +797,7 @@ const Loop = {
 };
 
 // ===============================
-// EVENT HOOKS (UI REACTIONS)
+//    EVENT HOOKS (UI REACTIONS)
 // ===============================
 function bindUIEvents(){
 
@@ -748,10 +814,11 @@ function bindUIEvents(){
 }
 
 // ===============================
-// INIT PART 3
+//         INIT PART 3
 // ===============================
 function initPart3(){
 
+  Waveform.init();
   Lyrics.init();
   Loop.init();
   bindUIEvents();
@@ -773,9 +840,8 @@ window.__PLAYER_PART3__ = {
 
 
 
-
 // ===============================
-// PRO PLAYER v4 - PART 4 / 4
+//         PRO PLAYER
 // API + MEDIA + MOBILE + INIT
 // ===============================
 
@@ -799,7 +865,7 @@ const {
 } = window.__PLAYER_PART3__;
 
 // ===============================
-// MEDIA SESSION (FULL)
+//         MEDIA SESSION 
 // ===============================
 const Media = {
 
@@ -825,7 +891,7 @@ const Media = {
 };
 
 // ===============================
-// MOBILE / VISIBILITY HANDLER
+//   MOBILE / VISIBILITY HANDLER
 // ===============================
 const Mobile = {
 
@@ -847,7 +913,7 @@ const Mobile = {
 };
 
 // ===============================
-// FULLSCREEN CONTROLLER
+//     FULLSCREEN CONTROLLER
 // ===============================
 const Fullscreen = {
 
@@ -862,7 +928,7 @@ const Fullscreen = {
 };
 
 // ===============================
-// BOTTOM SHEET (REAL)
+//        BOTTOM SHEET
 // ===============================
 const BottomSheet = {
 
@@ -904,7 +970,7 @@ const BottomSheet = {
 };
 
 // ===============================
-// SECURITY / AUTOPLAY FIX
+//    SECURITY / AUTOPLAY FIX
 // ===============================
 const Security = {
 
@@ -957,7 +1023,7 @@ const API = {
 };
 
 // ===============================
-// GLOBAL INIT
+//          GLOBAL INIT
 // ===============================
 function init(){
 
@@ -970,46 +1036,37 @@ function init(){
   Mobile.init();
   BottomSheet.init();
   Security.init();
+
   Events.emit("ready");
 
 }
 
 // ===============================
-// AUTO INIT
+//          AUTO INIT
 // ===============================
 document.addEventListener("DOMContentLoaded", init);
-Waveform.init();
+
 // ===============================
-// EXPORT GLOBAL
+//         EXPORT GLOBAL
 // ===============================
 window.PlayerAPI = API;
+
 })();
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-// ==================
-// ADDON PRO VISUAL
-// ==================
+// ===============================
+//        ADDON PRO VISUAL 
+// ===============================
 
 (function(){
 
 const { State, Events, AudioCore } = window.__PLAYER_PART1__;
 const { DOM, Engine, Playlist } = window.__PLAYER_PART2__;
 
-// ====================
-//       WAVEFORM 
-// ====================
+// ===============================
+//           WAVEFORM 
+// ===============================
 const WaveAddon = {
 
   bars: [],
@@ -1055,7 +1112,7 @@ const WaveAddon = {
 };
 
 // ===============================
-// COVER FX (ZOOM + RYTHME)
+//    COVER FX (ZOOM + RYTHME)
 // ===============================
 const CoverAddon = {
 
@@ -1100,7 +1157,7 @@ const CoverAddon = {
 };
 
 // ===============================
-// GLOW FX (PLAYER)
+//           GLOW FX 
 // ===============================
 const GlowAddon = {
 
@@ -1121,7 +1178,7 @@ const GlowAddon = {
 };
 
 // ===============================
-// TRACK ACTIVE (VISUEL)
+//          TRACK ACTIVE   
 // ===============================
 const TrackUIAddon = {
 
@@ -1141,7 +1198,7 @@ const TrackUIAddon = {
 };
 
 // ===============================
-// CROSSFADE BOOST (CHEVAUCHEMENT)
+//        CROSSFADE BOOST 
 // ===============================
 const CrossfadeAddon = {
 
@@ -1157,7 +1214,7 @@ const CrossfadeAddon = {
 };
 
 // ===============================
-// LYRICS BUTTON FIX (SANS CASSER)
+//       LYRICS BUTTON FIX 
 // ===============================
 const LyricsAddon = {
 
@@ -1189,7 +1246,7 @@ const LyricsAddon = {
 };
 
 // ===============================
-// INIT GLOBAL ADDON
+//       INIT GLOBAL ADDON
 // ===============================
 function initAddons(){
 
