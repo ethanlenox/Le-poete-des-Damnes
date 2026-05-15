@@ -14,87 +14,61 @@ const player = document.getElementById("miniPlayer");
 /* ===================== */
 /* lecteur pages parole */
 /* ===================== */
+
 /* TEMPS */
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
 const tracks = document.querySelectorAll(".track");
 
-/* player systeme */
 let currentIndex = 0;
 
 /* ===================== */
 /*    MUSIQUE CONTINU    */
 /* ===================== */
 
-function initAudioFromStorage() {
-  const savedTrack = localStorage.getItem("lastTrack");
-  const savedSrc = localStorage.getItem("lastSrc");
-  const savedTitle = localStorage.getItem("lastTitle");
-
-  if (savedSrc) {
-    audio.src = savedSrc;
-    title.textContent = savedTitle || "Lecture...";
-    audio.load();
-  }
-
-  if (savedTrack !== null) {
-    currentIndex = parseInt(savedTrack);
-  }
-}
-
-initAudioFromStorage();
-
 function restoreState() {
 
   const savedTrack = localStorage.getItem("lastTrack");
+  const savedSrc = localStorage.getItem("lastSrc");
+  const savedTitle = localStorage.getItem("lastTitle");
   const savedTime = localStorage.getItem("trackTime");
 
-  if (savedTrack === null) return;
-  if (!tracks.length) return;
+  if (!savedSrc) return;
 
-  currentIndex = parseInt(savedTrack);
+  /* index */
+  if (savedTrack !== null) {
+    currentIndex = parseInt(savedTrack);
+  }
 
-  const t = tracks[currentIndex];
-  if (!t) return;
-
-  title.textContent = t.dataset.title || "Lecture...";
-
-  audio.src = t.dataset.src;
+  /* source unique (IMPORTANT) */
+  audio.src = savedSrc;
   audio.load();
 
+  /* titre */
+  title.textContent = savedTitle || "Lecture...";
+
+  /* temps restauré proprement */
   audio.addEventListener("loadedmetadata", () => {
+
     if (savedTime) {
       audio.currentTime = parseFloat(savedTime);
     }
+
+    if (durationEl) {
+      durationEl.textContent = formatTime(audio.duration || 0);
+    }
+
   }, { once: true });
 
-  playBtn.textContent = "▶"; 
-  audio.pause(); // IMPORTANT : pas autoplay
+  /* état UI propre */
+  if (playBtn) {
+    playBtn.textContent = "▶";
+  }
+
+  audio.pause();
 }
 
 restoreState();
-
-let repeatMode = false;
-const savedTrack =
-  localStorage.getItem("lastTrack");
-
-if (savedTrack !== null) {
-  currentIndex = parseInt(savedTrack);
-}
-let lastScroll = 0;
-const savedTime = localStorage.getItem("trackTime");
-
-if (savedTime) {
- audio.addEventListener("loadedmetadata", () => {
-  const savedTime = localStorage.getItem("trackTime");
-
-  if (savedTime) {
-    audio.currentTime = parseFloat(savedTime);
-  }
-
-  durationEl.textContent = formatTime(audio.duration);
-});
-}
 
 /* ===================== */
 /* ⏱ FORMAT TEMPS */
