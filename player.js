@@ -291,21 +291,29 @@ muteBtn.addEventListener("click", () => {
 });
 
 nextBtn.addEventListener("click", () => {
-  if (currentIndex + 1 < tracks.length) {
-    playTrack(currentIndex + 1);
-  } else {
-    playTrack(0);
-  }
+
+  if (!tracks || tracks.length === 0) return;
+
+  currentIndex = (currentIndex + 1) % tracks.length;
+
+  playTrack(currentIndex);
+
 });
 
 prevBtn.addEventListener("click", () => {
-  if (currentIndex - 1 >= 0) {
-    playTrack(currentIndex - 1);
-  } else {
-    playTrack(tracks.length - 1);
-  }
+
+  if (!tracks || tracks.length === 0) return;
+
+  currentIndex =
+    (currentIndex - 1 + tracks.length) % tracks.length;
+
+  playTrack(currentIndex);
+
 });
-  
+
+window.addEventListener("beforeunload", () => {
+  localStorage.setItem("trackTime", audio.currentTime);
+});
 
 /* ===================== */
 /* 🎵 WAVEFORM */
