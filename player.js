@@ -1,3 +1,22 @@
+window.addEventListener("DOMContentLoaded", () => {
+
+  const savedSrc = localStorage.getItem("lastSrc");
+  const savedTitle = localStorage.getItem("lastTitle");
+  const savedTrack = localStorage.getItem("lastTrack");
+
+  if (savedSrc) {
+
+    audio.src = savedSrc;
+    title.textContent = savedTitle || "Lecture...";
+    currentIndex = savedTrack ? parseInt(savedTrack) : 0;
+
+    audio.load();
+
+  }
+
+});
+
+
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
