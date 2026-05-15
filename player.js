@@ -98,7 +98,7 @@ function setActiveTrack(i) {
 
   if (tracks[i]) {
 
-    tracks[i].classList.add("active","playing");
+    tracks[i].classList.add("active");
 
     tracks[i].scrollIntoView({
       behavior: "smooth",block: "center"
