@@ -113,21 +113,33 @@ function setActiveTrack(i) {
 /* ▶ PLAY TRACK */
 /* ===================== */
 
-function playTrack(i) {
+async function playTrack(i) {
+
   const t = tracks[i];
+
   if (!t) return;
 
-  audio.src = t.dataset.src;
-  title.textContent = t.dataset.title || "Lecture...";
+  /* réveil audio context */
+  if (audioContext.state === "suspended") {
+    await audioContext.resume();
+  }
 
-  audio.play();
+  audio.src = t.dataset.src;
+
+  title.textContent =
+    t.dataset.title || "Lecture...";
+
+  await audio.play();
+
   playBtn.textContent = "⏸";
 
   currentIndex = i;
+
   localStorage.setItem(
-  "lastTrack",
-  currentIndex
-);
+    "lastTrack",
+    currentIndex
+  );
+
   setActiveTrack(i);
 }
 
@@ -352,13 +364,6 @@ audio.addEventListener("pause", () => {
 
   tracks[currentIndex]?.classList.remove("playing");
   
-});
-
-audio.addEventListener("play", async () => {
-
-  if (audioContext.state === "suspended") {
-    await audioContext.resume();
-  }
 });
 
 /* pause */
