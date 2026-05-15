@@ -259,12 +259,13 @@ apply(g1, g2){
   g1.gain.cancelScheduledValues(now);
   g2.gain.cancelScheduledValues(now);
 
+  // on fige les valeurs actuelles
   g1.gain.setValueAtTime(g1.gain.value, now);
   g2.gain.setValueAtTime(g2.gain.value, now);
 
+  // crossfade propre
   g1.gain.linearRampToValueAtTime(0, now + this.duration);
   g2.gain.linearRampToValueAtTime(1, now + this.duration);
-
 }
 
 };
@@ -468,16 +469,17 @@ const Engine = {
 
       newAudio.currentTime = 0;
      
-     await newAudio.play().catch(()=>{});
-      Crossfade.apply(
-      AudioCore.currentGain(),
-      AudioCore.nextGain()
-      );
-      AudioCore.swap();
-
-      if(DOM.title) DOM.title.textContent = track.title;
-
-      Events.emit("trackChange", track);
+   await Loader.load(nextAudio, track.src);
+   nextAudio.currentTime = 0;
+   nextAudio.play().catch(()=>{});
+   Crossfade.apply(
+   AudioCore.currentGain(),
+   AudioCore.nextGain());
+   setTimeout(() => {
+   AudioCore.swap();
+   }, Crossfade.duration * 1000);
+   if (DOM.title) DOM.title.textContent = track.title;
+   Events.emit("trackChange", track);
 
       this.save();
       this.preload();
