@@ -406,3 +406,23 @@ function saveTrack(i) {
   localStorage.setItem("lastSrc", t.dataset.src);
   localStorage.setItem("lastTitle", t.dataset.title);
 }
+
+/* ===================== */
+/* 🎵 LYRICS BUTTON FIX */
+/* ===================== */
+
+document.querySelectorAll(".lyrics-btn").forEach(btn => {
+
+  btn.addEventListener("click", (e) => {
+
+    const index = btn.dataset.track;
+
+    if (index !== undefined) {
+      saveTrack(parseInt(index));
+    }
+
+  });
+
+});
+
+
