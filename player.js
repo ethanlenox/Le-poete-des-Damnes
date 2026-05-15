@@ -92,21 +92,15 @@ const AudioCore = {
 
     this.gainA = this.ctx.createGain();
     this.gainB = this.ctx.createGain();
-    this.masterGain = this.ctx.createGain();
+
     this.analyser = this.ctx.createAnalyser();
     this.analyser.fftSize = 1024;
 
     this.bufferLength = this.analyser.frequencyBinCount;
     this.dataArray = new Uint8Array(this.bufferLength);
-    
-    srcA.connect(this.gainA);
-    srcB.connect(this.gainB);
 
-    this.gainA.connect(this.masterGain);
-    this.gainB.connect(this.masterGain);
-
-    this.masterGain.connect(this.analyser);
-    this.analyser.connect(this.ctx.destination);
+    srcA.connect(this.gainA).connect(this.analyser).connect(this.ctx.destination);
+    srcB.connect(this.gainB).connect(this.analyser).connect(this.ctx.destination);
 
     this.gainA.gain.value = 1;
     this.gainB.gain.value = 0;
@@ -251,22 +245,21 @@ const Crossfade = {
 
   duration: 2,
 
-apply(g1, g2){
+  apply(g1, g2){
 
-  const ctx = AudioCore.ctx;
-  const now = ctx.currentTime;
+    const ctx = AudioCore.ctx;
+    const now = ctx.currentTime;
 
-  g1.gain.cancelScheduledValues(now);
-  g2.gain.cancelScheduledValues(now);
+    g1.gain.cancelScheduledValues(now);
+    g2.gain.cancelScheduledValues(now);
 
-  // on fige les valeurs actuelles
-  g1.gain.setValueAtTime(g1.gain.value, now);
-  g2.gain.setValueAtTime(g2.gain.value, now);
+    // courbe plus smooth (expo)
+    g1.gain.setValueAtTime(g1.gain.value, now);
+    g2.gain.setValueAtTime(g2.gain.value, now);
 
-  // crossfade propre
-  g1.gain.linearRampToValueAtTime(0, now + this.duration);
-  g2.gain.linearRampToValueAtTime(1, now + this.duration);
-}
+    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
+    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
+  }
 
 };
 
@@ -460,26 +453,24 @@ const Engine = {
 
     try {
 
-    if(Cache.has(track.src)){
-    const cached = Cache.get(track.src);
+      if(Cache.has(track.src)){
+        const cached = Cache.get(track.src);
         newAudio.src = cached.src;
       } else {
         await Loader.load(newAudio, track.src);
       }
 
       newAudio.currentTime = 0;
-     
-   await Loader.load(nextAudio, track.src);
-   nextAudio.currentTime = 0;
-   nextAudio.play().catch(()=>{});
-   Crossfade.apply(
-   AudioCore.currentGain(),
-   AudioCore.nextGain());
-   setTimeout(() => {
-   AudioCore.swap();
-   }, Crossfade.duration * 1000);
-   if (DOM.title) DOM.title.textContent = track.title;
-   Events.emit("trackChange", track);
+
+      await newAudio.play();
+
+      Crossfade.apply(oldGain, newGain);
+
+      AudioCore.swap();
+
+      if(DOM.title) DOM.title.textContent = track.title;
+
+      Events.emit("trackChange", track);
 
       this.save();
       this.preload();
@@ -543,16 +534,13 @@ function bindControls(){
   DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
 
   DOM.volume.oninput = ()=>{
-
-  State.volume = parseFloat(DOM.volume.value);
-
-  AudioCore.masterGain.gain.value = State.volume;
-
-};
+    State.volume = DOM.volume.value;
+    AudioCore.gainA.gain.value = State.volume;
+    AudioCore.gainB.gain.value = State.volume;
+  };
 
   DOM.progress.oninput = ()=>{
     const a = AudioCore.current();
-
     a.currentTime = (DOM.progress.value / 100) * a.duration;
   };
 
@@ -1065,6 +1053,8 @@ window.PlayerAPI = API;
 
 })();
 
+
+
 // ===============================
 //        ADDON PRO VISUAL 
 // ===============================
@@ -1246,6 +1236,7 @@ const LyricsAddon = {
         localStorage.setItem("lastTitle", t.title);
         localStorage.setItem("trackTime", AudioCore.current().currentTime);
 
+        // navigation naturelle (tu gardes ton HTML)
       });
 
     });
