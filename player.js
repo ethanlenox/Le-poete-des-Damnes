@@ -470,9 +470,21 @@ const Engine = {
       newGain.gain.value = 0.001;
       await newAudio.play();
 
+
+
+      
       Crossfade.apply(oldGain, newGain);
 
+      setTimeout(()=>{
+
+      oldAudio.pause();
+      oldAudio.currentTime = 0;
+
       AudioCore.swap();
+
+      }, Crossfade.duration * 1000);
+
+      
 
       if(DOM.title) DOM.title.textContent = track.title;
 
