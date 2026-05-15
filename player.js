@@ -92,15 +92,22 @@ const AudioCore = {
 
     this.gainA = this.ctx.createGain();
     this.gainB = this.ctx.createGain();
-
+    this.masterGain = this.ctx.createGain();
     this.analyser = this.ctx.createAnalyser();
     this.analyser.fftSize = 1024;
 
     this.bufferLength = this.analyser.frequencyBinCount;
     this.dataArray = new Uint8Array(this.bufferLength);
+    
+    srcA.connect(this.gainA);
+    srcB.connect(this.gainB);
 
-    srcA.connect(this.gainA).connect(this.analyser).connect(this.ctx.destination);
-    srcB.connect(this.gainB).connect(this.analyser).connect(this.ctx.destination);
+    this.gainA.connect(this.analyser);
+    this.gainB.connect(this.analyser);
+
+    this.analyser.connect(this.masterGain);
+
+    this.masterGain.connect(this.ctx.destination);
 
     this.gainA.gain.value = 1;
     this.gainB.gain.value = 0;
@@ -534,10 +541,12 @@ function bindControls(){
   DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
 
   DOM.volume.oninput = ()=>{
-    State.volume = DOM.volume.value;
-    AudioCore.gainA.gain.value = State.volume;
-    AudioCore.gainB.gain.value = State.volume;
-  };
+
+  State.volume = parseFloat(DOM.volume.value);
+
+  AudioCore.masterGain.gain.value = State.volume;
+
+};
 
   DOM.progress.oninput = ()=>{
     const a = AudioCore.current();
