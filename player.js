@@ -514,7 +514,9 @@ const Engine = {
 
     const a = AudioCore.current();
 
-    a.src = src;
+    if (a.src !== src) {
+      a.src = src;
+  }
     State.index = i;
 
     a.onloadedmetadata = ()=>{
@@ -773,6 +775,18 @@ const UIEffects = {
 
 };
 
+  coverSpin(el){
+  if(!el) return;
+
+  el.animate([
+    { transform: "rotate(0deg)" },
+    { transform: "rotate(360deg)" }
+  ], {
+    duration: 8000,
+    iterations: Infinity
+  });
+}
+
 // ===============================
 // PROGRESS SYNC ENGINE
 // ===============================
@@ -815,6 +829,21 @@ function bindUIEvents(){
     UIEffects.background();
   });
 
+  Events.on("play", ()=>{
+  const cover = document.getElementById("cover");
+  UIEffects.coverSpin(cover);
+});
+
+  Events.on("pause", ()=>{
+  const cover = document.getElementById("cover");
+  if(cover) cover.getAnimations().forEach(a=>a.pause());
+});
+
+  Events.on("play", ()=>{
+  const cover = document.getElementById("cover");
+  if(cover) cover.getAnimations().forEach(a=>a.play());
+});
+  
 }
 
 // ===============================
@@ -1048,6 +1077,43 @@ function init(){
 
 }
 
+  const savedSrc = localStorage.getItem("lastSrc");
+
+if (savedSrc) {
+
+  const a = AudioCore.current();
+  a.src = savedSrc;
+
+  const t = localStorage.getItem("trackTime");
+
+  a.addEventListener("loadedmetadata", () => {
+
+    if (t) {
+      a.currentTime = parseFloat(t);
+    }
+
+    a.play().catch(() => {});
+
+  }, { once: true });
+
+}
+
+  // PAROLES BUTTON (navigation + save)
+document.querySelectorAll(".lyrics-btn").forEach(btn=>{
+  btn.addEventListener("click",(e)=>{
+    const i = btn.dataset.track;
+    if(i !== undefined){
+      const t = Playlist.list[i];
+      if(t){
+        localStorage.setItem("lastTrack", i);
+        localStorage.setItem("lastSrc", t.src);
+        localStorage.setItem("lastTitle", t.title);
+        localStorage.setItem("trackTime", AudioCore.current().currentTime);
+      }
+    }
+  });
+});
+  
 // ===============================
 // AUTO INIT
 // ===============================
