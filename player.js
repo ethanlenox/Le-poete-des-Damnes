@@ -316,13 +316,12 @@ const dataArray =
 const bars =
   waveform.querySelectorAll("span");
 
+/* état animation waveform */
+let waveformAnimationId = null;
+
 /* animation waveform */
 
 function animateWaveform() {
-
-  requestAnimationFrame(
-    animateWaveform
-  );
 
   analyser.getByteFrequencyData(
     dataArray
@@ -339,11 +338,12 @@ function animateWaveform() {
     bar.style.height =
       `${height}px`;
   });
+
+  waveformAnimationId =
+    requestAnimationFrame(
+      animateWaveform
+    );
 }
-
-/* lancement */
-
-animateWaveform();
 
 /* ===================== */
 /* 🎵 GLOBAL AUDIO STATE */
@@ -353,8 +353,15 @@ audio.addEventListener("play", () => {
 
   waveform.classList.remove("paused");
 
-  tracks[currentIndex]?.classList.add("playing");
-  
+  tracks[currentIndex]?.classList.add(
+    "playing"
+  );
+
+  /* évite double boucle */
+  if (!waveformAnimationId) {
+
+    animateWaveform();
+  }
 });
 
 /* pause */
@@ -366,7 +373,15 @@ audio.addEventListener("pause", () => {
   tracks[currentIndex]?.classList.remove(
     "playing"
   );
+
+  /* stop animation */
+  cancelAnimationFrame(
+    waveformAnimationId
+  );
+
+  waveformAnimationId = null;
 });
+
 repeatBtn.addEventListener(
   "click",
   () => {
