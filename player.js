@@ -1055,18 +1055,224 @@ window.PlayerAPI = API;
 })();
 
 
-// PAROLES BUTTON COVERS (navigation + save)
-document.querySelectorAll(".lyrics-btn").forEach(btn=>{
-  btn.addEventListener("click",(e)=>{
-    const i = btn.dataset.track;
-    if(i !== undefined){
-      const t = Playlist.list[i];
-      if(t){
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// ADDON PRO VISUAL (NON DESTRUCTIF)
+// ===============================
+
+(function(){
+
+const { State, Events, AudioCore } = window.__PLAYER_PART1__;
+const { DOM, Engine, Playlist } = window.__PLAYER_PART2__;
+
+// ===============================
+// WAVEFORM (ANCIEN STYLE RESTAURÉ)
+// ===============================
+const WaveAddon = {
+
+  bars: [],
+  raf: null,
+
+  init(){
+
+    const wf = document.getElementById("waveform");
+    if(!wf) return;
+
+    this.bars = wf.querySelectorAll("span");
+
+    Events.on("play", ()=>this.start());
+    Events.on("pause", ()=>this.stop());
+  },
+
+  start(){
+    if(this.raf) return;
+
+    const loop = ()=>{
+
+      const analyser = AudioCore.analyser;
+      if(analyser){
+        analyser.getByteFrequencyData(AudioCore.dataArray);
+
+        this.bars.forEach((bar,i)=>{
+          const v = AudioCore.dataArray[i*2] || 0;
+          bar.style.height = Math.max(4, v/6) + "px";
+        });
+      }
+
+      this.raf = requestAnimationFrame(loop);
+    };
+
+    loop();
+  },
+
+  stop(){
+    cancelAnimationFrame(this.raf);
+    this.raf = null;
+  }
+
+};
+
+// ===============================
+// COVER FX (ZOOM + RYTHME)
+// ===============================
+const CoverAddon = {
+
+  el: null,
+  raf: null,
+
+  init(){
+    this.el = document.getElementById("cover");
+    if(!this.el) return;
+
+    Events.on("play", ()=>this.start());
+    Events.on("pause", ()=>this.stop());
+  },
+
+  start(){
+    if(this.raf) return;
+
+    const loop = ()=>{
+
+      const analyser = AudioCore.analyser;
+      if(analyser){
+        analyser.getByteFrequencyData(AudioCore.dataArray);
+
+        const v = AudioCore.dataArray[20] / 255;
+        const scale = 1 + (v * 0.06);
+
+        this.el.style.transform = `scale(${scale})`;
+      }
+
+      this.raf = requestAnimationFrame(loop);
+    };
+
+    loop();
+  },
+
+  stop(){
+    cancelAnimationFrame(this.raf);
+    this.raf = null;
+    if(this.el) this.el.style.transform = "scale(1)";
+  }
+
+};
+
+// ===============================
+// GLOW FX (PLAYER)
+// ===============================
+const GlowAddon = {
+
+  init(){
+    Events.on("play", ()=>{
+      if(DOM.player){
+        DOM.player.style.boxShadow = "0 0 25px #00e5ff";
+      }
+    });
+
+    Events.on("pause", ()=>{
+      if(DOM.player){
+        DOM.player.style.boxShadow = "none";
+      }
+    });
+  }
+
+};
+
+// ===============================
+// TRACK ACTIVE (VISUEL)
+// ===============================
+const TrackUIAddon = {
+
+  init(){
+    Events.on("trackChange", ()=>{
+      document.querySelectorAll(".track").forEach(t=>{
+        t.classList.remove("active","playing");
+      });
+
+      const el = document.querySelectorAll(".track")[State.index];
+      if(el){
+        el.classList.add("active","playing");
+      }
+    });
+  }
+
+};
+
+// ===============================
+// CROSSFADE BOOST (CHEVAUCHEMENT)
+// ===============================
+const CrossfadeAddon = {
+
+  init(){
+
+    Events.on("trackChange", ()=>{
+      const g = AudioCore.currentGain();
+      g.gain.value = State.volume;
+    });
+
+  }
+
+};
+
+// ===============================
+// LYRICS BUTTON FIX (SANS CASSER)
+// ===============================
+const LyricsAddon = {
+
+  init(){
+
+    document.querySelectorAll(".lyrics-btn").forEach(btn=>{
+
+      btn.addEventListener("click",(e)=>{
+        e.stopPropagation();
+
+        const i = btn.dataset.track;
+        if(i === undefined) return;
+
+        const t = Playlist.get(parseInt(i));
+        if(!t) return;
+
         localStorage.setItem("lastTrack", i);
         localStorage.setItem("lastSrc", t.src);
         localStorage.setItem("lastTitle", t.title);
         localStorage.setItem("trackTime", AudioCore.current().currentTime);
-      }
-    }
-  });
+
+        // navigation naturelle (tu gardes ton HTML)
+      });
+
+    });
+
+  }
+
+};
+
+// ===============================
+// INIT GLOBAL ADDON
+// ===============================
+function initAddons(){
+
+  WaveAddon.init();
+  CoverAddon.init();
+  GlowAddon.init();
+  TrackUIAddon.init();
+  CrossfadeAddon.init();
+  LyricsAddon.init();
+
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  setTimeout(initAddons, 0);
 });
+
+})();
