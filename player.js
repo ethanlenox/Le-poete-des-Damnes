@@ -61,12 +61,23 @@ function restoreState() {
   }, { once: true });
 
   /* état UI propre */
-  if (playBtn) {
-    playBtn.textContent = "▶";
+if (playBtn) {
+  playBtn.textContent = audio.paused ? "▶" : "⏸";
+}
+
+/*ne pas casser la continuité */
+setTimeout(() => {
+
+  if (!audio.paused) return;
+
+  const wasPlaying = localStorage.getItem("isPlaying");
+
+  if (wasPlaying === "true") {
+    audio.play().catch(() => {
+    });
   }
 
-  audio.pause();
-}
+}, 50);
 
 restoreState();
 
