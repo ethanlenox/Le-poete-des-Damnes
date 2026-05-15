@@ -1,384 +1,1061 @@
-// AUDIO GLOBAL PERSISTANT
-if (!window.globalAudio) {
-  window.globalAudio = new Audio();
-}
-const audio = window.globalAudio;
+// ===============================
+// PRO PLAYER
+// CORE + STATE + AUDIO ENGINE
+// ===============================
 
-/* ✅ AJOUT : éviter double init */
-if (audio._initialized) return;
-audio._initialized = true;
+(function(){
 
-const playBtn = document.getElementById("playPauseBtn");
-const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");
-const muteBtn = document.getElementById("muteBtn");
-const title = document.getElementById("trackTitle");
-const progress = document.getElementById("progressBar");
-const volumeBar = document.getElementById("volumeBar");
-const waveform = document.getElementById("waveform");
-const repeatBtn = document.getElementById("repeatBtn");
-const toggleBtn = document.getElementById("togglePlayer");
-const player = document.getElementById("miniPlayer");
+if (window.__ULTRA_PRO_PLAYER_V4__) return;
+window.__ULTRA_PRO_PLAYER_V4__ = true;
 
-const currentTimeEl = document.getElementById("currentTime");
-const durationEl = document.getElementById("duration");
-const tracks = document.querySelectorAll(".track");
+// ===============================
+// STATE MANAGER (FULL)
+// ===============================
+const State = {
+  index: 0,
+  playing: false,
+  volume: 1,
+  muted: false,
+  repeat: false,
+  shuffle: false,
+  ready: false,
+  locked: false,
+  buffering: false,
+  lastInteraction: 0,
+  lastUpdate: 0,
+  duration: 0,
+  currentTime: 0,
+  networkState: "idle",
+  error: null,
+  retries: 0,
+  maxRetries: 3
+};
 
-let currentIndex = 0;
-let repeatMode = false;
+// ===============================
+// EVENT BUS (FULL)
+// ===============================
+const Events = {
+  events: new Map(),
 
-/* ===================== */
-/*    MUSIQUE CONTINU    */
-/* ===================== */
+  on(name, fn){
+    if(!this.events.has(name)) this.events.set(name, []);
+    this.events.get(name).push(fn);
+  },
 
-function restoreState() {
+  off(name, fn){
+    if(!this.events.has(name)) return;
+    const arr = this.events.get(name).filter(f=>f!==fn);
+    this.events.set(name, arr);
+  },
 
-  const savedTrack = localStorage.getItem("lastTrack");
-  const savedSrc = localStorage.getItem("lastSrc");
-  const savedTitle = localStorage.getItem("lastTitle");
-  const savedTime = localStorage.getItem("trackTime");
-
-  if (!savedSrc) return;
-
-  if (savedTrack !== null) {
-    currentIndex = parseInt(savedTrack);
-  }
-
-  if (audio.src !== savedSrc) {
-    audio.src = savedSrc;
-  }
-
-  if (savedTime) {
-    audio.currentTime = parseFloat(savedTime);
-  }
-
-  if (title) {
-    title.textContent = savedTitle || "Lecture...";
-  }
-
-  if (playBtn) {
-    playBtn.textContent = audio.paused ? "▶" : "⏸";
-  }
-}
-
-restoreState();
-
-/* ===================== */
-/* FORMAT TEMPS */
-/* ===================== */
-
-function formatTime(sec) {
-  if (isNaN(sec)) return "0:00";
-
-  let minutes = Math.floor(sec / 60);
-  let seconds = Math.floor(sec % 60);
-
-  if (seconds < 10) seconds = "0" + seconds;
-
-  return minutes + ":" + seconds;
-}
-
-/* ===================== */
-/* VOLUME */
-/* ===================== */
-
-let savedVolume = localStorage.getItem("volume");
-audio.volume = savedVolume !== null ? savedVolume : 1;
-
-if (volumeBar) {
-  volumeBar.value = audio.volume;
-}
-
-/* ===================== */
-/* ACTIVE TRACK */
-/* ===================== */
-
-function setActiveTrack(i) {
-
-  tracks.forEach(t =>
-    t.classList.remove("active", "playing")
-  );
-
-  if (tracks[i]) {
-
-    tracks[i].classList.add("active", "playing");
-
-    tracks[i].scrollIntoView({
-      behavior: "smooth",
-      block: "center"
+  emit(name, data){
+    if(!this.events.has(name)) return;
+    this.events.get(name).forEach(fn=>{
+      try { fn(data); } catch(e){}
     });
+  },
+
+  once(name, fn){
+    const wrap = (d)=>{
+      fn(d);
+      this.off(name, wrap);
+    };
+    this.on(name, wrap);
   }
-}
+};
 
-/* ===================== */
-/* PLAY TRACK */
-/* ===================== */
+// ===============================
+// AUDIO CORE (DOUBLE ENGINE)
+// ===============================
+const AudioCore = {
 
-async function playTrack(i) {
+  ctx: null,
 
-  const t = tracks[i];
-  if (!t) return;
+  A: new Audio(),
+  B: new Audio(),
 
-  currentIndex = i;
+  active: "A",
 
-  audio.src = t.dataset.src;
+  gainA: null,
+  gainB: null,
 
-  if (title) {
-    title.textContent = t.dataset.title || "Lecture...";
+  analyser: null,
+  dataArray: null,
+  bufferLength: 0,
+
+  init(){
+
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const srcA = this.ctx.createMediaElementSource(this.A);
+    const srcB = this.ctx.createMediaElementSource(this.B);
+
+    this.gainA = this.ctx.createGain();
+    this.gainB = this.ctx.createGain();
+
+    this.analyser = this.ctx.createAnalyser();
+    this.analyser.fftSize = 1024;
+
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+
+    srcA.connect(this.gainA).connect(this.analyser).connect(this.ctx.destination);
+    srcB.connect(this.gainB).connect(this.analyser).connect(this.ctx.destination);
+
+    this.gainA.gain.value = 1;
+    this.gainB.gain.value = 0;
+
+    this.bindEvents();
+  },
+
+  bindEvents(){
+
+    [this.A, this.B].forEach((audio)=>{
+
+      audio.addEventListener("play", ()=>{
+        State.playing = true;
+        Events.emit("play");
+      });
+
+      audio.addEventListener("pause", ()=>{
+        State.playing = false;
+        Events.emit("pause");
+      });
+
+      audio.addEventListener("timeupdate", ()=>{
+        State.currentTime = audio.currentTime;
+        State.duration = audio.duration || 0;
+        Events.emit("time", {
+          current: audio.currentTime,
+          duration: audio.duration
+        });
+      });
+
+      audio.addEventListener("waiting", ()=>{
+        State.buffering = true;
+        Events.emit("buffering", true);
+      });
+
+      audio.addEventListener("playing", ()=>{
+        State.buffering = false;
+        Events.emit("buffering", false);
+      });
+
+      audio.addEventListener("ended", ()=>{
+        Events.emit("ended");
+      });
+
+      audio.addEventListener("error", (e)=>{
+        State.error = e;
+        Events.emit("error", e);
+      });
+
+    });
+
+  },
+
+  current(){
+    return this.active === "A" ? this.A : this.B;
+  },
+
+  next(){
+    return this.active === "A" ? this.B : this.A;
+  },
+
+  currentGain(){
+    return this.active === "A" ? this.gainA : this.gainB;
+  },
+
+  nextGain(){
+    return this.active === "A" ? this.gainB : this.gainA;
+  },
+
+  swap(){
+    this.active = this.active === "A" ? "B" : "A";
   }
 
-  audio.play().catch(() => {});
+};
 
-  if (playBtn) playBtn.textContent = "⏸";
+// ===============================
+// ERROR HANDLER + RETRY
+// ===============================
+const ErrorHandler = {
 
-  localStorage.setItem("lastTrack", i);
-  localStorage.setItem("lastSrc", t.dataset.src);
-  localStorage.setItem("lastTitle", t.dataset.title);
+  handle(e){
+    console.warn("Audio error", e);
 
-  setActiveTrack(i);
-}
-
-/* CLICK TRACK */
-if (tracks.length) {
-  tracks.forEach((t, i) => {
-    t.addEventListener("click", () => playTrack(i));
-  });
-}
-
-/* PLAY / PAUSE */
-if (playBtn) {
-playBtn.addEventListener("click", () => {
-
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "⏸";
-    setActiveTrack(currentIndex);
-  } else {
-    audio.pause();
-    playBtn.textContent = "▶";
-  }
-});
-}
-
-/* ===================== */
-/* PROGRESS */
-/* ===================== */
-
-let lastSave = 0;
-
-audio.addEventListener("timeupdate", () => {
-
-  if (!audio.duration) return;
-
-  const now = Date.now();
-  if (now - lastSave > 1000) {
-    localStorage.setItem("trackTime", audio.currentTime);
-    lastSave = now;
-  }
-
-  if (progress) {
-    const percent =
-      (audio.currentTime / audio.duration) * 100;
-
-    progress.value = percent;
-
-    progress.style.background =
-      `linear-gradient(
-        90deg,
-        #00e5ff 0%,
-        #00e5ff ${percent}%,
-        rgba(255,255,255,0.12) ${percent}%,
-        rgba(255,255,255,0.12) 100%
-      )`;
-  }
-
-  if (currentTimeEl) {
-    currentTimeEl.textContent =
-      formatTime(audio.currentTime);
-  }
-});
-
-audio.addEventListener("loadedmetadata", () => {
-  if (durationEl) {
-    durationEl.textContent = formatTime(audio.duration);
-  }
-});
-
-if (progress) {
-progress.addEventListener("input", () => {
-  audio.currentTime = (progress.value / 100) * audio.duration;
-});
-}
-
-/* ===================== */
-/* NEXT / PREV */
-/* ===================== */
-
-function fadeOutAndNext(nextIndex) {
-  let fade = setInterval(() => {
-    if (audio.volume > 0.05) {
-      audio.volume -= 0.05;
+    if(State.retries < State.maxRetries){
+      State.retries++;
+      setTimeout(()=>{
+        Events.emit("retry");
+      }, 1000);
     } else {
-      clearInterval(fade);
-      audio.pause();
-      audio.volume = volumeBar ? volumeBar.value : 1;
-      playTrack(nextIndex);
+      Events.emit("fatalError", e);
     }
-  }, 50);
-}
+  },
 
-audio.addEventListener("ended", () => {
-
-  if (repeatMode) {
-    audio.currentTime = 0;
-    audio.play();
-    return;
+  reset(){
+    State.retries = 0;
   }
 
-  if (currentIndex + 1 < tracks.length) {
-    fadeOutAndNext(currentIndex + 1);
-  } else {
-    if (playBtn) playBtn.textContent = "▶";
+};
+
+// ===============================
+// AUDIO LOADER (SMART)
+// ===============================
+const Loader = {
+
+  load(audio, src){
+    return new Promise((resolve, reject)=>{
+
+      if(!src) return reject("no src");
+
+      if(audio.src !== src){
+        audio.src = src;
+      }
+
+      const onReady = ()=>{
+        cleanup();
+        resolve();
+      };
+
+      const onError = (e)=>{
+        cleanup();
+        reject(e);
+      };
+
+      const cleanup = ()=>{
+        audio.removeEventListener("canplay", onReady);
+        audio.removeEventListener("error", onError);
+      };
+
+      audio.addEventListener("canplay", onReady);
+      audio.addEventListener("error", onError);
+
+      audio.load();
+    });
   }
-});
 
-if (nextBtn) {
-nextBtn.addEventListener("click", () => {
-  if (!tracks.length) return;
-  currentIndex = (currentIndex + 1) % tracks.length;
-  playTrack(currentIndex);
-});
-}
+};
 
-if (prevBtn) {
-prevBtn.addEventListener("click", () => {
-  if (!tracks.length) return;
-  currentIndex =
-    (currentIndex - 1 + tracks.length) % tracks.length;
-  playTrack(currentIndex);
-});
-}
+// ===============================
+// CROSSFADE ENGINE (PRO CURVE)
+// ===============================
+const Crossfade = {
 
-/* ===================== */
-/* VOLUME / MUTE */
-/* ===================== */
+  duration: 2,
 
-if (volumeBar) {
-volumeBar.addEventListener("input", () => {
-  audio.volume = volumeBar.value;
-  localStorage.setItem("volume", audio.volume);
-});
-}
+  apply(g1, g2){
 
-if (muteBtn) {
-muteBtn.addEventListener("click", () => {
-  if (audio.volume > 0) {
-    audio.volume = 0;
-    if (volumeBar) volumeBar.value = 0;
-    muteBtn.textContent = "🔇";
-  } else {
-    audio.volume = 1;
-    if (volumeBar) volumeBar.value = 1;
-    muteBtn.textContent = "🔊";
+    const ctx = AudioCore.ctx;
+    const now = ctx.currentTime;
+
+    g1.gain.cancelScheduledValues(now);
+    g2.gain.cancelScheduledValues(now);
+
+    // courbe plus smooth (expo)
+    g1.gain.setValueAtTime(g1.gain.value, now);
+    g2.gain.setValueAtTime(g2.gain.value, now);
+
+    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
+    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
   }
-});
+
+};
+
+// ===============================
+// CLEANUP / MEMORY CONTROL
+// ===============================
+const Memory = {
+
+  cleanupAudio(audio){
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+  },
+
+  clearCache(map){
+    map.forEach(a=>{
+      this.cleanupAudio(a);
+    });
+    map.clear();
+  }
+
+};
+
+// expose part1
+window.__PLAYER_PART1__ = {
+  State,
+  Events,
+  AudioCore,
+  Loader,
+  Crossfade,
+  ErrorHandler,
+  Memory
+};
+
+})();
+
+
+
+
+
+
+// ===============================
+// PRO PLAYER
+// ENGINE + CONTROLS + PLAYLIST
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore,
+  Loader,
+  Crossfade,
+  ErrorHandler,
+  Memory
+} = window.__PLAYER_PART1__;
+
+// ===============================
+// DOM BINDER
+// ===============================
+const DOM = {
+  play: null,
+  next: null,
+  prev: null,
+  progress: null,
+  volume: null,
+  title: null,
+  tracks: [],
+  player: null,
+
+  init(){
+    this.play = document.getElementById("playPauseBtn");
+    this.next = document.getElementById("nextBtn");
+    this.prev = document.getElementById("prevBtn");
+    this.progress = document.getElementById("progressBar");
+    this.volume = document.getElementById("volumeBar");
+    this.title = document.getElementById("trackTitle");
+    this.player = document.getElementById("miniPlayer");
+    this.tracks = document.querySelectorAll(".track");
+  }
+};
+
+// ===============================
+// CACHE AUDIO (SMART LIMIT)
+// ===============================
+const Cache = {
+  map: new Map(),
+  max: 10,
+
+  add(src, audio){
+    if(this.map.size >= this.max){
+      const first = this.map.keys().next().value;
+      const old = this.map.get(first);
+      Memory.cleanupAudio(old);
+      this.map.delete(first);
+    }
+    this.map.set(src, audio);
+  },
+
+  get(src){
+    return this.map.get(src);
+  },
+
+  has(src){
+    return this.map.has(src);
+  }
+};
+
+// ===============================
+// PRELOAD QUEUE (ASYNC)
+// ===============================
+const Preload = {
+
+  queue: [],
+  loading: false,
+
+  push(src){
+    if(!src || this.queue.includes(src) || Cache.has(src)) return;
+    this.queue.push(src);
+    this.run();
+  },
+
+  async run(){
+    if(this.loading || !this.queue.length) return;
+
+    this.loading = true;
+
+    const src = this.queue.shift();
+    const a = new Audio();
+
+    try {
+      await Loader.load(a, src);
+      Cache.add(src, a);
+    } catch(e){}
+
+    this.loading = false;
+    this.run();
+  }
+};
+
+// ===============================
+// PLAYLIST MANAGER
+// ===============================
+const Playlist = {
+
+  list: [],
+
+  buildFromDOM(){
+    this.list = Array.from(DOM.tracks).map(el=>({
+      src: el.dataset.src,
+      title: el.dataset.title
+    }));
+  },
+
+  get(i){
+    return this.list[i];
+  },
+
+  next(){
+    if(State.shuffle){
+      return Math.floor(Math.random()*this.list.length);
+    }
+    return (State.index + 1) % this.list.length;
+  },
+
+  prev(){
+    return (State.index - 1 + this.list.length) % this.list.length;
+  }
+
+};
+
+// ===============================
+// ENGINE (FULL CONTROL)
+// ===============================
+const Engine = {
+
+  async play(i){
+
+    if(State.locked) return;
+
+    const track = Playlist.get(i);
+    if(!track) return;
+
+    State.locked = true;
+    State.index = i;
+
+    const newAudio = AudioCore.next();
+    const newGain = AudioCore.nextGain();
+
+    const oldAudio = AudioCore.current();
+    const oldGain = AudioCore.currentGain();
+
+    try {
+
+      if(Cache.has(track.src)){
+        const cached = Cache.get(track.src);
+        newAudio.src = cached.src;
+      } else {
+        await Loader.load(newAudio, track.src);
+      }
+
+      newAudio.currentTime = 0;
+
+      await newAudio.play();
+
+      Crossfade.apply(oldGain, newGain);
+
+      AudioCore.swap();
+
+      if(DOM.title) DOM.title.textContent = track.title;
+
+      Events.emit("trackChange", track);
+
+      this.save();
+      this.preload();
+
+    } catch(e){
+      ErrorHandler.handle(e);
+    }
+
+    State.locked = false;
+  },
+
+  toggle(){
+    const a = AudioCore.current();
+    if(a.paused){
+      a.play();
+    } else {
+      a.pause();
+    }
+  },
+
+  preload(){
+    const nextIndex = Playlist.next();
+    const t = Playlist.get(nextIndex);
+    if(t) Preload.push(t.src);
+  },
+
+  save(){
+    localStorage.setItem("pp_i", State.index);
+    localStorage.setItem("pp_t", AudioCore.current().currentTime);
+    localStorage.setItem("pp_s", AudioCore.current().src);
+  },
+
+  restore(){
+    const src = localStorage.getItem("pp_s");
+    if(!src) return;
+
+    const i = parseInt(localStorage.getItem("pp_i")) || 0;
+    const t = parseFloat(localStorage.getItem("pp_t")) || 0;
+
+    const a = AudioCore.current();
+
+    a.src = src;
+    State.index = i;
+
+    a.onloadedmetadata = ()=>{
+      a.currentTime = t;
+    };
+  }
+
+};
+
+// ===============================
+// CONTROLS BIND
+// ===============================
+function bindControls(){
+
+  DOM.play.onclick = ()=>Engine.toggle();
+
+  DOM.next.onclick = ()=>Engine.play(Playlist.next());
+
+  DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
+
+  DOM.volume.oninput = ()=>{
+    State.volume = DOM.volume.value;
+    AudioCore.gainA.gain.value = State.volume;
+    AudioCore.gainB.gain.value = State.volume;
+  };
+
+  DOM.progress.oninput = ()=>{
+    const a = AudioCore.current();
+    a.currentTime = (DOM.progress.value / 100) * a.duration;
+  };
+
+  DOM.tracks.forEach((el,i)=>{
+    el.onclick = ()=>Engine.play(i);
+  });
+
 }
 
-/* ===================== */
-/* AUDIO CONTEXT GLOBAL */
-/* ===================== */
+// ===============================
+// AUTO NEXT / REPEAT
+// ===============================
+function bindAudioLogic(){
 
-if (!window.globalAudioContext) {
-  window.globalAudioContext =
-    new (window.AudioContext || window.webkitAudioContext)();
+  Events.on("ended", ()=>{
+
+    if(State.repeat){
+      const a = AudioCore.current();
+      a.currentTime = 0;
+      a.play();
+    } else {
+      Engine.play(Playlist.next());
+    }
+
+  });
+
+  Events.on("error", ErrorHandler.handle);
+
+  Events.on("retry", ()=>{
+    Engine.play(State.index);
+  });
+
 }
 
-const audioContext = window.globalAudioContext;
+// ===============================
+// INIT PART 2
+// ===============================
+function initPart2(){
 
-/* ✅ éviter double source */
-if (!audio._sourceCreated) {
-  const source = audioContext.createMediaElementSource(audio);
-  const analyser = audioContext.createAnalyser();
+  DOM.init();
+  Playlist.buildFromDOM();
+  bindControls();
+  bindAudioLogic();
+  Engine.restore();
 
-  source.connect(analyser);
-  analyser.connect(audioContext.destination);
+}
 
-  analyser.fftSize = 64;
+// expose part2
+window.__PLAYER_PART2__ = {
+  DOM,
+  Cache,
+  Preload,
+  Playlist,
+  Engine,
+  initPart2
+};
 
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
+})();
 
-  const bars = waveform
-    ? waveform.querySelectorAll("span")
-    : [];
 
-  let waveformAnimationId = null;
 
-  function animateWaveform() {
-    analyser.getByteFrequencyData(dataArray);
 
-    bars.forEach((bar, i) => {
-      const value = dataArray[i * 2];
-      const height = Math.max(4, value / 6);
-      bar.style.height = `${height}px`;
+
+// ===============================
+// PRO PLAYER
+// WAVEFORM + LYRICS + ANIMATIONS
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore
+} = window.__PLAYER_PART1__;
+
+const {
+  DOM
+} = window.__PLAYER_PART2__;
+
+// ===============================
+// RAF MANAGER (PERF CONTROL)
+// ===============================
+const RAF = {
+  tasks: new Map(),
+  running: false,
+
+  add(name, fn){
+    this.tasks.set(name, fn);
+    if(!this.running) this.run();
+  },
+
+  remove(name){
+    this.tasks.delete(name);
+  },
+
+  run(){
+    this.running = true;
+
+    const loop = ()=>{
+      this.tasks.forEach(fn=>{
+        try{ fn(); }catch(e){}
+      });
+      requestAnimationFrame(loop);
+    };
+
+    requestAnimationFrame(loop);
+  }
+};
+
+// ===============================
+// WAVEFORM ENGINE (REAL)
+// ===============================
+const Waveform = {
+
+  bars: [],
+  resolution: 64,
+
+  init(){
+    if(!DOM.wave) return;
+
+    DOM.wave.innerHTML = "";
+
+    for(let i=0;i<this.resolution;i++){
+      const bar = document.createElement("span");
+      bar.style.display = "inline-block";
+      bar.style.width = "2px";
+      bar.style.marginRight = "1px";
+      bar.style.height = "5px";
+      DOM.wave.appendChild(bar);
+      this.bars.push(bar);
+    }
+
+    RAF.add("waveform", ()=>this.draw());
+  },
+
+  draw(){
+    const analyser = AudioCore.analyser;
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(AudioCore.dataArray);
+
+    for(let i=0;i<this.bars.length;i++){
+      const v = AudioCore.dataArray[i] / 255;
+      const h = v * 100;
+      this.bars[i].style.height = h + "%";
+    }
+  }
+
+};
+
+// ===============================
+// LYRICS ENGINE (SYNC PRECIS)
+// ===============================
+const Lyrics = {
+
+  list: [],
+  currentIndex: -1,
+  container: null,
+
+  init(){
+    this.container = document.getElementById("lyrics");
+  },
+
+  load(data){
+    this.list = data.sort((a,b)=>a.time - b.time);
+    this.currentIndex = -1;
+  },
+
+  update(){
+
+    if(!this.list.length) return;
+
+    const t = AudioCore.current().currentTime;
+
+    for(let i=0;i<this.list.length;i++){
+      if(t >= this.list[i].time && this.currentIndex !== i){
+        this.currentIndex = i;
+        this.render(this.list[i].text);
+        break;
+      }
+    }
+  },
+
+  render(text){
+    if(!this.container) return;
+
+    this.container.textContent = text;
+
+    this.container.animate([
+      { opacity: 0, transform: "translateY(10px)" },
+      { opacity: 1, transform: "translateY(0)" }
+    ], { duration: 200 });
+  }
+
+};
+
+// ===============================
+// ANIMATIONS ENGINE
+// ===============================
+const UIEffects = {
+
+  pulse(el){
+    if(!el) return;
+
+    el.animate([
+      { transform: "scale(1)" },
+      { transform: "scale(1.15)" },
+      { transform: "scale(1)" }
+    ], { duration: 200 });
+  },
+
+  glow(el){
+    if(!el) return;
+
+    el.animate([
+      { boxShadow: "0 0 0px #0ff" },
+      { boxShadow: "0 0 25px #0ff" },
+      { boxShadow: "0 0 0px #0ff" }
+    ], { duration: 800 });
+  },
+
+  background(){
+
+    const hue = Math.floor(Math.random()*360);
+    document.body.style.background = `hsl(${hue},30%,10%)`;
+  }
+
+};
+
+// ===============================
+// PROGRESS SYNC ENGINE
+// ===============================
+const Progress = {
+
+  update(){
+    const a = AudioCore.current();
+    if(!a.duration || !DOM.progress) return;
+
+    const val = (a.currentTime / a.duration) * 100;
+    DOM.progress.value = val;
+  }
+
+};
+
+// ===============================
+// GLOBAL LOOP (CENTRAL)
+// ===============================
+const Loop = {
+
+  init(){
+    RAF.add("progress", ()=>Progress.update());
+    RAF.add("lyrics", ()=>Lyrics.update());
+  }
+
+};
+
+// ===============================
+// EVENT HOOKS (UI REACTIONS)
+// ===============================
+function bindUIEvents(){
+
+  Events.on("play", ()=>{
+    UIEffects.pulse(DOM.play);
+    UIEffects.glow(DOM.player);
+    UIEffects.background();
+  });
+
+  Events.on("trackChange", ()=>{
+    UIEffects.background();
+  });
+
+}
+
+// ===============================
+// INIT PART 3
+// ===============================
+function initPart3(){
+
+  Waveform.init();
+  Lyrics.init();
+  Loop.init();
+  bindUIEvents();
+
+}
+
+// expose part3
+window.__PLAYER_PART3__ = {
+  RAF,
+  Waveform,
+  Lyrics,
+  UIEffects,
+  Progress,
+  Loop,
+  initPart3
+};
+
+})();
+
+
+
+
+
+
+// ===============================
+// PRO PLAYER 
+// API + MEDIA + MOBILE + INIT
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore
+} = window.__PLAYER_PART1__;
+
+const {
+  DOM,
+  Engine,
+  Playlist,
+  initPart2
+} = window.__PLAYER_PART2__;
+
+const {
+  initPart3
+} = window.__PLAYER_PART3__;
+
+// ===============================
+// MEDIA SESSION (FULL)
+// ===============================
+const Media = {
+
+  init(){
+
+    if(!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.setActionHandler("play", ()=>Engine.toggle());
+    navigator.mediaSession.setActionHandler("pause", ()=>Engine.toggle());
+    navigator.mediaSession.setActionHandler("nexttrack", ()=>Engine.play(Playlist.next()));
+    navigator.mediaSession.setActionHandler("previoustrack", ()=>Engine.play(Playlist.prev()));
+
+    Events.on("trackChange", (track)=>{
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist || "",
+        album: track.album || ""
+      });
     });
 
-    waveformAnimationId =
-      requestAnimationFrame(animateWaveform);
   }
 
-  audio.addEventListener("play", () => {
-    if (waveform) waveform.classList.remove("paused");
-    if (!waveformAnimationId) animateWaveform();
-  });
+};
 
-  audio.addEventListener("pause", () => {
-    if (waveform) waveform.classList.add("paused");
-    cancelAnimationFrame(waveformAnimationId);
-    waveformAnimationId = null;
-  });
+// ===============================
+// MOBILE / VISIBILITY HANDLER
+// ===============================
+const Mobile = {
 
-  audio._sourceCreated = true;
-}
+  init(){
 
-/* ===================== */
-/* REPEAT */
-/* ===================== */
+    document.addEventListener("visibilitychange", ()=>{
+      if(document.hidden){
+        Events.emit("appHidden");
+      } else {
+        Events.emit("appVisible");
+      }
+    });
 
-if (repeatBtn) {
-repeatBtn.addEventListener("click", () => {
-  repeatMode = !repeatMode;
-  repeatBtn.style.opacity =
-    repeatMode ? "1" : "0.5";
-});
-}
+    window.addEventListener("focus", ()=>Events.emit("focus"));
+    window.addEventListener("blur", ()=>Events.emit("blur"));
 
-/* ===================== */
-/* SAVE TRACK */
-/* ===================== */
+  }
 
-function saveTrack(i) {
-  const t = tracks[i];
+};
 
-  localStorage.setItem("lastTrack", i);
-  localStorage.setItem("lastSrc", t.dataset.src);
-  localStorage.setItem("lastTitle", t.dataset.title);
-}
+// ===============================
+// FULLSCREEN CONTROLLER
+// ===============================
+const Fullscreen = {
 
-/* ===================== */
-/* LYRICS BUTTON */
-/* ===================== */
-
-document.querySelectorAll(".lyrics-btn").forEach(btn => {
-
-  btn.addEventListener("click", () => {
-
-    const index = btn.dataset.track;
-
-    if (index !== undefined) {
-      saveTrack(parseInt(index));
+  toggle(){
+    if(!document.fullscreenElement){
+      DOM.player && DOM.player.requestFullscreen();
+    } else {
+      document.exitFullscreen();
     }
+  }
 
-  });
+};
 
-});
+// ===============================
+// BOTTOM SHEET (REAL)
+// ===============================
+const BottomSheet = {
+
+  open: false,
+  startY: 0,
+  currentY: 0,
+
+  init(){
+
+    if(!DOM.player) return;
+
+    DOM.player.addEventListener("touchstart", (e)=>{
+      this.startY = e.touches[0].clientY;
+    });
+
+    DOM.player.addEventListener("touchmove", (e)=>{
+      this.currentY = e.touches[0].clientY;
+      const delta = this.currentY - this.startY;
+
+      if(delta > 0){
+        DOM.player.style.transform = `translateY(${delta}px)`;
+      }
+    });
+
+    DOM.player.addEventListener("touchend", ()=>{
+      const delta = this.currentY - this.startY;
+
+      if(delta > 100){
+        this.open = false;
+        DOM.player.style.transform = "translateY(80%)";
+      } else {
+        this.open = true;
+        DOM.player.style.transform = "translateY(0)";
+      }
+    });
+
+  }
+
+};
+
+// ===============================
+// SECURITY / AUTOPLAY FIX
+// ===============================
+const Security = {
+
+  unlocked: false,
+
+  init(){
+
+    const unlock = ()=>{
+      if(this.unlocked) return;
+
+      AudioCore.ctx.resume();
+      this.unlocked = true;
+
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+    };
+
+    document.addEventListener("click", unlock);
+    document.addEventListener("touchstart", unlock);
+
+  }
+
+};
+
+// ===============================
+// API PUBLIC (CONTROL EXTERNE)
+// ===============================
+const API = {
+
+  play(i){ Engine.play(i); },
+  pause(){ AudioCore.current().pause(); },
+  toggle(){ Engine.toggle(); },
+  next(){ Engine.play(Playlist.next()); },
+  prev(){ Engine.play(Playlist.prev()); },
+
+  volume(v){
+    State.volume = v;
+    AudioCore.gainA.gain.value = v;
+    AudioCore.gainB.gain.value = v;
+  },
+
+  loadPlaylist(data){
+    Playlist.list = data;
+  },
+
+  loadLyrics(data){
+    window.__PLAYER_PART3__.Lyrics.load(data);
+  }
+
+};
+
+// ===============================
+// GLOBAL INIT
+// ===============================
+function init(){
+
+  AudioCore.init();
+
+  initPart2();
+  initPart3();
+
+  Media.init();
+  Mobile.init();
+  BottomSheet.init();
+  Security.init();
+
+  Events.emit("ready");
+
+}
+
+// ===============================
+// AUTO INIT
+// ===============================
+document.addEventListener("DOMContentLoaded", init);
+
+// ===============================
+// EXPORT GLOBAL
+// ===============================
+window.PlayerAPI = API;
+
+})();
