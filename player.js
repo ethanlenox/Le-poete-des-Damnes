@@ -94,12 +94,12 @@ volumeBar.value = audio.volume;
 function setActiveTrack(i) {
 
   tracks.forEach(t =>
-    t.classList.remove("active","playing")
+    t.classList.remove("active", "playing")
   );
 
   if (tracks[i]) {
 
-    tracks[i].classList.add("active");
+    tracks[i].classList.add("active", "playing");
 
     tracks[i].scrollIntoView({
       behavior: "smooth",
@@ -353,10 +353,6 @@ audio.addEventListener("play", () => {
 
   waveform.classList.remove("paused");
 
-  tracks[currentIndex]?.classList.add(
-    "playing"
-  );
-
   /* évite double boucle */
   if (!waveformAnimationId) {
 
@@ -369,10 +365,6 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
 
   waveform.classList.add("paused");
-
-  tracks[currentIndex]?.classList.remove(
-    "playing"
-  );
 
   /* stop animation */
   cancelAnimationFrame(
