@@ -1,362 +1,1056 @@
+// ===============================
+// PRO PLAYER v4 - PART 1 / 4
+// CORE + STATE + AUDIO ENGINE
+// ===============================
+
 (function(){
 
-// ===============================
-// GLOBAL
-// ===============================
-if (window.__PRO_PLAYER__) return;
+if (window.__ULTRA_PRO_PLAYER_V4__) return;
+window.__ULTRA_PRO_PLAYER_V4__ = true;
 
-window.__PRO_PLAYER__ = true;
-
-const Player = {
-  audioA: new Audio(),
-  audioB: new Audio(),
-  active: "A",
-  gainA: null,
-  gainB: null,
-  ctx: null,
-  analyser: null,
-  dataArray: null,
-  bufferLength: 0,
-  raf: null,
-  playlist: [],
+// ===============================
+// STATE MANAGER (FULL)
+// ===============================
+const State = {
   index: 0,
   playing: false,
-  repeat: false,
   volume: 1,
   muted: false,
-  crossfade: 2,
-  preloadMap: new Map(),
-  lyrics: [],
-  dom: {},
-  initDone: false
+  repeat: false,
+  shuffle: false,
+  ready: false,
+  locked: false,
+  buffering: false,
+  lastInteraction: 0,
+  lastUpdate: 0,
+  duration: 0,
+  currentTime: 0,
+  networkState: "idle",
+  error: null,
+  retries: 0,
+  maxRetries: 3
 };
 
 // ===============================
-// DOM
+// EVENT BUS (FULL)
 // ===============================
-function bindDOM(){
-  Player.dom.play = document.getElementById("playPauseBtn");
-  Player.dom.next = document.getElementById("nextBtn");
-  Player.dom.prev = document.getElementById("prevBtn");
-  Player.dom.progress = document.getElementById("progressBar");
-  Player.dom.volume = document.getElementById("volumeBar");
-  Player.dom.title = document.getElementById("trackTitle");
-  Player.dom.wave = document.getElementById("waveform");
-  Player.dom.player = document.getElementById("miniPlayer");
-  Player.dom.tracks = document.querySelectorAll(".track");
-}
+const Events = {
+  events: new Map(),
 
-// ===============================
-// AUDIO ENGINE
-// ===============================
-function initAudio(){
-  Player.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  on(name, fn){
+    if(!this.events.has(name)) this.events.set(name, []);
+    this.events.get(name).push(fn);
+  },
 
-  const srcA = Player.ctx.createMediaElementSource(Player.audioA);
-  const srcB = Player.ctx.createMediaElementSource(Player.audioB);
+  off(name, fn){
+    if(!this.events.has(name)) return;
+    const arr = this.events.get(name).filter(f=>f!==fn);
+    this.events.set(name, arr);
+  },
 
-  Player.gainA = Player.ctx.createGain();
-  Player.gainB = Player.ctx.createGain();
+  emit(name, data){
+    if(!this.events.has(name)) return;
+    this.events.get(name).forEach(fn=>{
+      try { fn(data); } catch(e){}
+    });
+  },
 
-  Player.analyser = Player.ctx.createAnalyser();
-  Player.analyser.fftSize = 256;
-
-  Player.bufferLength = Player.analyser.frequencyBinCount;
-  Player.dataArray = new Uint8Array(Player.bufferLength);
-
-  srcA.connect(Player.gainA).connect(Player.analyser).connect(Player.ctx.destination);
-  srcB.connect(Player.gainB).connect(Player.analyser).connect(Player.ctx.destination);
-
-  Player.gainA.gain.value = 1;
-  Player.gainB.gain.value = 0;
-}
+  once(name, fn){
+    const wrap = (d)=>{
+      fn(d);
+      this.off(name, wrap);
+    };
+    this.on(name, wrap);
+  }
+};
 
 // ===============================
-// HELPERS
+// AUDIO CORE (DOUBLE ENGINE)
 // ===============================
-function current(){
-  return Player.active === "A" ? Player.audioA : Player.audioB;
-}
-function next(){
-  return Player.active === "A" ? Player.audioB : Player.audioA;
-}
-function currentGain(){
-  return Player.active === "A" ? Player.gainA : Player.gainB;
-}
-function nextGain(){
-  return Player.active === "A" ? Player.gainB : Player.gainA;
-}
+const AudioCore = {
 
-// ===============================
-// PLAY
-// ===============================
-function playTrack(i){
-  const t = Player.dom.tracks[i];
-  if (!t) return;
+  ctx: null,
 
-  Player.index = i;
+  A: new Audio(),
+  B: new Audio(),
 
-  const newA = next();
-  const newG = nextGain();
+  active: "A",
 
-  const oldA = current();
-  const oldG = currentGain();
+  gainA: null,
+  gainB: null,
 
-  const src = t.dataset.src;
+  analyser: null,
+  dataArray: null,
+  bufferLength: 0,
 
-  if (newA.src !== src){
-    newA.src = src;
+  init(){
+
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const srcA = this.ctx.createMediaElementSource(this.A);
+    const srcB = this.ctx.createMediaElementSource(this.B);
+
+    this.gainA = this.ctx.createGain();
+    this.gainB = this.ctx.createGain();
+
+    this.analyser = this.ctx.createAnalyser();
+    this.analyser.fftSize = 1024;
+
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+
+    srcA.connect(this.gainA).connect(this.analyser).connect(this.ctx.destination);
+    srcB.connect(this.gainB).connect(this.analyser).connect(this.ctx.destination);
+
+    this.gainA.gain.value = 1;
+    this.gainB.gain.value = 0;
+
+    this.bindEvents();
+  },
+
+  bindEvents(){
+
+    [this.A, this.B].forEach((audio)=>{
+
+      audio.addEventListener("play", ()=>{
+        State.playing = true;
+        Events.emit("play");
+      });
+
+      audio.addEventListener("pause", ()=>{
+        State.playing = false;
+        Events.emit("pause");
+      });
+
+      audio.addEventListener("timeupdate", ()=>{
+        State.currentTime = audio.currentTime;
+        State.duration = audio.duration || 0;
+        Events.emit("time", {
+          current: audio.currentTime,
+          duration: audio.duration
+        });
+      });
+
+      audio.addEventListener("waiting", ()=>{
+        State.buffering = true;
+        Events.emit("buffering", true);
+      });
+
+      audio.addEventListener("playing", ()=>{
+        State.buffering = false;
+        Events.emit("buffering", false);
+      });
+
+      audio.addEventListener("ended", ()=>{
+        Events.emit("ended");
+      });
+
+      audio.addEventListener("error", (e)=>{
+        State.error = e;
+        Events.emit("error", e);
+      });
+
+    });
+
+  },
+
+  current(){
+    return this.active === "A" ? this.A : this.B;
+  },
+
+  next(){
+    return this.active === "A" ? this.B : this.A;
+  },
+
+  currentGain(){
+    return this.active === "A" ? this.gainA : this.gainB;
+  },
+
+  nextGain(){
+    return this.active === "A" ? this.gainB : this.gainA;
+  },
+
+  swap(){
+    this.active = this.active === "A" ? "B" : "A";
   }
 
-  newA.currentTime = 0;
-
-  newA.play().catch(()=>{});
-
-  crossfade(oldG, newG);
-
-  Player.active = Player.active === "A" ? "B" : "A";
-
-  if (Player.dom.title) Player.dom.title.textContent = t.dataset.title;
-
-  saveState();
-  preloadNext();
-}
+};
 
 // ===============================
-// CROSSFADE PRO
+// ERROR HANDLER + RETRY
 // ===============================
-function crossfade(g1, g2){
-  const duration = Player.crossfade;
-  const now = Player.ctx.currentTime;
+const ErrorHandler = {
 
-  g1.gain.cancelScheduledValues(now);
-  g2.gain.cancelScheduledValues(now);
+  handle(e){
+    console.warn("Audio error", e);
 
-  g1.gain.setValueAtTime(g1.gain.value, now);
-  g2.gain.setValueAtTime(g2.gain.value, now);
+    if(State.retries < State.maxRetries){
+      State.retries++;
+      setTimeout(()=>{
+        Events.emit("retry");
+      }, 1000);
+    } else {
+      Events.emit("fatalError", e);
+    }
+  },
 
-  g1.gain.linearRampToValueAtTime(0, now + duration);
-  g2.gain.linearRampToValueAtTime(1, now + duration);
-}
+  reset(){
+    State.retries = 0;
+  }
 
-// ===============================
-// PRELOAD SMART
-// ===============================
-function preloadNext(){
-  const nextIndex = (Player.index + 1) % Player.dom.tracks.length;
-  const t = Player.dom.tracks[nextIndex];
-  if (!t) return;
-
-  const src = t.dataset.src;
-
-  if (Player.preloadMap.has(src)) return;
-
-  const a = new Audio();
-  a.src = src;
-  a.preload = "auto";
-
-  Player.preloadMap.set(src, a);
-}
+};
 
 // ===============================
-// CONTROLS
+// AUDIO LOADER (SMART)
+// ===============================
+const Loader = {
+
+  load(audio, src){
+    return new Promise((resolve, reject)=>{
+
+      if(!src) return reject("no src");
+
+      if(audio.src !== src){
+        audio.src = src;
+      }
+
+      const onReady = ()=>{
+        cleanup();
+        resolve();
+      };
+
+      const onError = (e)=>{
+        cleanup();
+        reject(e);
+      };
+
+      const cleanup = ()=>{
+        audio.removeEventListener("canplay", onReady);
+        audio.removeEventListener("error", onError);
+      };
+
+      audio.addEventListener("canplay", onReady);
+      audio.addEventListener("error", onError);
+
+      audio.load();
+    });
+  }
+
+};
+
+// ===============================
+// CROSSFADE ENGINE (PRO CURVE)
+// ===============================
+const Crossfade = {
+
+  duration: 2,
+
+  apply(g1, g2){
+
+    const ctx = AudioCore.ctx;
+    const now = ctx.currentTime;
+
+    g1.gain.cancelScheduledValues(now);
+    g2.gain.cancelScheduledValues(now);
+
+    // courbe plus smooth (expo)
+    g1.gain.setValueAtTime(g1.gain.value, now);
+    g2.gain.setValueAtTime(g2.gain.value, now);
+
+    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
+    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
+  }
+
+};
+
+// ===============================
+// CLEANUP / MEMORY CONTROL
+// ===============================
+const Memory = {
+
+  cleanupAudio(audio){
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+  },
+
+  clearCache(map){
+    map.forEach(a=>{
+      this.cleanupAudio(a);
+    });
+    map.clear();
+  }
+
+};
+
+// expose part1
+window.__PLAYER_PART1__ = {
+  State,
+  Events,
+  AudioCore,
+  Loader,
+  Crossfade,
+  ErrorHandler,
+  Memory
+};
+
+})();
+
+
+
+
+// ===============================
+// PRO PLAYER v4 - PART 2 / 4
+// ENGINE + CONTROLS + PLAYLIST
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore,
+  Loader,
+  Crossfade,
+  ErrorHandler,
+  Memory
+} = window.__PLAYER_PART1__;
+
+// ===============================
+// DOM BINDER
+// ===============================
+const DOM = {
+  play: null,
+  next: null,
+  prev: null,
+  progress: null,
+  volume: null,
+  title: null,
+  tracks: [],
+  player: null,
+
+  init(){
+    this.play = document.getElementById("playPauseBtn");
+    this.next = document.getElementById("nextBtn");
+    this.prev = document.getElementById("prevBtn");
+    this.progress = document.getElementById("progressBar");
+    this.volume = document.getElementById("volumeBar");
+    this.title = document.getElementById("trackTitle");
+    this.player = document.getElementById("miniPlayer");
+    this.tracks = document.querySelectorAll(".track");
+  }
+};
+
+// ===============================
+// CACHE AUDIO (SMART LIMIT)
+// ===============================
+const Cache = {
+  map: new Map(),
+  max: 10,
+
+  add(src, audio){
+    if(this.map.size >= this.max){
+      const first = this.map.keys().next().value;
+      const old = this.map.get(first);
+      Memory.cleanupAudio(old);
+      this.map.delete(first);
+    }
+    this.map.set(src, audio);
+  },
+
+  get(src){
+    return this.map.get(src);
+  },
+
+  has(src){
+    return this.map.has(src);
+  }
+};
+
+// ===============================
+// PRELOAD QUEUE (ASYNC)
+// ===============================
+const Preload = {
+
+  queue: [],
+  loading: false,
+
+  push(src){
+    if(!src || this.queue.includes(src) || Cache.has(src)) return;
+    this.queue.push(src);
+    this.run();
+  },
+
+  async run(){
+    if(this.loading || !this.queue.length) return;
+
+    this.loading = true;
+
+    const src = this.queue.shift();
+    const a = new Audio();
+
+    try {
+      await Loader.load(a, src);
+      Cache.add(src, a);
+    } catch(e){}
+
+    this.loading = false;
+    this.run();
+  }
+};
+
+// ===============================
+// PLAYLIST MANAGER
+// ===============================
+const Playlist = {
+
+  list: [],
+
+  buildFromDOM(){
+    this.list = Array.from(DOM.tracks).map(el=>({
+      src: el.dataset.src,
+      title: el.dataset.title
+    }));
+  },
+
+  get(i){
+    return this.list[i];
+  },
+
+  next(){
+    if(State.shuffle){
+      return Math.floor(Math.random()*this.list.length);
+    }
+    return (State.index + 1) % this.list.length;
+  },
+
+  prev(){
+    return (State.index - 1 + this.list.length) % this.list.length;
+  }
+
+};
+
+// ===============================
+// ENGINE (FULL CONTROL)
+// ===============================
+const Engine = {
+
+  async play(i){
+
+    if(State.locked) return;
+
+    const track = Playlist.get(i);
+    if(!track) return;
+
+    State.locked = true;
+    State.index = i;
+
+    const newAudio = AudioCore.next();
+    const newGain = AudioCore.nextGain();
+
+    const oldAudio = AudioCore.current();
+    const oldGain = AudioCore.currentGain();
+
+    try {
+
+      if(Cache.has(track.src)){
+        const cached = Cache.get(track.src);
+        newAudio.src = cached.src;
+      } else {
+        await Loader.load(newAudio, track.src);
+      }
+
+      newAudio.currentTime = 0;
+
+      await newAudio.play();
+
+      Crossfade.apply(oldGain, newGain);
+
+      AudioCore.swap();
+
+      if(DOM.title) DOM.title.textContent = track.title;
+
+      Events.emit("trackChange", track);
+
+      this.save();
+      this.preload();
+
+    } catch(e){
+      ErrorHandler.handle(e);
+    }
+
+    State.locked = false;
+  },
+
+  toggle(){
+    const a = AudioCore.current();
+    if(a.paused){
+      a.play();
+    } else {
+      a.pause();
+    }
+  },
+
+  preload(){
+    const nextIndex = Playlist.next();
+    const t = Playlist.get(nextIndex);
+    if(t) Preload.push(t.src);
+  },
+
+  save(){
+    localStorage.setItem("pp_i", State.index);
+    localStorage.setItem("pp_t", AudioCore.current().currentTime);
+    localStorage.setItem("pp_s", AudioCore.current().src);
+  },
+
+  restore(){
+    const src = localStorage.getItem("pp_s");
+    if(!src) return;
+
+    const i = parseInt(localStorage.getItem("pp_i")) || 0;
+    const t = parseFloat(localStorage.getItem("pp_t")) || 0;
+
+    const a = AudioCore.current();
+
+    a.src = src;
+    State.index = i;
+
+    a.onloadedmetadata = ()=>{
+      a.currentTime = t;
+    };
+  }
+
+};
+
+// ===============================
+// CONTROLS BIND
 // ===============================
 function bindControls(){
-  Player.dom.play.onclick = togglePlay;
-  Player.dom.next.onclick = ()=>playTrack((Player.index+1)%Player.dom.tracks.length);
-  Player.dom.prev.onclick = ()=>playTrack((Player.index-1+Player.dom.tracks.length)%Player.dom.tracks.length);
 
-  Player.dom.volume.oninput = ()=>{
-    Player.volume = Player.dom.volume.value;
-    Player.gainA.gain.value = Player.volume;
-    Player.gainB.gain.value = Player.volume;
+  DOM.play.onclick = ()=>Engine.toggle();
+
+  DOM.next.onclick = ()=>Engine.play(Playlist.next());
+
+  DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
+
+  DOM.volume.oninput = ()=>{
+    State.volume = DOM.volume.value;
+    AudioCore.gainA.gain.value = State.volume;
+    AudioCore.gainB.gain.value = State.volume;
   };
 
-  Player.dom.progress.oninput = ()=>{
-    const a = current();
-    a.currentTime = (Player.dom.progress.value/100)*a.duration;
+  DOM.progress.oninput = ()=>{
+    const a = AudioCore.current();
+    a.currentTime = (DOM.progress.value / 100) * a.duration;
   };
+
+  DOM.tracks.forEach((el,i)=>{
+    el.onclick = ()=>Engine.play(i);
+  });
+
 }
 
 // ===============================
-// PLAY / PAUSE
+// AUTO NEXT / REPEAT
 // ===============================
-function togglePlay(){
-  const a = current();
-  if (a.paused){
-    a.play();
-    Player.playing = true;
-  } else {
-    a.pause();
-    Player.playing = false;
-  }
-}
+function bindAudioLogic(){
 
-// ===============================
-// PROGRESS LOOP
-// ===============================
-function progressLoop(){
-  const a = current();
-  if (a.duration){
-    Player.dom.progress.value = (a.currentTime/a.duration)*100;
-  }
-  requestAnimationFrame(progressLoop);
-}
+  Events.on("ended", ()=>{
 
-// ===============================
-// WAVEFORM REAL
-// ===============================
-function waveform(){
-  Player.analyser.getByteFrequencyData(Player.dataArray);
-
-  if (!Player.dom.wave) return;
-
-  const bars = Player.dom.wave.children;
-
-  for (let i=0;i<bars.length;i++){
-    const v = Player.dataArray[i] / 255;
-    bars[i].style.height = (v*100)+"%";
-  }
-
-  requestAnimationFrame(waveform);
-}
-
-// ===============================
-// LYRICS ENGINE
-// ===============================
-function loadLyrics(data){
-  Player.lyrics = data;
-}
-
-function lyricsLoop(){
-  const t = current().currentTime;
-
-  Player.lyrics.forEach(l=>{
-    if (Math.abs(l.time - t) < 0.2){
-      renderLyric(l.text);
+    if(State.repeat){
+      const a = AudioCore.current();
+      a.currentTime = 0;
+      a.play();
+    } else {
+      Engine.play(Playlist.next());
     }
+
   });
 
-  requestAnimationFrame(lyricsLoop);
-}
+  Events.on("error", ErrorHandler.handle);
 
-function renderLyric(text){
-  let el = document.getElementById("lyrics");
-  if (!el) return;
-  el.textContent = text;
-}
-
-// ===============================
-// MEDIA SESSION
-// ===============================
-function mediaSession(){
-  if (!("mediaSession" in navigator)) return;
-
-  navigator.mediaSession.setActionHandler("play", togglePlay);
-  navigator.mediaSession.setActionHandler("pause", togglePlay);
-  navigator.mediaSession.setActionHandler("nexttrack", ()=>Player.dom.next.click());
-  navigator.mediaSession.setActionHandler("previoustrack", ()=>Player.dom.prev.click());
-}
-
-// ===============================
-// STORAGE
-// ===============================
-function saveState(){
-  localStorage.setItem("pp_index", Player.index);
-  localStorage.setItem("pp_time", current().currentTime);
-  localStorage.setItem("pp_src", current().src);
-}
-
-function restoreState(){
-  const i = localStorage.getItem("pp_index");
-  const t = localStorage.getItem("pp_time");
-  const s = localStorage.getItem("pp_src");
-
-  if (!s) return;
-
-  current().src = s;
-  Player.index = parseInt(i)||0;
-
-  current().onloadedmetadata = ()=>{
-    current().currentTime = t || 0;
-  };
-}
-
-// ===============================
-// TRACK CLICK
-// ===============================
-function bindTracks(){
-  Player.dom.tracks.forEach((t,i)=>{
-    t.onclick = ()=>playTrack(i);
+  Events.on("retry", ()=>{
+    Engine.play(State.index);
   });
+
 }
 
 // ===============================
-// AUTO NEXT
+// INIT PART 2
 // ===============================
-function bindEnded(){
-  Player.audioA.onended = nextAuto;
-  Player.audioB.onended = nextAuto;
+function initPart2(){
+
+  DOM.init();
+  Playlist.buildFromDOM();
+  bindControls();
+  bindAudioLogic();
+  Engine.restore();
+
 }
 
-function nextAuto(){
-  if (Player.repeat){
-    current().currentTime = 0;
-    current().play();
-  } else {
-    Player.dom.next.click();
+// expose part2
+window.__PLAYER_PART2__ = {
+  DOM,
+  Cache,
+  Preload,
+  Playlist,
+  Engine,
+  initPart2
+};
+
+})();
+
+
+
+
+// ===============================
+// PRO PLAYER v4 - PART 3 / 4
+// WAVEFORM + LYRICS + ANIMATIONS
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore
+} = window.__PLAYER_PART1__;
+
+const {
+  DOM
+} = window.__PLAYER_PART2__;
+
+// ===============================
+// RAF MANAGER (PERF CONTROL)
+// ===============================
+const RAF = {
+  tasks: new Map(),
+  running: false,
+
+  add(name, fn){
+    this.tasks.set(name, fn);
+    if(!this.running) this.run();
+  },
+
+  remove(name){
+    this.tasks.delete(name);
+  },
+
+  run(){
+    this.running = true;
+
+    const loop = ()=>{
+      this.tasks.forEach(fn=>{
+        try{ fn(); }catch(e){}
+      });
+      requestAnimationFrame(loop);
+    };
+
+    requestAnimationFrame(loop);
   }
-}
+};
 
 // ===============================
-// DYNAMIC BG
+// WAVEFORM ENGINE (REAL)
 // ===============================
-function dynamicBG(){
-  const c = Math.floor(Math.random()*360);
-  document.body.style.background = `hsl(${c},40%,10%)`;
-}
+const Waveform = {
 
-// ===============================
-// FULLSCREEN
-// ===============================
-function fullscreen(){
-  if (!document.fullscreenElement){
-    Player.dom.player.requestFullscreen();
-  } else {
-    document.exitFullscreen();
+  bars: [],
+  resolution: 64,
+
+  init(){
+    if(!DOM.wave) return;
+
+    DOM.wave.innerHTML = "";
+
+    for(let i=0;i<this.resolution;i++){
+      const bar = document.createElement("span");
+      bar.style.display = "inline-block";
+      bar.style.width = "2px";
+      bar.style.marginRight = "1px";
+      bar.style.height = "5px";
+      DOM.wave.appendChild(bar);
+      this.bars.push(bar);
+    }
+
+    RAF.add("waveform", ()=>this.draw());
+  },
+
+  draw(){
+    const analyser = AudioCore.analyser;
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(AudioCore.dataArray);
+
+    for(let i=0;i<this.bars.length;i++){
+      const v = AudioCore.dataArray[i] / 255;
+      const h = v * 100;
+      this.bars[i].style.height = h + "%";
+    }
   }
+
+};
+
+// ===============================
+// LYRICS ENGINE (SYNC PRECIS)
+// ===============================
+const Lyrics = {
+
+  list: [],
+  currentIndex: -1,
+  container: null,
+
+  init(){
+    this.container = document.getElementById("lyrics");
+  },
+
+  load(data){
+    this.list = data.sort((a,b)=>a.time - b.time);
+    this.currentIndex = -1;
+  },
+
+  update(){
+
+    if(!this.list.length) return;
+
+    const t = AudioCore.current().currentTime;
+
+    for(let i=0;i<this.list.length;i++){
+      if(t >= this.list[i].time && this.currentIndex !== i){
+        this.currentIndex = i;
+        this.render(this.list[i].text);
+        break;
+      }
+    }
+  },
+
+  render(text){
+    if(!this.container) return;
+
+    this.container.textContent = text;
+
+    this.container.animate([
+      { opacity: 0, transform: "translateY(10px)" },
+      { opacity: 1, transform: "translateY(0)" }
+    ], { duration: 200 });
+  }
+
+};
+
+// ===============================
+// ANIMATIONS ENGINE
+// ===============================
+const UIEffects = {
+
+  pulse(el){
+    if(!el) return;
+
+    el.animate([
+      { transform: "scale(1)" },
+      { transform: "scale(1.15)" },
+      { transform: "scale(1)" }
+    ], { duration: 200 });
+  },
+
+  glow(el){
+    if(!el) return;
+
+    el.animate([
+      { boxShadow: "0 0 0px #0ff" },
+      { boxShadow: "0 0 25px #0ff" },
+      { boxShadow: "0 0 0px #0ff" }
+    ], { duration: 800 });
+  },
+
+  background(){
+
+    const hue = Math.floor(Math.random()*360);
+    document.body.style.background = `hsl(${hue},30%,10%)`;
+  }
+
+};
+
+// ===============================
+// PROGRESS SYNC ENGINE
+// ===============================
+const Progress = {
+
+  update(){
+    const a = AudioCore.current();
+    if(!a.duration || !DOM.progress) return;
+
+    const val = (a.currentTime / a.duration) * 100;
+    DOM.progress.value = val;
+  }
+
+};
+
+// ===============================
+// GLOBAL LOOP (CENTRAL)
+// ===============================
+const Loop = {
+
+  init(){
+    RAF.add("progress", ()=>Progress.update());
+    RAF.add("lyrics", ()=>Lyrics.update());
+  }
+
+};
+
+// ===============================
+// EVENT HOOKS (UI REACTIONS)
+// ===============================
+function bindUIEvents(){
+
+  Events.on("play", ()=>{
+    UIEffects.pulse(DOM.play);
+    UIEffects.glow(DOM.player);
+    UIEffects.background();
+  });
+
+  Events.on("trackChange", ()=>{
+    UIEffects.background();
+  });
+
 }
 
 // ===============================
-// BOTTOM SHEET
+// INIT PART 3
 // ===============================
-let sheetOpen=false;
-function toggleSheet(){
-  sheetOpen=!sheetOpen;
-  Player.dom.player.style.transform = sheetOpen?"translateY(0)":"translateY(80%)";
+function initPart3(){
+
+  Waveform.init();
+  Lyrics.init();
+  Loop.init();
+  bindUIEvents();
+
 }
 
+// expose part3
+window.__PLAYER_PART3__ = {
+  RAF,
+  Waveform,
+  Lyrics,
+  UIEffects,
+  Progress,
+  Loop,
+  initPart3
+};
+
+})();
+
+
+
+
 // ===============================
-// INIT
+// PRO PLAYER v4 - PART 4 / 4
+// API + MEDIA + MOBILE + INIT
+// ===============================
+
+(function(){
+
+const {
+  State,
+  Events,
+  AudioCore
+} = window.__PLAYER_PART1__;
+
+const {
+  DOM,
+  Engine,
+  Playlist,
+  initPart2
+} = window.__PLAYER_PART2__;
+
+const {
+  initPart3
+} = window.__PLAYER_PART3__;
+
+// ===============================
+// MEDIA SESSION (FULL)
+// ===============================
+const Media = {
+
+  init(){
+
+    if(!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.setActionHandler("play", ()=>Engine.toggle());
+    navigator.mediaSession.setActionHandler("pause", ()=>Engine.toggle());
+    navigator.mediaSession.setActionHandler("nexttrack", ()=>Engine.play(Playlist.next()));
+    navigator.mediaSession.setActionHandler("previoustrack", ()=>Engine.play(Playlist.prev()));
+
+    Events.on("trackChange", (track)=>{
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist || "",
+        album: track.album || ""
+      });
+    });
+
+  }
+
+};
+
+// ===============================
+// MOBILE / VISIBILITY HANDLER
+// ===============================
+const Mobile = {
+
+  init(){
+
+    document.addEventListener("visibilitychange", ()=>{
+      if(document.hidden){
+        Events.emit("appHidden");
+      } else {
+        Events.emit("appVisible");
+      }
+    });
+
+    window.addEventListener("focus", ()=>Events.emit("focus"));
+    window.addEventListener("blur", ()=>Events.emit("blur"));
+
+  }
+
+};
+
+// ===============================
+// FULLSCREEN CONTROLLER
+// ===============================
+const Fullscreen = {
+
+  toggle(){
+    if(!document.fullscreenElement){
+      DOM.player && DOM.player.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+};
+
+// ===============================
+// BOTTOM SHEET (REAL)
+// ===============================
+const BottomSheet = {
+
+  open: false,
+  startY: 0,
+  currentY: 0,
+
+  init(){
+
+    if(!DOM.player) return;
+
+    DOM.player.addEventListener("touchstart", (e)=>{
+      this.startY = e.touches[0].clientY;
+    });
+
+    DOM.player.addEventListener("touchmove", (e)=>{
+      this.currentY = e.touches[0].clientY;
+      const delta = this.currentY - this.startY;
+
+      if(delta > 0){
+        DOM.player.style.transform = `translateY(${delta}px)`;
+      }
+    });
+
+    DOM.player.addEventListener("touchend", ()=>{
+      const delta = this.currentY - this.startY;
+
+      if(delta > 100){
+        this.open = false;
+        DOM.player.style.transform = "translateY(80%)";
+      } else {
+        this.open = true;
+        DOM.player.style.transform = "translateY(0)";
+      }
+    });
+
+  }
+
+};
+
+// ===============================
+// SECURITY / AUTOPLAY FIX
+// ===============================
+const Security = {
+
+  unlocked: false,
+
+  init(){
+
+    const unlock = ()=>{
+      if(this.unlocked) return;
+
+      AudioCore.ctx.resume();
+      this.unlocked = true;
+
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+    };
+
+    document.addEventListener("click", unlock);
+    document.addEventListener("touchstart", unlock);
+
+  }
+
+};
+
+// ===============================
+// API PUBLIC (CONTROL EXTERNE)
+// ===============================
+const API = {
+
+  play(i){ Engine.play(i); },
+  pause(){ AudioCore.current().pause(); },
+  toggle(){ Engine.toggle(); },
+  next(){ Engine.play(Playlist.next()); },
+  prev(){ Engine.play(Playlist.prev()); },
+
+  volume(v){
+    State.volume = v;
+    AudioCore.gainA.gain.value = v;
+    AudioCore.gainB.gain.value = v;
+  },
+
+  loadPlaylist(data){
+    Playlist.list = data;
+  },
+
+  loadLyrics(data){
+    window.__PLAYER_PART3__.Lyrics.load(data);
+  }
+
+};
+
+// ===============================
+// GLOBAL INIT
 // ===============================
 function init(){
-  if (Player.initDone) return;
 
-  bindDOM();
-  initAudio();
-  bindControls();
-  bindTracks();
-  bindEnded();
-  restoreState();
-  mediaSession();
+  AudioCore.init();
 
-  progressLoop();
-  waveform();
-  lyricsLoop();
+  initPart2();
+  initPart3();
 
-  Player.initDone = true;
+  Media.init();
+  Mobile.init();
+  BottomSheet.init();
+  Security.init();
+
+  Events.emit("ready");
+
 }
 
+// ===============================
+// AUTO INIT
+// ===============================
 document.addEventListener("DOMContentLoaded", init);
+
+// ===============================
+// EXPORT GLOBAL
+// ===============================
+window.PlayerAPI = API;
 
 })();
