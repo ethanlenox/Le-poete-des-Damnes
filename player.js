@@ -467,7 +467,7 @@ const Engine = {
       }
 
       newAudio.currentTime = 0;
-
+      newGain.gain.value = 0.001;
       await newAudio.play();
 
       Crossfade.apply(oldGain, newGain);
