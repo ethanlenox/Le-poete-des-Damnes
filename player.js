@@ -259,8 +259,8 @@ apply(g1, g2){
   g1.gain.cancelScheduledValues(now);
   g2.gain.cancelScheduledValues(now);
 
-  g1.gain.setValueAtTime(1, now);
-  g2.gain.setValueAtTime(0, now);
+  g1.gain.setValueAtTime(g1.gain.value, now);
+  g2.gain.setValueAtTime(g2.gain.value, now);
 
   g1.gain.linearRampToValueAtTime(0, now + this.duration);
   g2.gain.linearRampToValueAtTime(1, now + this.duration);
@@ -467,7 +467,7 @@ const Engine = {
       }
 
       newAudio.currentTime = 0;
-      newGain.gain.value = 0.001;
+     
       await newAudio.play();
 
 
