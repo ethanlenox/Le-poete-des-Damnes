@@ -4,13 +4,12 @@
 // ===============================
 
 (function(){
-
 if (window.__ULTRA_PRO_PLAYER_V4__) return;
 window.__ULTRA_PRO_PLAYER_V4__ = true;
 
-// ===============================
-// STATE MANAGER (FULL)
-// ===============================
+// =================
+// STATE MANAGER 
+// =================
 const State = {
   index: 0,
   playing: false,
@@ -31,9 +30,9 @@ const State = {
   maxRetries: 3
 };
 
-// ===============================
+// ===================
 // EVENT BUS (FULL)
-// ===============================
+// ===================
 const Events = {
   events: new Map(),
 
@@ -234,31 +233,6 @@ const Loader = {
 
       audio.load();
     });
-  }
-
-};
-
-// ===============================
-// CROSSFADE ENGINE (PRO CURVE)
-// ===============================
-const Crossfade = {
-
-  duration: 2,
-
-  apply(g1, g2){
-
-    const ctx = AudioCore.ctx;
-    const now = ctx.currentTime;
-
-    g1.gain.cancelScheduledValues(now);
-    g2.gain.cancelScheduledValues(now);
-
-    // courbe plus smooth (expo)
-    g1.gain.setValueAtTime(g1.gain.value, now);
-    g2.gain.setValueAtTime(g2.gain.value, now);
-
-    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
-    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
   }
 
 };
@@ -651,59 +625,6 @@ const RAF = {
 };
 
 // ===============================
-//          WAVEFORM 
-// ===============================
-const Waveform = {
-
-  bars: [],
-  resolution: 64,
-
-  init(){
-    if(!DOM.wave){
-      DOM.wave = document.getElementById("waveform");
-      if(!DOM.wave) return;
-    }
-
-    this.bars = [];
-    DOM.wave.innerHTML = "";
-
-    for(let i=0;i<this.resolution;i++){
-      const bar = document.createElement("span");
-      bar.style.display = "inline-block";
-      bar.style.width = "2px";
-      bar.style.marginRight = "1px";
-      bar.style.height = "5px";
-      DOM.wave.appendChild(bar);
-      this.bars.push(bar);
-    }
-
-    // EVENTS
-    Events.on("play", ()=>{
-      if(!AudioCore.analyser) return;
-      RAF.add("waveform", ()=>this.draw());
-    });
-
-    Events.on("pause", ()=>{
-      RAF.remove("waveform");
-    });
-  },
-
-  draw(){
-    const analyser = AudioCore.analyser;
-    if(!analyser) return;
-
-    analyser.getByteFrequencyData(AudioCore.dataArray);
-
-    for(let i=0;i<this.bars.length;i++){
-      const v = AudioCore.dataArray[i] / 255;
-      const h = v * 100;
-      this.bars[i].style.height = h + "%";
-    }
-  }
-
-};
-
-// ===============================
 // LYRICS ENGINE (SYNC PRECIS)
 // ===============================
 const Lyrics = {
@@ -1077,14 +998,61 @@ window.PlayerAPI = API;
 
 
 
-// ===============================
-// ADDON PRO VISUAL (NON DESTRUCTIF)
-// ===============================
+// ==================
+// ADDON PRO VISUAL
+// ==================
 
 (function(){
 
 const { State, Events, AudioCore } = window.__PLAYER_PART1__;
 const { DOM, Engine, Playlist } = window.__PLAYER_PART2__;
+
+// ====================
+//       WAVEFORM 
+// ====================
+const WaveAddon = {
+
+  bars: [],
+  raf: null,
+
+  init(){
+
+    const wf = document.getElementById("waveform");
+    if(!wf) return;
+
+    this.bars = wf.querySelectorAll("span");
+
+    Events.on("play", ()=>this.start());
+    Events.on("pause", ()=>this.stop());
+  },
+
+  start(){
+    if(this.raf) return;
+
+    const loop = ()=>{
+
+      const analyser = AudioCore.analyser;
+      if(analyser){
+        analyser.getByteFrequencyData(AudioCore.dataArray);
+
+        this.bars.forEach((bar,i)=>{
+          const v = AudioCore.dataArray[i*2] || 0;
+          bar.style.height = Math.max(4, v/6) + "px";
+        });
+      }
+
+      this.raf = requestAnimationFrame(loop);
+    };
+
+    loop();
+  },
+
+  stop(){
+    cancelAnimationFrame(this.raf);
+    this.raf = null;
+  }
+
+};
 
 // ===============================
 // COVER FX (ZOOM + RYTHME)
