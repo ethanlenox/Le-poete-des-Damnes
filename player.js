@@ -1,22 +1,3 @@
-window.addEventListener("DOMContentLoaded", () => {
-
-  const savedSrc = localStorage.getItem("lastSrc");
-  const savedTitle = localStorage.getItem("lastTitle");
-  const savedTrack = localStorage.getItem("lastTrack");
-
-  if (savedSrc) {
-
-    audio.src = savedSrc;
-    title.textContent = savedTitle || "Lecture...";
-    currentIndex = savedTrack ? parseInt(savedTrack) : 0;
-
-    audio.load();
-
-  }
-
-});
-
-
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
 const nextBtn = document.getElementById("nextBtn");
@@ -31,20 +12,25 @@ const toggleBtn = document.getElementById("togglePlayer");
 const player = document.getElementById("miniPlayer");
 
 /* lecteur pages paroles */
-const savedSrc = localStorage.getItem("lastSrc");
-const savedTitle = localStorage.getItem("lastTitle");
+const savedTrack = localStorage.getItem("lastTrack");
 
-if (savedSrc) {
-  audio.src = savedSrc;
-  title.textContent = savedTitle || "Lecture...";
-  audio.play().catch(() => {
-// sécurité navigateur (autoplay bloqué parfois)
-  console.log("Autoplay bloqué, attente clic utilisateur");
-  });
-  
-  playBtn.textContent = "⏸";
+if (savedTrack !== null) {
+  currentIndex = parseInt(savedTrack);
+
+  const t = tracks[currentIndex];
+
+  if (t) {
+    audio.src = t.dataset.src;
+    title.textContent = t.dataset.title || "Lecture...";
+
+    audio.load();
+
+    const savedTime = localStorage.getItem("trackTime");
+    if (savedTime) {
+      audio.currentTime = parseFloat(savedTime);
+    }
+  }
 }
-
 /* mode initial */
 if (toggleBtn && player) {
   player.classList.add("compact");
