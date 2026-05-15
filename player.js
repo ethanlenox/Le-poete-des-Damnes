@@ -651,7 +651,7 @@ const RAF = {
 };
 
 // ===============================
-// WAVEFORM ENGINE (REAL)
+//          WAVEFORM 
 // ===============================
 const Waveform = {
 
@@ -659,8 +659,12 @@ const Waveform = {
   resolution: 64,
 
   init(){
-    if(!DOM.wave) return;
+    if(!DOM.wave){
+      DOM.wave = document.getElementById("waveform");
+      if(!DOM.wave) return;
+    }
 
+    this.bars = [];
     DOM.wave.innerHTML = "";
 
     for(let i=0;i<this.resolution;i++){
@@ -673,7 +677,15 @@ const Waveform = {
       this.bars.push(bar);
     }
 
-    RAF.add("waveform", ()=>this.draw());
+    // EVENTS
+    Events.on("play", ()=>{
+      if(!AudioCore.analyser) return;
+      RAF.add("waveform", ()=>this.draw());
+    });
+
+    Events.on("pause", ()=>{
+      RAF.remove("waveform");
+    });
   },
 
   draw(){
@@ -819,7 +831,6 @@ function bindUIEvents(){
 // ===============================
 function initPart3(){
 
-  Waveform.init();
   Lyrics.init();
   Loop.init();
   bindUIEvents();
