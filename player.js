@@ -35,49 +35,27 @@ function restoreState() {
 
   if (!savedSrc) return;
 
-  /* index */
   if (savedTrack !== null) {
     currentIndex = parseInt(savedTrack);
   }
 
-  /* source unique (IMPORTANT) */
   audio.src = savedSrc;
+  title.textContent = savedTitle || "Lecture...";
   audio.load();
 
-  /* titre */
-  title.textContent = savedTitle || "Lecture...";
-
-  /* temps restauré proprement */
   audio.addEventListener("loadedmetadata", () => {
 
     if (savedTime) {
       audio.currentTime = parseFloat(savedTime);
     }
 
-    if (durationEl) {
-      durationEl.textContent = formatTime(audio.duration || 0);
-    }
-
   }, { once: true });
 
-  /* état UI propre */
-if (playBtn) {
-  playBtn.textContent = audio.paused ? "▶" : "⏸";
+  playBtn.textContent = "▶";
+
+  // IMPORTANT : ne jamais autoplay ici
+  audio.pause();
 }
-
-/*ne pas casser la continuité */
-setTimeout(() => {
-
-  if (!audio.paused) return;
-
-  const wasPlaying = localStorage.getItem("isPlaying");
-
-  if (wasPlaying === "true") {
-    audio.play().catch(() => {
-    });
-  }
-
-}, 50);
 
 restoreState();
 
@@ -139,7 +117,9 @@ async function playTrack(i) {
   audio.src = t.dataset.src;
   title.textContent = t.dataset.title || "Lecture...";
 
-  await audio.play();
+  audio.play().catch(() => {
+  console.log("Clic Play");
+});
 
   playBtn.textContent = "⏸";
 
