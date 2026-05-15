@@ -1052,8 +1052,10 @@ document.addEventListener("DOMContentLoaded", init);
 // EXPORT GLOBAL
 // ===============================
 window.PlayerAPI = API;
+})();
 
-  // PAROLES BUTTON COVERS (navigation + save)
+
+// PAROLES BUTTON COVERS (navigation + save)
 document.querySelectorAll(".lyrics-btn").forEach(btn=>{
   btn.addEventListener("click",(e)=>{
     const i = btn.dataset.track;
@@ -1068,5 +1070,3 @@ document.querySelectorAll(".lyrics-btn").forEach(btn=>{
     }
   });
 });
-
-})();
