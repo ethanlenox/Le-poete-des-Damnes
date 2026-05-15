@@ -22,6 +22,28 @@ const tracks = document.querySelectorAll(".track");
 /* player systeme */
 let currentIndex = 0;
 
+/* ===================== */
+/*    MUSIQUE CONTINU    */
+/* ===================== */
+
+function initAudioFromStorage() {
+  const savedTrack = localStorage.getItem("lastTrack");
+  const savedSrc = localStorage.getItem("lastSrc");
+  const savedTitle = localStorage.getItem("lastTitle");
+
+  if (savedSrc) {
+    audio.src = savedSrc;
+    title.textContent = savedTitle || "Lecture...";
+    audio.load();
+  }
+
+  if (savedTrack !== null) {
+    currentIndex = parseInt(savedTrack);
+  }
+}
+
+initAudioFromStorage();
+
 function restoreState() {
 
   const savedTrack = localStorage.getItem("lastTrack");
