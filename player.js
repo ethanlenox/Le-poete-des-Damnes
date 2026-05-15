@@ -102,12 +102,11 @@ const AudioCore = {
     srcA.connect(this.gainA);
     srcB.connect(this.gainB);
 
-    this.gainA.connect(this.analyser);
-    this.gainB.connect(this.analyser);
+    this.gainA.connect(this.masterGain);
+    this.gainB.connect(this.masterGain);
 
-    this.analyser.connect(this.masterGain);
-
-    this.masterGain.connect(this.ctx.destination);
+    this.masterGain.connect(this.analyser);
+    this.analyser.connect(this.ctx.destination);
 
     this.gainA.gain.value = 1;
     this.gainB.gain.value = 0;
