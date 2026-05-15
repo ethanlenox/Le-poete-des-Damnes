@@ -1072,31 +1072,9 @@ function init(){
   Security.init();
 
   Events.emit("ready");
-
 }
 
-  const savedSrc = localStorage.getItem("lastSrc");
-
-if (savedSrc) {
-
-  const a = AudioCore.current();
-  a.src = savedSrc;
-
-  const t = localStorage.getItem("trackTime");
-
-  a.addEventListener("loadedmetadata", () => {
-
-    if (t) {
-      a.currentTime = parseFloat(t);
-    }
-
-    a.play().catch(() => {});
-
-  }, { once: true });
-
-}
-
-  // PAROLES BUTTON (navigation + save)
+// PAROLES BUTTON (navigation + save)
 document.querySelectorAll(".lyrics-btn").forEach(btn=>{
   btn.addEventListener("click",(e)=>{
     const i = btn.dataset.track;
