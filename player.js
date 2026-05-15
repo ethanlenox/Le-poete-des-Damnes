@@ -11,40 +11,43 @@ const repeatBtn = document.getElementById("repeatBtn");
 const toggleBtn = document.getElementById("togglePlayer");
 const player = document.getElementById("miniPlayer");
 
-/* lecteur pages paroles */
-const savedTrack = localStorage.getItem("lastTrack");
-
-if (savedTrack !== null) {
-  currentIndex = parseInt(savedTrack);
-
-  const t = tracks[currentIndex];
-
-  if (t) {
-    audio.src = t.dataset.src;
-    title.textContent = t.dataset.title || "Lecture...";
-
-    audio.load();
-
-    const savedTime = localStorage.getItem("trackTime");
-    if (savedTime) {
-      audio.currentTime = parseFloat(savedTime);
-    }
-  }
-}
-/* mode initial */
-if (toggleBtn && player) {
-  player.classList.add("compact");
-
-  toggleBtn.addEventListener("click", () => {
-    player.classList.toggle("compact");
-    player.classList.toggle("expanded");
-  });
-}
-
-/* 🆕 TEMPS */
+/* ===================== */
+/* lecteur pages parole */
+/* ===================== */
+/* TEMPS */
 const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
 const tracks = document.querySelectorAll(".track");
+let currentIndex = 0;
+/* player systeme */
+function restorePlayer() {
+  const savedTrack = localStorage.getItem("lastTrack");
+  const savedTime = localStorage.getItem("trackTime");
+
+  if (!tracks.length) return;
+  if (savedTrack === null) return;
+
+  currentIndex = parseInt(savedTrack);
+  const t = tracks[currentIndex];
+
+  if (!t) return;
+
+  audio.src = t.dataset.src;
+  title.textContent = t.dataset.title || "Lecture...";
+
+  audio.load();
+
+  audio.addEventListener("loadedmetadata", () => {
+
+    if (savedTime) {
+      audio.currentTime = parseFloat(savedTime);
+    }
+
+  }, { once: true });
+}
+
+restorePlayer();
+
 
 let currentIndex = 0;
 let repeatMode = false;
