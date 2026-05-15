@@ -210,9 +210,8 @@ const Loader = {
 
       if(!src) return reject("no src");
 
-      if(audio.src !== src){
-        audio.src = src;
-      }
+      // ✅ FIX
+      audio.src = src;
 
       const onReady = ()=>{
         cleanup();
@@ -439,6 +438,11 @@ const Engine = {
 
   async play(i){
 
+    // ✅ FIX AUTOPLAY
+    if (AudioCore.ctx.state === "suspended") {
+      await AudioCore.ctx.resume();
+    }
+
     if(State.locked) return;
 
     const track = Playlist.get(i);
@@ -456,8 +460,8 @@ const Engine = {
     try {
 
       if(Cache.has(track.src)){
-        const cached = Cache.get(track.src);
-        newAudio.src = cached.src;
+        // ✅ FIX
+        newAudio.src = track.src;
       } else {
         await Loader.load(newAudio, track.src);
       }
@@ -465,6 +469,9 @@ const Engine = {
       newAudio.currentTime = 0;
 
       await newAudio.play();
+
+      // ✅ FIX volume
+      newGain.gain.value = State.volume;
 
       Crossfade.apply(oldGain, newGain);
 
@@ -485,9 +492,16 @@ const Engine = {
   },
 
   toggle(){
+
     const a = AudioCore.current();
+
+    // ✅ FIX autoplay
+    if (AudioCore.ctx.state === "suspended") {
+      AudioCore.ctx.resume();
+    }
+
     if(a.paused){
-      a.play();
+      a.play().catch(()=>{});
     } else {
       a.pause();
     }
