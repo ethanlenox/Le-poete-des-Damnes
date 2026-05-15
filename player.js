@@ -459,8 +459,8 @@ const Engine = {
 
     try {
 
-      if(Cache.has(track.src)){
-        const cached = Cache.get(track.src);
+    if(Cache.has(track.src)){
+    const cached = Cache.get(track.src);
         newAudio.src = cached.src;
       } else {
         await Loader.load(newAudio, track.src);
@@ -468,23 +468,12 @@ const Engine = {
 
       newAudio.currentTime = 0;
      
-      await newAudio.play();
-
-
-
-      
-      Crossfade.apply(oldGain, newGain);
-
-      setTimeout(()=>{
-
-      oldAudio.pause();
-      oldAudio.currentTime = 0;
-
+     await newAudio.play().catch(()=>{});
+      Crossfade.apply(
+      AudioCore.currentGain(),
+      AudioCore.nextGain()
+      );
       AudioCore.swap();
-
-      }, Crossfade.duration * 1000);
-
-      
 
       if(DOM.title) DOM.title.textContent = track.title;
 
@@ -561,6 +550,7 @@ function bindControls(){
 
   DOM.progress.oninput = ()=>{
     const a = AudioCore.current();
+
     a.currentTime = (DOM.progress.value / 100) * a.duration;
   };
 
