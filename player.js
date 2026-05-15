@@ -251,21 +251,21 @@ const Crossfade = {
 
   duration: 2,
 
-  apply(g1, g2){
+apply(g1, g2){
 
-    const ctx = AudioCore.ctx;
-    const now = ctx.currentTime;
+  const ctx = AudioCore.ctx;
+  const now = ctx.currentTime;
 
-    g1.gain.cancelScheduledValues(now);
-    g2.gain.cancelScheduledValues(now);
+  g1.gain.cancelScheduledValues(now);
+  g2.gain.cancelScheduledValues(now);
 
-    // courbe plus smooth (expo)
-    g1.gain.setValueAtTime(g1.gain.value, now);
-    g2.gain.setValueAtTime(g2.gain.value, now);
+  g1.gain.setValueAtTime(1, now);
+  g2.gain.setValueAtTime(0, now);
 
-    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
-    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
-  }
+  g1.gain.linearRampToValueAtTime(0, now + this.duration);
+  g2.gain.linearRampToValueAtTime(1, now + this.duration);
+
+}
 
 };
 
