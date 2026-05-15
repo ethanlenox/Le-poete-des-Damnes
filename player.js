@@ -290,6 +290,10 @@ muteBtn.addEventListener("click", () => {
   }
 });
 
+/* ===================== */
+/* BOUTONS PLAYER PAGES */
+/* ===================== */
+
 nextBtn.addEventListener("click", () => {
 
   if (!tracks || tracks.length === 0) return;
