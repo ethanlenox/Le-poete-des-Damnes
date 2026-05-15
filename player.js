@@ -1053,8 +1053,6 @@ window.PlayerAPI = API;
 
 })();
 
-
-
 // ===============================
 //        ADDON PRO VISUAL 
 // ===============================
@@ -1236,7 +1234,6 @@ const LyricsAddon = {
         localStorage.setItem("lastTitle", t.title);
         localStorage.setItem("trackTime", AudioCore.current().currentTime);
 
-        // navigation naturelle (tu gardes ton HTML)
       });
 
     });
