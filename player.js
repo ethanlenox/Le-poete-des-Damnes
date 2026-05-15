@@ -1038,7 +1038,6 @@ function init(){
   Mobile.init();
   BottomSheet.init();
   Security.init();
-
   Events.emit("ready");
 
 }
@@ -1047,7 +1046,7 @@ function init(){
 // AUTO INIT
 // ===============================
 document.addEventListener("DOMContentLoaded", init);
-
+Waveform.init();
 // ===============================
 // EXPORT GLOBAL
 // ===============================
@@ -1075,53 +1074,6 @@ window.PlayerAPI = API;
 
 const { State, Events, AudioCore } = window.__PLAYER_PART1__;
 const { DOM, Engine, Playlist } = window.__PLAYER_PART2__;
-
-// ===============================
-// WAVEFORM (ANCIEN STYLE RESTAURÉ)
-// ===============================
-const WaveAddon = {
-
-  bars: [],
-  raf: null,
-
-  init(){
-
-    const wf = document.getElementById("waveform");
-    if(!wf) return;
-
-    this.bars = wf.querySelectorAll("span");
-
-    Events.on("play", ()=>this.start());
-    Events.on("pause", ()=>this.stop());
-  },
-
-  start(){
-    if(this.raf) return;
-
-    const loop = ()=>{
-
-      const analyser = AudioCore.analyser;
-      if(analyser){
-        analyser.getByteFrequencyData(AudioCore.dataArray);
-
-        this.bars.forEach((bar,i)=>{
-          const v = AudioCore.dataArray[i*2] || 0;
-          bar.style.height = Math.max(4, v/6) + "px";
-        });
-      }
-
-      this.raf = requestAnimationFrame(loop);
-    };
-
-    loop();
-  },
-
-  stop(){
-    cancelAnimationFrame(this.raf);
-    this.raf = null;
-  }
-
-};
 
 // ===============================
 // COVER FX (ZOOM + RYTHME)
