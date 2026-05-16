@@ -635,25 +635,18 @@ if(muteBtn){
 // ===============================
   function bindAudioLogic(){
 
-  Events.on("ended", ()=>{
+  let autoTransition = false;
 
-  if(State.repeat){
-    const a = AudioCore.current();
-    a.currentTime = 0;
-    a.play();
-    return;
+  Events.on("time", ({ current, duration })=>{
 
-// AUTO CROSSFADE AVANT FIN
-Events.on("time", ({ current, duration })=>{
-
-  if(!duration || State.locked) return;
+  if(!duration) return;
 
   const remain = duration - current;
 
-  // déclenche 1.3s avant fin
-  if(remain <= 1.3){
+  // déclenche avant fin réelle
+  if(remain <= Crossfade.duration && !autoTransition){
 
-    State.locked = true;
+    autoTransition = true;
 
     const nextIndex = Playlist.next();
 
@@ -661,17 +654,22 @@ Events.on("time", ({ current, duration })=>{
 
   }
 
-});
-    
+  // reset sécurité
+  if(remain > Crossfade.duration){
+    autoTransition = false;
   }
 
-  const nextIndex = Playlist.next();
+});
+    
+  Events.on("ended", ()=>{
 
-  // petit délai pour stabiliser le contexte audio
-  setTimeout(()=>{
-    Engine.play(nextIndex);
-  }, 50);
-
+  if(State.repeat){
+    const a = AudioCore.current();
+    a.currentTime = 0;
+    a.play();
+    return;
+  }
+  autoTransition = false;
 });
 
 
