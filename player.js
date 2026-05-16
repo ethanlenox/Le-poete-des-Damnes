@@ -243,45 +243,33 @@ const Loader = {
 // ===============================
 const Crossfade = {
 
-  duration: 1.5,
+  duration: 1.2,
 
   apply(oldAudio, newAudio, g1, g2){
 
     const ctx = AudioCore.ctx;
     const now = ctx.currentTime;
 
-    const targetVolume = Math.max(State.volume, 0.001);
+    const vol = Math.max(State.volume, 0.001);
 
-    // reset complet
     g1.gain.cancelScheduledValues(now);
     g2.gain.cancelScheduledValues(now);
 
-    // ancien son = volume actuel
-    g1.gain.setValueAtTime(targetVolume, now);
+    // ancien track part du volume actuel
+    g1.gain.setValueAtTime(vol, now);
+    g1.gain.linearRampToValueAtTime(0.001, now + this.duration);
 
-    // nouveau son = muet
+    // nouveau track démarre à 0
     g2.gain.setValueAtTime(0.001, now);
-
-    // fade out ancien
-    g1.gain.linearRampToValueAtTime(
-      0.001,
-      now + this.duration
-    );
-
-    // fade in nouveau
-    g2.gain.linearRampToValueAtTime(
-      targetVolume,
-      now + this.duration
-    );
+    g2.gain.linearRampToValueAtTime(vol, now + this.duration);
 
     setTimeout(()=>{
-
       oldAudio.pause();
       oldAudio.currentTime = 0;
-
     }, this.duration * 1000);
-
   }
+
+};
 
 // ===============================
 //    CLEANUP / MEMORY CONTROL
@@ -481,16 +469,18 @@ const Engine = {
       }
 
       newAudio.currentTime = 0;
-      newAudio.muted = State.muted;
-      newGain.gain.value = 0.001;
-      await newAudio.play();
-      Crossfade.apply(
-      oldAudio,
-      newAudio,
-      oldGain,
-      newGain
-    );
-      AudioCore.swap();
+newAudio.muted = State.muted;
+
+await newAudio.play();
+
+Crossfade.apply(
+  oldAudio,
+  newAudio,
+  oldGain,
+  newGain
+);
+
+AudioCore.swap();
 
       if(DOM.title) DOM.title.textContent = track.title;
 
@@ -618,14 +608,14 @@ if(muteBtn){
   }
 
 // fin ajout boutons aux
+ DOM.volume.oninput = ()=>{
+  State.volume = Number(DOM.volume.value);
 
+  const v = Math.max(State.volume, 0.001);
 
-  
-  DOM.volume.oninput = ()=>{
-    State.volume = DOM.volume.value;
-    AudioCore.gainA.gain.value = State.volume;
-    AudioCore.gainB.gain.value = State.volume;
-  };
+  AudioCore.gainA.gain.value = v;
+  AudioCore.gainB.gain.value = v;
+};
 
   DOM.progress.oninput = ()=>{
     const a = AudioCore.current();
