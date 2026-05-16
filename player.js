@@ -243,22 +243,35 @@ const Loader = {
 // ===============================
 const Crossfade = {
 
-  duration: 2,
+  duration: 1.5,
 
-  apply(g1, g2){
+  apply(oldAudio, newAudio, g1, g2){
 
     const ctx = AudioCore.ctx;
     const now = ctx.currentTime;
 
+    const targetVolume = Math.max(State.volume, 0.001);
+
     g1.gain.cancelScheduledValues(now);
     g2.gain.cancelScheduledValues(now);
 
-    // courbe plus smooth (expo)
     g1.gain.setValueAtTime(g1.gain.value, now);
-    g2.gain.setValueAtTime(g2.gain.value, now);
+    g2.gain.setValueAtTime(0.001, now);
 
     g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
-    g2.gain.exponentialRampToValueAtTime(1, now + this.duration);
+
+    g2.gain.exponentialRampToValueAtTime(
+      targetVolume,
+      now + this.duration
+    );
+
+    setTimeout(()=>{
+
+      oldAudio.pause();
+      oldAudio.currentTime = 0;
+
+    }, this.duration * 1000);
+
   }
 
 };
@@ -462,15 +475,17 @@ const Engine = {
 
       newAudio.currentTime = 0;
 
-      oldAudio.pause();
-      oldAudio.currentTime = 0;
-
       newAudio.muted = State.muted;
       newGain.gain.value = State.volume;
 
       await newAudio.play();
 
-      Crossfade.apply(oldGain, newGain);
+      Crossfade.apply(
+      oldAudio,
+      newAudio,
+      oldGain,
+      newGain
+    );
 
       AudioCore.swap();
 
