@@ -445,7 +445,7 @@ const Engine = {
 
   async play(i){
 
-if(State.locked || State.index === i) return;
+if(State.locked) return;
 
  const track = Playlist.get(i);
 if(!track) return;
