@@ -239,7 +239,7 @@ const Loader = {
 };
 
 // ===============================
-//       CROSSFADE ENGINE 
+//           CROSSFADE
 // ===============================
 const Crossfade = {
 
@@ -631,9 +631,9 @@ if(muteBtn){
 // ===============================
 //       AUTO NEXT / REPEAT
 // ===============================
-function bindAudioLogic(){
+  function bindAudioLogic(){
 
-Events.on("ended", ()=>{
+  Events.on("ended", ()=>{
 
   if(State.repeat){
     const a = AudioCore.current();
@@ -644,13 +644,14 @@ Events.on("ended", ()=>{
 
   const nextIndex = Playlist.next();
 
-  State.locked = true;
-
+  // petit délai pour stabiliser le contexte audio
   setTimeout(()=>{
     Engine.play(nextIndex);
-  }, 0);
+  }, 50);
 
 });
+
+
 
   Events.on("error", ErrorHandler.handle);
 
