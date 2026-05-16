@@ -123,13 +123,19 @@ const AudioCore = {
       });
 
       audio.addEventListener("timeupdate", ()=>{
-        State.currentTime = audio.currentTime;
-        State.duration = audio.duration || 0;
-        Events.emit("time", {
-          current: audio.currentTime,
-          duration: audio.duration
-        });
-      });
+
+  // ignore audio inactif
+  if(audio !== AudioCore.current()) return;
+
+  State.currentTime = audio.currentTime;
+  State.duration = audio.duration || 0;
+
+  Events.emit("time", {
+    current: audio.currentTime,
+    duration: audio.duration
+  });
+
+});
 
       audio.addEventListener("waiting", ()=>{
         State.buffering = true;
