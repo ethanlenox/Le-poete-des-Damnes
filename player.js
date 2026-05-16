@@ -533,6 +533,62 @@ function bindControls(){
 
   DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
 
+  
+
+
+// ajout boutons aux
+  const repeatBtn = document.getElementById("repeatBtn");
+  const muteBtn = document.getElementById("muteBtn");
+  const togglePlayerBtn = document.getElementById("togglePlayer");
+
+  // PLAY / PAUSE ICON
+  Events.on("play", ()=>{
+    if(DOM.play) DOM.play.textContent = "⏸";
+  });
+
+  Events.on("pause", ()=>{
+    if(DOM.play) DOM.play.textContent = "▶";
+  });
+
+  // REPEAT
+  if(repeatBtn){
+    repeatBtn.onclick = ()=>{
+
+      State.repeat = !State.repeat;
+
+      repeatBtn.style.opacity = State.repeat ? "1" : "0.5";
+    };
+  }
+
+  // MUTE
+  if(muteBtn){
+    muteBtn.onclick = ()=>{
+
+      State.muted = !State.muted;
+
+      const current = AudioCore.current();
+
+      current.muted = State.muted;
+
+      muteBtn.textContent = State.muted ? "🔇" : "🔊";
+    };
+  }
+
+  // PLAYLIST TOGGLE
+  if(togglePlayerBtn){
+
+    togglePlayerBtn.onclick = ()=>{
+
+      document.body.classList.toggle("playlist-open");
+
+    };
+
+  }
+
+// fin ajout boutons aux
+
+
+  
   DOM.volume.oninput = ()=>{
     State.volume = DOM.volume.value;
     AudioCore.gainA.gain.value = State.volume;
