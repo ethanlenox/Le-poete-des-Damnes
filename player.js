@@ -477,15 +477,13 @@ const Engine = {
       newAudio.muted = State.muted;
       newGain.gain.value = 0.001;
       await newAudio.play();
+      AudioCore.swap();
       Crossfade.apply(
       oldAudio,
       newAudio,
       oldGain,
       newGain
     );
-
-      
-      AudioCore.swap();
 
       if(DOM.title) DOM.title.textContent = track.title;
 
