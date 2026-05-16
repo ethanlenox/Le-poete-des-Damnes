@@ -937,22 +937,26 @@ const UIEffects = {
 // ===============================
 const Progress = {
 
-  update(){
+     update(){
   const a = AudioCore.current();
-  if(!a.duration || !DOM.progress) return;
+  if(!a) return;
 
-  const val = (a.currentTime / a.duration) * 100;
-  DOM.progress.value = val;
+  const progress = DOM?.progress;
+  if(!progress) return;
+
+  if(a.duration){
+    progress.value = (a.currentTime / a.duration) * 100;
+  }
 
   const current = document.getElementById("currentTime");
   const duration = document.getElementById("duration");
 
-  if(current){
-    current.textContent = this.formatTime(a.currentTime);
+  if(current && !isNaN(a.currentTime)){
+    current.textContent = this.formatTime(a.currentTime || 0);
   }
 
-  if(duration){
-    duration.textContent = this.formatTime(a.duration);
+  if(duration && !isNaN(a.duration)){
+    duration.textContent = this.formatTime(a.duration || 0);
   }
 }
 
