@@ -633,17 +633,23 @@ if(muteBtn){
 // ===============================
 function bindAudioLogic(){
 
-  Events.on("ended", ()=>{
+Events.on("ended", ()=>{
 
-    if(State.repeat){
-      const a = AudioCore.current();
-      a.currentTime = 0;
-      a.play();
-    } else {
-      Engine.play(Playlist.next());
-    }
+  if(State.repeat){
+    const a = AudioCore.current();
+    a.currentTime = 0;
+    a.play();
+    return;
+  }
 
-  });
+  const nextIndex = Playlist.next();
+
+  // petit délai pour stabiliser le contexte audio
+  setTimeout(()=>{
+    Engine.play(nextIndex);
+  }, 50);
+
+});
 
   Events.on("error", ErrorHandler.handle);
 
