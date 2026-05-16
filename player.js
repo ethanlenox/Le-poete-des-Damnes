@@ -252,15 +252,24 @@ const Crossfade = {
 
     const targetVolume = Math.max(State.volume, 0.001);
 
+    // reset complet
     g1.gain.cancelScheduledValues(now);
     g2.gain.cancelScheduledValues(now);
 
-    g1.gain.setValueAtTime(g1.gain.value, now);
+    // ancien son = volume actuel
+    g1.gain.setValueAtTime(targetVolume, now);
+
+    // nouveau son = muet
     g2.gain.setValueAtTime(0.001, now);
 
-    g1.gain.exponentialRampToValueAtTime(0.001, now + this.duration);
+    // fade out ancien
+    g1.gain.linearRampToValueAtTime(
+      0.001,
+      now + this.duration
+    );
 
-    g2.gain.exponentialRampToValueAtTime(
+    // fade in nouveau
+    g2.gain.linearRampToValueAtTime(
       targetVolume,
       now + this.duration
     );
@@ -273,8 +282,6 @@ const Crossfade = {
     }, this.duration * 1000);
 
   }
-
-};
 
 // ===============================
 //    CLEANUP / MEMORY CONTROL
