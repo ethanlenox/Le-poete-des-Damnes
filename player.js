@@ -462,6 +462,11 @@ const Engine = {
 
       newAudio.currentTime = 0;
 
+      oldAudio.pause();
+      oldAudio.currentTime = 0;
+
+      newAudio.muted = State.muted;
+
       await newAudio.play();
 
       Crossfade.apply(oldGain, newGain);
@@ -560,19 +565,27 @@ function bindControls(){
     };
   }
 
-  // MUTE
-  if(muteBtn){
-    muteBtn.onclick = ()=>{
+// MUTE
+if(muteBtn){
 
-      State.muted = !State.muted;
+  const syncMute = ()=>{
 
-      const current = AudioCore.current();
+    AudioCore.A.muted = State.muted;
+    AudioCore.B.muted = State.muted;
 
-      current.muted = State.muted;
+    muteBtn.textContent = State.muted ? "🔇" : "🔊";
+  };
 
-      muteBtn.textContent = State.muted ? "🔇" : "🔊";
-    };
-  }
+  muteBtn.onclick = ()=>{
+
+    State.muted = !State.muted;
+
+    syncMute();
+  };
+
+  Events.on("trackChange", syncMute);
+
+}
 
   // PLAYLIST TOGGLE
   if(togglePlayerBtn){
