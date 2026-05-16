@@ -466,6 +466,7 @@ const Engine = {
       oldAudio.currentTime = 0;
 
       newAudio.muted = State.muted;
+      newGain.gain.value = State.volume;
 
       await newAudio.play();
 
