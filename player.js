@@ -269,10 +269,14 @@ const Crossfade = {
     g2.gain.setValueAtTime(0.001, now);
     g2.gain.linearRampToValueAtTime(vol, now + this.duration);
 
-    setTimeout(()=>{
-      oldAudio.pause();
-      oldAudio.currentTime = 0;
-    }, this.duration * 1000);
+   setTimeout(()=>{
+
+  oldAudio.pause();
+  oldAudio.currentTime = 0;
+  oldAudio.src = "";
+  oldAudio.load();
+
+}, this.duration * 1000);
   }
 
 };
