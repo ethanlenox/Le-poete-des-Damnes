@@ -493,7 +493,9 @@ AudioCore.swap();
       ErrorHandler.handle(e);
     }
 
-    State.locked = false;
+    setTimeout(()=>{
+  State.locked = false;
+}, 1500);
   },
 
   toggle(){
@@ -640,6 +642,27 @@ if(muteBtn){
     a.currentTime = 0;
     a.play();
     return;
+
+// AUTO CROSSFADE AVANT FIN
+Events.on("time", ({ current, duration })=>{
+
+  if(!duration || State.locked) return;
+
+  const remain = duration - current;
+
+  // déclenche 1.3s avant fin
+  if(remain <= 1.3){
+
+    State.locked = true;
+
+    const nextIndex = Playlist.next();
+
+    Engine.play(nextIndex);
+
+  }
+
+});
+    
   }
 
   const nextIndex = Playlist.next();
