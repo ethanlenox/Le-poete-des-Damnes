@@ -452,6 +452,8 @@ const Engine = {
   async play(i){
 
 if(State.locked) return;
+if(this.transitioning) return;
+this.transitioning = true;
 
  const track = Playlist.get(i);
 if(!track) return;
@@ -497,11 +499,15 @@ AudioCore.swap();
 
     } catch(e){
       ErrorHandler.handle(e);
+      this.transitioning = false;
     }
 
     setTimeout(()=>{
-  State.locked = false;
-}, 1500);
+
+      State.locked = false;
+      this.transitioning = false;
+
+    }, 1500);
   },
 
   toggle(){
