@@ -520,12 +520,52 @@ AudioCore.swap();
   },
 
   save(){
+    this.saveSettings();
     localStorage.setItem("pp_i", State.index);
     localStorage.setItem("pp_t", AudioCore.current().currentTime);
     localStorage.setItem("pp_s", AudioCore.current().src);
   },
 
+    saveSettings(){
+
+    localStorage.setItem("pp_volume", State.volume);
+    localStorage.setItem("pp_muted", State.muted);
+    localStorage.setItem("pp_repeat", State.repeat);
+    localStorage.setItem("pp_shuffle", State.shuffle);
+
+  },
+
+  restoreSettings(){
+
+    const volume = parseFloat(localStorage.getItem("pp_volume"));
+    const muted = localStorage.getItem("pp_muted");
+    const repeat = localStorage.getItem("pp_repeat");
+    const shuffle = localStorage.getItem("pp_shuffle");
+
+    if(!isNaN(volume)){
+      State.volume = volume;
+    }
+
+    State.muted = muted === "true";
+    State.repeat = repeat === "true";
+    State.shuffle = shuffle === "true";
+
+    AudioCore.A.muted = State.muted;
+    AudioCore.B.muted = State.muted;
+
+    if(AudioCore.gainA){
+      AudioCore.gainA.gain.value = State.volume;
+    }
+
+    if(AudioCore.gainB){
+      AudioCore.gainB.gain.value = State.volume;
+    }
+
+  },
+  
+
   restore(){
+    this.restoreSettings();
     const src = localStorage.getItem("pp_s");
     if(!src) return;
 
