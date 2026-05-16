@@ -447,17 +447,17 @@ const Engine = {
 
     if(State.locked) return;
 
-    const track = Playlist.get(i);
-    if(!track) return;
+ const track = Playlist.get(i);
+if(!track) return;
 
-    State.locked = true;
-    State.index = i;
+State.locked = true;
+State.index = i;
 
-    const newAudio = AudioCore.next();
-    const newGain = AudioCore.nextGain();
+const oldAudio = AudioCore.current();
+const oldGain = AudioCore.currentGain();
 
-    const oldAudio = AudioCore.current();
-    const oldGain = AudioCore.currentGain();
+const newAudio = AudioCore.next();
+const newGain = AudioCore.nextGain();
 
     try {
 
@@ -644,10 +644,11 @@ Events.on("ended", ()=>{
 
   const nextIndex = Playlist.next();
 
-  // petit délai pour stabiliser le contexte audio
+  State.locked = true;
+
   setTimeout(()=>{
     Engine.play(nextIndex);
-  }, 50);
+  }, 0);
 
 });
 
