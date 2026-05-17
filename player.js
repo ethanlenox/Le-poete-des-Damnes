@@ -803,14 +803,58 @@ if(!oldAudio.src){
   }
 },
 
-  toggle(){
-    const a = AudioCore.current();
-    if(a.paused){
-      a.play();
-    } else {
+async toggle(){
+
+  const a = AudioCore.current();
+
+  const gain = AudioCore.currentGain();
+
+  const now = AudioCore.ctx.currentTime;
+
+  // PLAY
+  if(a.paused){
+
+    try{
+
+      gain.gain.cancelScheduledValues(now);
+
+      gain.gain.setValueAtTime(0.001, now);
+
+      gain.gain.linearRampToValueAtTime(
+        Math.max(State.volume, 0.001),
+        now + 0.12
+      );
+
+      await a.play();
+
+    }catch(e){}
+
+  } else {
+
+    // PAUSE FADE
+    gain.gain.cancelScheduledValues(now);
+
+    gain.gain.setValueAtTime(
+      Math.max(gain.gain.value, 0.001),
+      now
+    );
+
+    gain.gain.linearRampToValueAtTime(
+      0.001,
+      now + 0.12
+    );
+
+    setTimeout(()=>{
+
       a.pause();
-    }
-  },
+
+      // restore volume
+      gain.gain.value =
+        Math.max(State.volume, 0.001);
+
+    }, 120);
+  }
+},
 
   preload(){
     const nextIndex = Playlist.next();
