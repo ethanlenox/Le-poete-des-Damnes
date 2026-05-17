@@ -452,12 +452,24 @@ const Playlist = {
 //      ENGINE (FULL CONTROL)
 // ===============================
 const Engine = {
+  transitioning: false,
 
   async play(i){
 
 if(State.locked) return;
-if(this.transitioning) return;
+
+if(this.transitioning){
+  return;
+}
+
 this.transitioning = true;
+
+// protection anti relance ultra rapide
+clearTimeout(this.__playLock);
+
+this.__playLock = setTimeout(()=>{
+  this.transitioning = false;
+}, 2000);
 
  const track = Playlist.get(i);
 if(!track) return;
@@ -508,10 +520,9 @@ AudioCore.swap();
 
     setTimeout(()=>{
 
-      State.locked = false;
-      this.transitioning = false;
+  State.locked = false;
 
-    }, 1500);
+ }, 1500);
   },
 
   toggle(){
