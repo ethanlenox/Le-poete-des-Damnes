@@ -1235,22 +1235,79 @@ const Media = {
 //   MOBILE / VISIBILITY HANDLER
 // ===============================
 const Mobile = {
+    recovering: false,
+
+    async recoverAudio(){
+
+    if(this.recovering) return;
+
+    this.recovering = true;
+
+    try{
+
+      // resume context safari/iOS
+      if(
+        AudioCore.ctx &&
+        AudioCore.ctx.state !== "running"
+      ){
+
+        await AudioCore.ctx.resume().catch(()=>{});
+      }
+
+      const current = AudioCore.current();
+
+      // audio cassé / suspendu
+      if(
+        State.playing &&
+        current &&
+        current.paused
+      ){
+
+        await current.play().catch(()=>{});
+      }
+
+    }catch(e){}
+
+    setTimeout(()=>{
+      this.recovering = false;
+    }, 1000);
+  },
 
   init(){
 
-    document.addEventListener("visibilitychange", ()=>{
-      if(document.hidden){
-        Events.emit("appHidden");
-      } else {
-        Events.emit("appVisible");
-      }
-    });
+    document.addEventListener("visibilitychange", async ()=>{
 
-    window.addEventListener("focus", ()=>Events.emit("focus"));
-    window.addEventListener("blur", ()=>Events.emit("blur"));
+  if(document.hidden){
+
+    Events.emit("appHidden");
+
+  } else {
+
+    Events.emit("appVisible");
+
+    await this.recoverAudio();
 
   }
 
+});
+
+  window.addEventListener("focus", async ()=>{
+
+  Events.emit("focus");
+
+  await this.recoverAudio();
+
+});
+    window.addEventListener("blur", ()=>Events.emit("blur"));
+
+    // safari / ios recovery
+window.addEventListener("pageshow", async ()=>{
+  await this.recoverAudio();
+});
+// retour veille téléphone
+document.addEventListener("resume", async ()=>{
+  await this.recoverAudio();
+});}
 };
 
 // ===============================
