@@ -359,27 +359,13 @@ const Crossfade = {
     g1.gain.cancelScheduledValues(now);
     g2.gain.cancelScheduledValues(now);
 
-    // ancien track fade naturel
-    g1.gain.setValueAtTime(
-    Math.max(g1.gain.value, 0.001),
-    now
-    );
+    // ancien track part du volume actuel
+    g1.gain.setValueAtTime(vol, now);
+    g1.gain.linearRampToValueAtTime(0.001, now + this.duration);
 
-    g1.gain.exponentialRampToValueAtTime(
-    0.001,
-    now + this.duration
-    );
-
-    // nouveau track fade naturel
-    g2.gain.setValueAtTime(
-    0.001,
-    now
-    );
-
-    g2.gain.exponentialRampToValueAtTime(
-    vol,
-    now + this.duration
-    );
+    // nouveau track démarre à 0
+    g2.gain.setValueAtTime(0.001, now);
+    g2.gain.linearRampToValueAtTime(vol, now + this.duration);
 
     this.cleanupTimer = setTimeout(()=>{
 
