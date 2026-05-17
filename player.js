@@ -704,14 +704,29 @@ if(muteBtn){
 
   let autoTransition = false;
 
-  Events.on("time", ({ current, duration })=>{
+    Events.on("time", ({ current, duration })=>{
 
-  if(!duration) return;
+  // sécurité durée invalide
+  if(
+    !duration ||
+    !isFinite(duration) ||
+    duration < 10
+  ){
+    return;
+  }
+
+  // sécurité début track
+  if(current < 5){
+    return;
+  }
 
   const remain = duration - current;
 
   // déclenche avant fin réelle
-  if(remain <= Crossfade.duration && !autoTransition){
+  if(
+    remain <= Crossfade.duration &&
+    !autoTransition
+  ){
 
     autoTransition = true;
 
@@ -726,17 +741,6 @@ if(muteBtn){
     autoTransition = false;
   }
 
-});
-    
-  Events.on("ended", ()=>{
-
-  if(State.repeat){
-    const a = AudioCore.current();
-    a.currentTime = 0;
-    a.play();
-    return;
-  }
-  autoTransition = false;
 });
 
 
