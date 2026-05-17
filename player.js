@@ -955,13 +955,37 @@ if(muteBtn){
   }
 
 // fin ajout boutons aux
- DOM.volume.oninput = ()=>{
+DOM.volume.oninput = ()=>{
+
   State.volume = Number(DOM.volume.value);
 
   const v = Math.max(State.volume, 0.001);
 
-  AudioCore.gainA.gain.value = v;
-  AudioCore.gainB.gain.value = v;
+  const now = AudioCore.ctx.currentTime;
+
+  // gain A smooth
+  AudioCore.gainA.gain.cancelScheduledValues(now);
+  AudioCore.gainA.gain.setValueAtTime(
+    AudioCore.gainA.gain.value,
+    now
+  );
+
+  AudioCore.gainA.gain.linearRampToValueAtTime(
+    v,
+    now + 0.08
+  );
+
+  // gain B smooth
+  AudioCore.gainB.gain.cancelScheduledValues(now);
+  AudioCore.gainB.gain.setValueAtTime(
+    AudioCore.gainB.gain.value,
+    now
+  );
+
+  AudioCore.gainB.gain.linearRampToValueAtTime(
+    v,
+    now + 0.08
+  );
 };
 
 DOM.progress.oninput = ()=>{
