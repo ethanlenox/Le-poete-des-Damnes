@@ -1569,6 +1569,8 @@ const { DOM, Engine, Playlist } = window.__PLAYER_PART2__;
 //           WAVEFORM 
 // ===============================
 const WaveAddon = {
+  fps: 30,
+  lastFrame: 0,
 
   bars: [],
   raf: null,
@@ -1587,9 +1589,32 @@ const WaveAddon = {
   start(){
     if(this.raf) return;
 
-    const loop = ()=>{
+    const loop = (now = 0)=>{
 
       const analyser = AudioCore.analyser;
+// pause totale si audio pause
+if(!State.playing){
+
+  this.stop();
+  return;
+}
+
+// hidden tab sécurité
+if(document.hidden){
+
+  this.stop();
+  return;
+}
+
+// limiter FPS
+if(now - this.lastFrame < (1000 / this.fps)){
+
+  this.raf = requestAnimationFrame(loop);
+  return;
+}
+
+this.lastFrame = now;
+      
       if(analyser){
         analyser.getByteFrequencyData(AudioCore.dataArray);
 
@@ -1606,6 +1631,7 @@ const WaveAddon = {
   },
 
   stop(){
+    this.lastFrame = 0;
     cancelAnimationFrame(this.raf);
     this.raf = null;
   }
