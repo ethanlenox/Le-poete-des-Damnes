@@ -294,10 +294,12 @@ const Loader = {
 //           CROSSFADE
 // ===============================
 const Crossfade = {
+  cleanupTimer: null,
 
   duration: 1.2,
 
   apply(oldAudio, newAudio, g1, g2){
+    clearTimeout(this.cleanupTimer);
 
     const ctx = AudioCore.ctx;
     const now = ctx.currentTime;
@@ -315,12 +317,19 @@ const Crossfade = {
     g2.gain.setValueAtTime(0.001, now);
     g2.gain.linearRampToValueAtTime(vol, now + this.duration);
 
-   setTimeout(()=>{
+    this.cleanupTimer = setTimeout(()=>{
 
-  oldAudio.pause();
-  oldAudio.currentTime = 0;
-  oldAudio.src = "";
-  oldAudio.load();
+  // sécurité
+  if(oldAudio !== newAudio){
+
+    oldAudio.pause();
+
+    oldAudio.currentTime = 0;
+
+    oldAudio.removeAttribute("src");
+
+    oldAudio.load();
+  }
 
 }, this.duration * 1000);
   }
