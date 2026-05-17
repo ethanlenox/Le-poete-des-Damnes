@@ -232,15 +232,30 @@ const AudioCore = {
 //     ERROR HANDLER + RETRY
 // ===============================
 const ErrorHandler = {
+    retryDelay: 1200,
 
   handle(e){
     console.warn("Audio error", e);
 
     if(State.retries < State.maxRetries){
       State.retries++;
+
       setTimeout(()=>{
-        Events.emit("retry");
-      }, 1000);
+
+  const current = AudioCore.current();
+
+  try{
+
+    current.pause();
+
+    current.currentTime = 0;
+
+  }catch(e){}
+
+  Events.emit("retry");
+
+}, this.retryDelay);
+      
     } else {
       Events.emit("fatalError", e);
     }
@@ -256,37 +271,71 @@ const ErrorHandler = {
 //          AUDIO LOADER 
 // ===============================
 const Loader = {
-
+    timeout: 15000,
   load(audio, src){
-    return new Promise((resolve, reject)=>{
 
-      if(!src) return reject("no src");
+  return new Promise((resolve, reject)=>{
 
-      if(audio.src !== src){
-        audio.src = src;
-      }
+    if(!src){
+      return reject("no src");
+    }
 
-      const onReady = ()=>{
-        cleanup();
-        resolve();
-      };
+    let timeoutId = null;
 
-      const onError = (e)=>{
-        cleanup();
-        reject(e);
-      };
+    if(audio.src !== src){
+      audio.src = src;
+    }
 
-      const cleanup = ()=>{
-        audio.removeEventListener("canplay", onReady);
-        audio.removeEventListener("error", onError);
-      };
+    const onReady = ()=>{
 
-      audio.addEventListener("canplay", onReady);
-      audio.addEventListener("error", onError);
+      cleanup();
+
+      resolve();
+    };
+
+    const onError = (e)=>{
+
+      cleanup();
+
+      reject(e);
+    };
+
+    const onTimeout = ()=>{
+
+      cleanup();
+
+      reject("timeout");
+    };
+
+    const cleanup = ()=>{
+
+      clearTimeout(timeoutId);
+
+      audio.removeEventListener("canplay", onReady);
+      audio.removeEventListener("error", onError);
+    };
+
+    timeoutId = setTimeout(
+      onTimeout,
+      this.timeout
+    );
+
+    audio.addEventListener("canplay", onReady);
+    audio.addEventListener("error", onError);
+
+    try{
 
       audio.load();
-    });
-  }
+
+    }catch(e){
+
+      cleanup();
+
+      reject(e);
+    }
+
+  });
+}
 
 };
 
