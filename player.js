@@ -12,6 +12,7 @@ window.__ULTRA_PRO_PLAYER_V4__ = true;
 //          STATE MANAGER
 // ===============================
 const State = {
+  seeking: false,
   index: 0,
   playing: false,
   volume: 1,
@@ -963,10 +964,37 @@ if(muteBtn){
   AudioCore.gainB.gain.value = v;
 };
 
-  DOM.progress.oninput = ()=>{
-    const a = AudioCore.current();
-    a.currentTime = (DOM.progress.value / 100) * a.duration;
-  };
+DOM.progress.oninput = ()=>{
+
+  const a = AudioCore.current();
+
+  if(!a.duration) return;
+
+  State.seeking = true;
+
+  const time =
+    (DOM.progress.value / 100) * a.duration;
+
+  a.currentTime = time;
+};
+
+  DOM.progress.addEventListener("change", ()=>{
+
+  State.seeking = false;
+
+});
+
+DOM.progress.addEventListener("touchend", ()=>{
+
+  State.seeking = false;
+
+});
+
+DOM.progress.addEventListener("mouseup", ()=>{
+
+  State.seeking = false;
+
+});
 
   DOM.tracks.forEach((el,i)=>{
     el.onclick = ()=>Engine.play(i);
@@ -1312,7 +1340,13 @@ const UIEffects = {
 
         const a = AudioCore.current();
 
-        if(!a.duration || !DOM.progress) return;
+        if(
+        !a.duration ||
+        !DOM.progress ||
+        State.seeking
+        ){
+        return;
+        }
 
         const val = (a.currentTime / a.duration) * 100;
 
