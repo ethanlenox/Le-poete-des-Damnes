@@ -457,17 +457,41 @@ const Playlist = {
 //      ENGINE (FULL CONTROL)
 // ===============================
 const Engine = {
+  queuedIndex: null,
+  playToken: 0,
+  lastPlayTime: 0,
   transitioning: false,
 
   async play(i){
 
-if(State.locked) return;
+    const now = performance.now();
 
+// anti spam ultra rapide
+if(now - this.lastPlayTime < 250){
+  return;
+}
+
+this.lastPlayTime = now;
+
+// lock sécurité
+if(State.locked){
+
+  // queue dernier tap utilisateur
+  this.queuedIndex = i;
+  return;
+}
+
+// transition en cours
 if(this.transitioning){
+
+  // garde uniquement la dernière demande
+  this.queuedIndex = i;
   return;
 }
 
 this.transitioning = true;
+
+const token = ++this.playToken;
 
 // protection anti relance ultra rapide
 clearTimeout(this.__playLock);
@@ -514,6 +538,13 @@ newAudio.muted = State.muted;
 
       await newAudio.play();
 
+// sécurité race condition async
+if(token !== this.playToken){
+
+  newAudio.pause();
+  return;
+}
+
 // premier lancement sans crossfade
 if(!oldAudio.src){
 
@@ -541,10 +572,10 @@ if(!oldAudio.src){
       this.save();
       this.preload();
 
-    } catch(e){
-      ErrorHandler.handle(e);
-      this.transitioning = false;
-    }
+      } catch(e){
+  ErrorHandler.handle(e);
+  this.finishTransition();
+  }
 
     setTimeout(()=>{
 
@@ -553,6 +584,23 @@ if(!oldAudio.src){
 
     }, 1500);
   },
+
+  finishTransition(){
+
+  this.transitioning = false;
+
+  // exécute dernière demande utilisateur
+  if(this.queuedIndex !== null){
+
+    const nextIndex = this.queuedIndex;
+
+    this.queuedIndex = null;
+
+    setTimeout(()=>{
+      this.play(nextIndex);
+    }, 50);
+  }
+},
 
   toggle(){
     const a = AudioCore.current();
