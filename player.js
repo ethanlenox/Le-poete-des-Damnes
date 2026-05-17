@@ -503,16 +503,27 @@ const newGain = AudioCore.nextGain();
       newAudio.currentTime = 0;
 newAudio.muted = State.muted;
 
-await newAudio.play();
+      await newAudio.play();
 
-Crossfade.apply(
-  oldAudio,
-  newAudio,
-  oldGain,
-  newGain
-);
+// premier lancement sans crossfade
+if(!oldAudio.src){
 
-AudioCore.swap();
+  newGain.gain.value = State.volume;
+
+  AudioCore.swap();
+
+} else {
+
+  Crossfade.apply(
+    oldAudio,
+    newAudio,
+    oldGain,
+    newGain
+  );
+
+  AudioCore.swap();
+
+}
 
       if(DOM.title) DOM.title.textContent = track.title;
 
