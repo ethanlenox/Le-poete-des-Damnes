@@ -474,6 +474,14 @@ this.__playLock = setTimeout(()=>{
  const track = Playlist.get(i);
 if(!track) return;
 
+    // sécurité premier démarrage AudioContext
+if(AudioCore.ctx && AudioCore.ctx.state !== "running"){
+
+  try{
+    await AudioCore.ctx.resume();
+  }catch(e){}
+}
+
 State.locked = true;
 State.index = i;
 
@@ -1190,7 +1198,7 @@ const Security = {
     const unlock = ()=>{
       if(this.unlocked) return;
 
-      AudioCore.ctx.resume();
+      AudioCore.ctx.resume().catch(()=>{});
       this.unlocked = true;
 
       document.removeEventListener("click", unlock);
