@@ -979,7 +979,6 @@ const UIEffects = {
 // ===============================
 //      PROGRESS SYNC ENGINE
 // ===============================
-const Progress = {
   const Progress = {
 
     format(sec){
