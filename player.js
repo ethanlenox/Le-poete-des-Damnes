@@ -547,17 +547,64 @@ const Cache = {
 //      PRELOAD QUEUE (ASYNC)
 // ===============================
 const Preload = {
-
+  enabled: true,
   queue: [],
   loading: false,
 
+  canPreload(){
+
+    // économie batterie/navigation cachée
+    if(document.hidden){
+      return false;
+    }
+
+    // data saver
+    const conn = navigator.connection ||
+                 navigator.mozConnection ||
+                 navigator.webkitConnection;
+
+    if(conn){
+
+      // mode économie données
+      if(conn.saveData){
+        return false;
+      }
+
+      // réseau faible
+      const slow = [
+        "slow-2g",
+        "2g"
+      ];
+
+      if(slow.includes(conn.effectiveType)){
+        return false;
+      }
+    }
+
+    return true;
+  },
+
   push(src){
-    if(!src || this.queue.includes(src) || Cache.has(src)) return;
+    if(
+  !src ||
+  !this.enabled ||
+  !this.canPreload() ||
+  this.queue.includes(src) ||
+  Cache.has(src)
+){
+  return;
+}
     this.queue.push(src);
     this.run();
   },
 
   async run(){
+
+    if(!this.canPreload()){
+
+    this.loading = false;
+    return;
+   }
     if(this.loading || !this.queue.length) return;
 
     this.loading = true;
