@@ -471,25 +471,79 @@ const DOM = {
 //          CACHE AUDIO
 // ===============================
 const Cache = {
+  usage: new Map(),
   map: new Map(),
   max: 10,
+ //apres effacer si bug
 
-  add(src, audio){
-    if(this.map.size >= this.max){
-      const first = this.map.keys().next().value;
-      const old = this.map.get(first);
-      Memory.cleanupAudio(old);
-      this.map.delete(first);
+  
+add(src, audio){
+
+  // update entrée existante
+  if(this.map.has(src)){
+
+    this.usage.set(src, Date.now());
+    return;
+  }
+
+  // purge LRU
+  if(this.map.size >= this.max){
+
+    let oldestKey = null;
+    let oldestTime = Infinity;
+
+    this.usage.forEach((time, key)=>{
+
+      if(time < oldestTime){
+
+        oldestTime = time;
+        oldestKey = key;
+      }
+
+    });
+
+    if(oldestKey){
+
+      const oldAudio = this.map.get(oldestKey);
+
+      if(oldAudio){
+        Memory.cleanupAudio(oldAudio);
+      }
+
+      this.map.delete(oldestKey);
+      this.usage.delete(oldestKey);
     }
-    this.map.set(src, audio);
+  }
+
+  this.map.set(src, audio);
+  this.usage.set(src, Date.now());
+},
+
+  //avant effacer si bug
+
+  
   },
 
   get(src){
-    return this.map.get(src);
-  },
+  if(this.map.has(src)){
+  this.usage.set(src, Date.now());
+  }
+
+  return this.map.get(src);
+},
 
   has(src){
     return this.map.has(src);
+  
+  ,
+  clear(){
+
+    this.map.forEach(audio=>{
+      Memory.cleanupAudio(audio);
+    });
+
+    this.map.clear();
+    this.usage.clear();
   }
 };
 
