@@ -1198,6 +1198,9 @@ const UIEffects = {
 //      PROGRESS SYNC ENGINE
 // ===============================
   const Progress = {
+        lastProgress: -1,
+    lastCurrentText: "",
+    lastDurationText: "",
 
     format(sec){
         if(isNaN(sec)) return "0:00";
@@ -1216,14 +1219,35 @@ const UIEffects = {
 
         const val = (a.currentTime / a.duration) * 100;
 
-        DOM.progress.value = val;
+        const rounded = Math.floor(val);
+
+        if(rounded !== this.lastProgress){
+
+        this.lastProgress = rounded;
+
+        DOM.progress.value = rounded;
+        }
 
         if(DOM.currentTime){
-            DOM.currentTime.textContent = this.format(a.currentTime);
+        const currentText = this.format(a.currentTime);
+
+        if(currentText !== this.lastCurrentText){
+
+        this.lastCurrentText = currentText;
+
+        DOM.currentTime.textContent = currentText;
+}
         }
 
         if(DOM.duration){
-            DOM.duration.textContent = this.format(a.duration);
+        const durationText = this.format(a.duration);
+
+        if(durationText !== this.lastDurationText){
+
+        this.lastDurationText = durationText;
+
+        DOM.duration.textContent = durationText;
+}
         }
     }
 };
