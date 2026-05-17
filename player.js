@@ -347,6 +347,8 @@ const DOM = {
   title: null,
   tracks: [],
   player: null,
+  currentTime: null,
+  duration: null,
 
   init(){
     this.play = document.getElementById("playPauseBtn");
@@ -355,6 +357,8 @@ const DOM = {
     this.progress = document.getElementById("progressBar");
     this.volume = document.getElementById("volumeBar");
     this.title = document.getElementById("trackTitle");
+    this.currentTime = document.getElementById("currentTime");
+    this.duration = document.getElementById("duration");
     this.player = document.getElementById("miniPlayer");
     this.tracks = document.querySelectorAll(".track");
   }
@@ -976,46 +980,35 @@ const UIEffects = {
 //      PROGRESS SYNC ENGINE
 // ===============================
 const Progress = {
+  const Progress = {
 
-  update(){
+    format(sec){
+        if(isNaN(sec)) return "0:00";
 
-  const a = AudioCore.current();
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
 
-  if(!a.duration || !DOM.progress) return;
+        return `${m}:${s < 10 ? "0"+s : s}`;
+    },
 
-  const val = (a.currentTime / a.duration) * 100;
+    update(){
 
-  DOM.progress.value = val;
+        const a = AudioCore.current();
 
-  // temps actuel
-  const currentEl = document.getElementById("currentTime");
+        if(!a.duration || !DOM.progress) return;
 
-  if(currentEl){
+        const val = (a.currentTime / a.duration) * 100;
 
-    const currentMinutes = Math.floor(a.currentTime / 60);
-    const currentSeconds = Math.floor(a.currentTime % 60)
-      .toString()
-      .padStart(2,"0");
+        DOM.progress.value = val;
 
-    currentEl.textContent =
-      currentMinutes + ":" + currentSeconds;
-  }
+        if(DOM.currentTime){
+            DOM.currentTime.textContent = this.format(a.currentTime);
+        }
 
-  // durée totale
-  const durationEl = document.getElementById("duration");
-
-  if(durationEl){
-
-    const durationMinutes = Math.floor(a.duration / 60);
-    const durationSeconds = Math.floor(a.duration % 60)
-      .toString()
-      .padStart(2,"0");
-
-    durationEl.textContent =
-      durationMinutes + ":" + durationSeconds;
-  }
-
-}
+        if(DOM.duration){
+            DOM.duration.textContent = this.format(a.duration);
+        }
+    }
 };
 
 // ===============================
