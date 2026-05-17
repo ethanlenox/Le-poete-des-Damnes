@@ -829,32 +829,99 @@ const {
 // ===============================
 //   RAF MANAGER (PERF CONTROL)
 // ===============================
-const RAF = {
+  const RAF = {
   tasks: new Map(),
   running: false,
+  rafId: null,
+  paused: false,
 
   add(name, fn){
+
     this.tasks.set(name, fn);
-    if(!this.running) this.run();
+
+    if(!this.running && !this.paused){
+      this.run();
+    }
   },
 
   remove(name){
+
     this.tasks.delete(name);
+
+    // stop total si plus aucune task
+    if(this.tasks.size === 0){
+      this.stop();
+    }
+  },
+
+  stop(){
+
+    this.running = false;
+
+    if(this.rafId){
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  },
+
+  pause(){
+
+    this.paused = true;
+    this.stop();
+  },
+
+  resume(){
+
+    if(!this.paused) return;
+
+    this.paused = false;
+
+    if(this.tasks.size > 0){
+      this.run();
+    }
   },
 
   run(){
+
+    if(this.running) return;
+
     this.running = true;
 
     const loop = ()=>{
+
+      // sécurité hidden tab
+      if(document.hidden){
+        this.pause();
+        return;
+      }
+
       this.tasks.forEach(fn=>{
-        try{ fn(); }catch(e){}
+        try{
+          fn();
+        }catch(e){}
       });
-      requestAnimationFrame(loop);
+
+      this.rafId = requestAnimationFrame(loop);
     };
 
-    requestAnimationFrame(loop);
+    this.rafId = requestAnimationFrame(loop);
   }
 };
+
+  // AUTO PAUSE ONGLET CACHÉ
+document.addEventListener("visibilitychange", ()=>{
+
+  if(document.hidden){
+
+    RAF.pause();
+
+  } else {
+
+    RAF.resume();
+
+  }
+
+});
 
 // ===============================
 //    WAVEFORM ENGINE (REAL)
