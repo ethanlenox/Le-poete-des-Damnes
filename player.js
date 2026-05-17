@@ -471,71 +471,66 @@ const DOM = {
 //          CACHE AUDIO
 // ===============================
 const Cache = {
+
   usage: new Map(),
   map: new Map(),
   max: 10,
- //apres effacer si bug
 
-  
-add(src, audio){
+  add(src, audio){
 
-  // update entrée existante
-  if(this.map.has(src)){
+    // update entrée existante
+    if(this.map.has(src)){
 
-    this.usage.set(src, Date.now());
-    return;
-  }
-
-  // purge LRU
-  if(this.map.size >= this.max){
-
-    let oldestKey = null;
-    let oldestTime = Infinity;
-
-    this.usage.forEach((time, key)=>{
-
-      if(time < oldestTime){
-
-        oldestTime = time;
-        oldestKey = key;
-      }
-
-    });
-
-    if(oldestKey){
-
-      const oldAudio = this.map.get(oldestKey);
-
-      if(oldAudio){
-        Memory.cleanupAudio(oldAudio);
-      }
-
-      this.map.delete(oldestKey);
-      this.usage.delete(oldestKey);
+      this.usage.set(src, Date.now());
+      return;
     }
-  }
 
-  this.map.set(src, audio);
-  this.usage.set(src, Date.now());
-},
+    // purge LRU
+    if(this.map.size >= this.max){
 
-  //avant effacer si bug
+      let oldestKey = null;
+      let oldestTime = Infinity;
 
-  
+      this.usage.forEach((time, key)=>{
+
+        if(time < oldestTime){
+
+          oldestTime = time;
+          oldestKey = key;
+        }
+
+      });
+
+      if(oldestKey){
+
+        const oldAudio = this.map.get(oldestKey);
+
+        if(oldAudio){
+          Memory.cleanupAudio(oldAudio);
+        }
+
+        this.map.delete(oldestKey);
+        this.usage.delete(oldestKey);
+      }
+    }
+
+    this.map.set(src, audio);
+    this.usage.set(src, Date.now());
   },
 
   get(src){
-  if(this.map.has(src)){
-  this.usage.set(src, Date.now());
-  }
 
-  return this.map.get(src);
-},
+    if(this.map.has(src)){
+      this.usage.set(src, Date.now());
+    }
+
+    return this.map.get(src);
+  },
 
   has(src){
     return this.map.has(src);
-  
-  ,
+  },
+
   clear(){
 
     this.map.forEach(audio=>{
@@ -545,6 +540,7 @@ add(src, audio){
     this.map.clear();
     this.usage.clear();
   }
+
 };
 
 // ===============================
