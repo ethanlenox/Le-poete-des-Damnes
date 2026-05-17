@@ -938,11 +938,43 @@ const UIEffects = {
 const Progress = {
 
   update(){
+
   const a = AudioCore.current();
+
   if(!a.duration || !DOM.progress) return;
 
   const val = (a.currentTime / a.duration) * 100;
+
   DOM.progress.value = val;
+
+  // temps actuel
+  const currentEl = document.getElementById("currentTime");
+
+  if(currentEl){
+
+    const currentMinutes = Math.floor(a.currentTime / 60);
+    const currentSeconds = Math.floor(a.currentTime % 60)
+      .toString()
+      .padStart(2,"0");
+
+    currentEl.textContent =
+      currentMinutes + ":" + currentSeconds;
+  }
+
+  // durée totale
+  const durationEl = document.getElementById("duration");
+
+  if(durationEl){
+
+    const durationMinutes = Math.floor(a.duration / 60);
+    const durationSeconds = Math.floor(a.duration % 60)
+      .toString()
+      .padStart(2,"0");
+
+    durationEl.textContent =
+      durationMinutes + ":" + durationSeconds;
+  }
+
 }
 };
 
