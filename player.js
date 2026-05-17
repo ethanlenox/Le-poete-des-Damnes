@@ -29,6 +29,7 @@ const State = {
   error: null,
   retries: 0,
   maxRetries: 3
+  changingTrack: false,
 };
 
 // ===============================
@@ -484,6 +485,7 @@ if(AudioCore.ctx && AudioCore.ctx.state !== "running"){
 
 State.locked = true;
 State.index = i;
+State.changingTrack = true;
 
 const oldAudio = AudioCore.current();
 const oldGain = AudioCore.currentGain();
@@ -540,8 +542,9 @@ if(!oldAudio.src){
     setTimeout(()=>{
 
   State.locked = false;
+  State.changingTrack = false;
 
- }, 1500);
+    }, 1500);
   },
 
   toggle(){
@@ -724,6 +727,9 @@ if(muteBtn){
   let autoTransition = false;
 
     Events.on("time", ({ current, duration })=>{
+      
+      if(State.changingTrack){return;
+}
 
   // sécurité durée invalide
   if(
