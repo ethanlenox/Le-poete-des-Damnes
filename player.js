@@ -29,7 +29,7 @@ const State = {
   error: null,
   retries: 0,
   maxRetries: 3
-  changingTrack: false,
+
 };
 
 // ===============================
@@ -485,7 +485,7 @@ if(AudioCore.ctx && AudioCore.ctx.state !== "running"){
 
 State.locked = true;
 State.index = i;
-State.changingTrack = true;
+
 
 const oldAudio = AudioCore.current();
 const oldGain = AudioCore.currentGain();
@@ -496,11 +496,14 @@ const newGain = AudioCore.nextGain();
     try {
 
       if(Cache.has(track.src)){
-        const cached = Cache.get(track.src);
-        newAudio.src = cached.src;
-      } else {
-        await Loader.load(newAudio, track.src);
-      }
+
+  newAudio.src = track.src;
+
+} else {
+
+  await Loader.load(newAudio, track.src);
+
+}
 
       newAudio.currentTime = 0;
 newAudio.muted = State.muted;
@@ -542,7 +545,7 @@ if(!oldAudio.src){
     setTimeout(()=>{
 
   State.locked = false;
-  State.changingTrack = false;
+ 
 
     }, 1500);
   },
@@ -727,9 +730,6 @@ if(muteBtn){
   let autoTransition = false;
 
     Events.on("time", ({ current, duration })=>{
-      
-      if(State.changingTrack){return;
-}
 
   // sécurité durée invalide
   if(
