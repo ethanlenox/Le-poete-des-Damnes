@@ -36,18 +36,49 @@ const State = {
 //          EVENT BUS
 // ===============================
 const Events = {
+  maxListeners: 50,
   events: new Map(),
 
-  on(name, fn){
-    if(!this.events.has(name)) this.events.set(name, []);
-    this.events.get(name).push(fn);
-  },
+on(name, fn){
+
+  if(!this.events.has(name)){
+    this.events.set(name, []);
+  }
+
+  const list = this.events.get(name);
+
+  // évite doublons
+  if(list.includes(fn)){
+    return;
+  }
+
+  // protection mémoire
+  if(list.length >= this.maxListeners){
+    list.shift();
+  }
+
+  list.push(fn);
+},
 
   off(name, fn){
-    if(!this.events.has(name)) return;
-    const arr = this.events.get(name).filter(f=>f!==fn);
+
+  if(!this.events.has(name)) return;
+
+  const arr = this.events
+    .get(name)
+    .filter(f => f !== fn);
+
+  // cleanup total
+  if(arr.length === 0){
+
+    this.events.delete(name);
+
+  } else {
+
     this.events.set(name, arr);
-  },
+
+  }
+},
 
   emit(name, data){
     if(!this.events.has(name)) return;
@@ -57,12 +88,26 @@ const Events = {
   },
 
   once(name, fn){
-    const wrap = (d)=>{
-      fn(d);
-      this.off(name, wrap);
-    };
-    this.on(name, wrap);
-  }
+
+  const wrap = (d)=>{
+    fn(d);
+    this.off(name, wrap);
+  };
+
+  this.on(name, wrap);
+},
+
+clear(name){
+
+  if(!this.events.has(name)) return;
+
+  this.events.delete(name);
+},
+
+destroy(){
+
+  this.events.clear();
+}
 };
 
 // ===============================
