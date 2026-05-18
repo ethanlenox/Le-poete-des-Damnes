@@ -1708,69 +1708,12 @@ const Mobile = {
   },
 
   init(){
-
-    const markGesture = (e)=>{
-
-  const t = e?.target;
-
-  // ignore sliders audio
-  if(
-    t &&
-    (
-      t.id === "volumeBar" ||
-      t.id === "progressBar"
-    )
-  ){
-    return;
-  }
-
-  this.lastUserGesture = Date.now();
-
-  this.recoverAudio();
-
-};
-
-    document.addEventListener(
-  "touchstart",
-  markGesture,
-  { passive:true }
-);
-
-document.addEventListener(
-  "touchend",
-  markGesture,
-  { passive:true }
-);
-
-document.addEventListener(
-  "touchend",
-  (e)=>{
-
-    // ignore sliders iOS
-    const t = e.target;
-
-    if(
-      t &&
-      (
-        t.id === "volumeBar" ||
-        t.id === "progressBar"
-      )
-    ){
-      return;
-    }
-
-    markGesture();
-
-  },
-  { passive:true }
-);
-
-document.addEventListener(
+    
+  document.addEventListener(
   "click",
   markGesture,
   { passive:true }
 );
-
     document.addEventListener("visibilitychange", async ()=>{
 
   if(document.hidden){
