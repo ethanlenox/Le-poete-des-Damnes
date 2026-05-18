@@ -1,4 +1,4 @@
-// ===============================
+ // ==============================
 //         PRO PLAYER
 // CORE + STATE + AUDIO ENGINE
 // ===============================
@@ -662,40 +662,6 @@ const Engine = {
   playToken: 0,
   lastPlayTime: 0,
   transitioning: false,
-  touchLock: false,
-  lastTouch: 0,
-
-  canInteract(type = "default"){
-
-  // volume/progress = jamais bloqués
-  if(
-    type === "volume" ||
-    type === "seek"
-  ){
-    return true;
-  }
-
-  const now = performance.now();
-
-  // anti double trigger iOS
-  if(now - this.lastTouch < 180){
-    return false;
-  }
-
-  // lock multi-touch
-  if(this.touchLock){
-    return false;
-  }
-
-  this.lastTouch = now;
-  this.touchLock = true;
-
-  setTimeout(()=>{
-    this.touchLock = false;
-  }, 220);
-
-  return true;
-},
 
   async play(i){
 
@@ -966,29 +932,11 @@ async toggle(){
 // ===============================
 function bindControls(){
 
-  DOM.play.onclick = ()=>{
+  DOM.play.onclick = ()=>Engine.toggle();
 
-  if(!Engine.canInteract()) return;
+  DOM.next.onclick = ()=>Engine.play(Playlist.next());
 
-  Engine.toggle();
-
-};
-
-DOM.next.onclick = ()=>{
-
-  if(!Engine.canInteract()) return;
-
-  Engine.play(Playlist.next());
-
-};
-
-DOM.prev.onclick = ()=>{
-
-  if(!Engine.canInteract()) return;
-
-  Engine.play(Playlist.prev());
-
-};
+  DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
 
   
 
@@ -1008,11 +956,8 @@ DOM.prev.onclick = ()=>{
   });
 
   // REPEAT
-
   if(repeatBtn){
     repeatBtn.onclick = ()=>{
-
-      if(!Engine.canInteract()) return;
 
       State.repeat = !State.repeat;
 
@@ -1033,8 +978,6 @@ if(muteBtn){
 
   muteBtn.onclick = ()=>{
 
-    if(!Engine.canInteract()) return;
-
     State.muted = !State.muted;
 
     syncMute();
@@ -1049,8 +992,6 @@ if(muteBtn){
 
     togglePlayerBtn.onclick = ()=>{
 
-      if(!Engine.canInteract()) return;
-
       document.body.classList.toggle("playlist-open");
 
     };
@@ -1058,22 +999,6 @@ if(muteBtn){
   }
 
 // fin ajout boutons aux
-
-  DOM.volume.addEventListener("touchstart", ()=>{
-
-  Mobile.sliderInteracting = true;
-
-}, { passive:true });
-
-DOM.volume.addEventListener("touchend", ()=>{
-
-  setTimeout(()=>{
-    Mobile.sliderInteracting = false;
-  }, 120);
-
-}, { passive:true });
-
-
 DOM.volume.oninput = ()=>{
 
   State.volume = Number(DOM.volume.value);
@@ -1107,20 +1032,6 @@ DOM.volume.oninput = ()=>{
   );
 };
 
-  DOM.progress.addEventListener("touchstart", ()=>{
-
-  Mobile.sliderInteracting = true;
-
-}, { passive:true });
-
-DOM.progress.addEventListener("touchend", ()=>{
-
-  setTimeout(()=>{
-    Mobile.sliderInteracting = false;
-  }, 120);
-
-}, { passive:true });
-
 DOM.progress.oninput = ()=>{
 
   const a = AudioCore.current();
@@ -1153,17 +1064,9 @@ DOM.progress.addEventListener("mouseup", ()=>{
 
 });
 
-DOM.tracks.forEach((el,i)=>{
-
-  el.onclick = ()=>{
-
-    if(!Engine.canInteract()) return;
-
-    Engine.play(i);
-
-  };
-
-});
+  DOM.tracks.forEach((el,i)=>{
+    el.onclick = ()=>Engine.play(i);
+  });
 
 }
 
@@ -1658,94 +1561,46 @@ const Media = {
 //   MOBILE / VISIBILITY HANDLER
 // ===============================
 const Mobile = {
-    sliderInteracting: false,
     recovering: false,
-    lastUserGesture: 0,
-    resumeLock: false,
 
-  async recoverAudio(){
+    async recoverAudio(){
 
     if(this.recovering) return;
-    if(this.sliderInteracting) return;
-    if(this.resumeLock) return;
 
     this.recovering = true;
-    this.resumeLock = true;
 
     try{
 
-      const current = AudioCore.current();
-
-      // SAFARI / iOS AudioContext
+      // resume context safari/iOS
       if(
         AudioCore.ctx &&
         AudioCore.ctx.state !== "running"
       ){
 
-        try{
-          await AudioCore.ctx.resume();
-        }catch(e){}
+        await AudioCore.ctx.resume().catch(()=>{});
       }
 
-      // élément audio suspendu
+      const current = AudioCore.current();
+
+      // audio cassé / suspendu
       if(
-        current &&
-        current.readyState >= 2 &&
         State.playing &&
+        current &&
         current.paused
       ){
 
-        try{
-
-          const p = current.play();
-
-          if(p && typeof p.then === "function"){
-            await p.catch(()=>{});
-          }
-
-        }catch(e){}
-      }
-
-      // double sécurité iOS lockscreen
-      if(
-        current &&
-        current.currentTime > 0 &&
-        current.paused &&
-        !document.hidden &&
-        State.playing
-      ){
-
-        try{
-
-          current.load();
-
-          const retryPlay = current.play();
-
-          if(retryPlay && typeof retryPlay.then === "function"){
-            await retryPlay.catch(()=>{});
-          }
-
-        }catch(e){}
+        await current.play().catch(()=>{});
       }
 
     }catch(e){}
 
     setTimeout(()=>{
       this.recovering = false;
-    }, 800);
-
-    setTimeout(()=>{
-      this.resumeLock = false;
-    }, 1500);
+    }, 1000);
   },
 
   init(){
-    
-  document.addEventListener(
-  "click",
-  markGesture,
-  { passive:true }
-);
+
     document.addEventListener("visibilitychange", async ()=>{
 
   if(document.hidden){
