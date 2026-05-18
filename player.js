@@ -2552,90 +2552,94 @@ IOSUnlock.init();
 })();
 
 
-// ===============================
-//       SMART NETWORK RETRY
-// adaptive retry system + crossfade fix
-// ===============================
+// ======================
+//   SMART NETWORK RETRY 
+// ======================
 
 (function(){
 
-const{State,Events,AudioCore}=window.__PLAYER_PART1__;
+const{State,Events}=window.__PLAYER_PART1__;
+const{Engine,Playlist}=window.__PLAYER_PART2__;
+
+// ===============================
+//        RETRY CONTROLLER
+// ===============================
 
 const SmartRetry={
 
 retrying:false,
-baseDelay:1500,
 maxDelay:12000,
+baseDelay:1500,
 
 init(){
 
 Events.on("error",e=>this.handle(e));
 
-window.addEventListener("online",()=>this.retryNow());
+window.addEventListener("online",()=>this.recover());
 
 },
 
 getDelay(){
 
 return Math.min(
-this.baseDelay*Math.max(State.retries,1),
+this.baseDelay*Math.max(State.retries||1,1),
 this.maxDelay
 );
 
 },
 
-async handle(){
+handle(){
 
 if(this.retrying)return;
+
 if(!navigator.onLine){
 Events.emit("network:offline");
 return;
 }
 
 this.retrying=true;
-State.retries++;
+State.retries=(State.retries||0)+1;
 
 const delay=this.getDelay();
 
-Events.emit("network:retry",{
-retry:State.retries,
-delay
-});
+Events.emit("network:retry",{retry:State.retries,delay});
 
-setTimeout(()=>this.retryNow(),delay);
+setTimeout(()=>this.recover(),delay);
 
 },
 
-async retryNow(){
+async recover(){
 
-const current=AudioCore.current();
+try{
 
-if(!current||!current.src){
+const index=State.index;
+
+if(index==null){
 this.retrying=false;
 return;
 }
 
-this.retrying=false;
-
-try{
-
-const src=current.src;
-const time=current.currentTime||0;
-
-Events.emit("network:replayRequest",{
-src,
-time,
-index:State.index
-});
+await Engine.play(index);
 
 State.retries=0;
+
+Events.emit("network:recovered");
 
 }catch(e){
 
 Events.emit("network:retryFailed",e);
-}}
+
+}
+
+this.retrying=false;
+
+}
 
 };
+
+// ===============================
+//         INIT
+// ===============================
 
 document.addEventListener("DOMContentLoaded",()=>{
 
@@ -2644,33 +2648,3 @@ SmartRetry.init();
 });
 
 })();
-
-
-// ===============================
-//  NETWORK SAFE REPLAY HANDLER
-// ===============================
-
-(function(){
-
-const{Events,AudioCore}=window.__PLAYER_PART1__;
-const{Engine}=window.__PLAYER_PART2__;
-
-Events.on("network:replayRequest",async({index,time})=>{
-
-try{
-
-//REJOUER VIA ENGINE
-await Engine.play(index);
-
-const a=AudioCore.current();
-
-if(a){
-a.currentTime=time;
-}
-
-}catch(e){
-
-Events.emit("network:replayFailed",e);
-}});
-})();
-
