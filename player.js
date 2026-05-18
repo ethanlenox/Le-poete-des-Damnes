@@ -2082,57 +2082,165 @@ const Watchdog={
     setTimeout(()=>this.r=false,2000);
   },
 
-  // ===========================
-  // CHECK AUDIO STATE
-  // ===========================
-  async check(){
+// ===============================
+// CHECK AUDIO STATE
+// ===========================
+async check(){
 
-    if(!State.playing||State.seeking||document.hidden){
-      return;
-    }
+  if(!State.playing||State.seeking||document.hidden){
+    return;
+  }
+
+  const a=AudioCore.current();
+  if(!a||a.paused||!a.duration){
+    return;
+  }
+
+  const c=a.currentTime;
+
+  if(c===this.lt){
+    this.s++;
+  }else{
+    this.s=0;
+  }
+
+  if(this.s>=this.m){
+    this.s=0;
+    Events.emit("audioStalled");
+    await this.recover(a);
+  }
+
+  this.lt=c;
+}
+
+}; // <-- fermeture Watchdog
+
+// ===============================
+//   STALL DETECTION SMART
+// ===============================
+const StallDetector={
+
+  // ===========================
+  // CONFIG
+  // ===========================
+  lastTime:0,
+  lastCheck:0,
+  freezeCount:0,
+
+  threshold:0.35,
+  maxFreeze:3,
+
+  // ===========================
+  // CHECK FLOW
+  // ===========================
+  check(){
 
     const a=AudioCore.current();
-    if(!a||a.paused||!a.duration){
-      return;
-    }
+    if(!a||State.seeking||document.hidden)return;
 
-    const c=a.currentTime;
+    const now=performance.now();
+    const t=a.currentTime;
 
-    if(c===this.lt){
-      this.s++;
+    // ignore trop fréquent
+    if(now-this.lastCheck<800)return;
+
+    this.lastCheck=now;
+
+    // détection blocage lecture
+    const delta=Math.abs(t-this.lastTime);
+
+    if(delta<this.threshold){
+      this.freezeCount++;
     }else{
-      this.s=0;
+      this.freezeCount=0;
     }
 
-    if(this.s>=this.m){
-      this.s=0;
-      Events.emit("audioStalled");
-      await this.recover(a);
+    if(this.freezeCount>=this.maxFreeze){
+
+      this.freezeCount=0;
+
+      Events.emit("stallDetected");
+
+      this.recover(a);
     }
 
-    this.lt=c;
+    this.lastTime=t;
   },
 
   // ===========================
-  // INIT WATCHDOG
+  // RECOVERY
+  // ===========================
+  async recover(a){
+
+    try{
+
+      const t=a.currentTime||0;
+
+      a.pause();
+
+      await new Promise(r=>setTimeout(r,80));
+
+      if(AudioCore.ctx&&AudioCore.ctx.state!=="running"){
+        await AudioCore.ctx.resume().catch(()=>{});
+      }
+
+      a.currentTime=t;
+
+      await a.play().catch(()=>{});
+
+      Events.emit("stallRecovered");
+
+    }catch(e){
+
+      Events.emit("stallError",e);
+
+    }
+  },
+
+  // ===========================
+  // INIT HOOKS
   // ===========================
   init(){
 
-    Events.on("play",()=>this.start());
-    Events.on("pause",()=>this.stop());
+    Events.on("play",()=>{
 
-    Events.on("trackChange",()=>{
-      this.lt=0;
-      this.s=0;
+      this.lastTime=0;
+      this.freezeCount=0;
+
     });
 
-    window.addEventListener("beforeunload",()=>this.stop());
+    Events.on("trackChange",()=>{
+
+      this.lastTime=0;
+      this.freezeCount=0;
+
+    });
+
   }
 };
 
-// ===============================
-//        AUTO INIT
-// ===============================
-document.addEventListener("DOMContentLoaded",()=>Watchdog.init());
+// ===========================
+// INIT WATCHDOG
+// ===========================
+Watchdog.init = function(){
 
-})();
+  Events.on("play",()=>this.start());
+  Events.on("pause",()=>this.stop());
+
+  Events.on("trackChange",()=>{
+    this.lt=0;
+    this.s=0;
+  });
+
+  window.addEventListener("beforeunload",()=>this.stop());
+};
+
+// ===============================
+// AUTO INIT
+// ===============================
+document.addEventListener("DOMContentLoaded",()=>{
+
+  Watchdog.init();
+  StallDetector.init();
+
+});
