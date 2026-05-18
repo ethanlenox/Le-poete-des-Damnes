@@ -662,6 +662,32 @@ const Engine = {
   playToken: 0,
   lastPlayTime: 0,
   transitioning: false,
+  touchLock: false,
+  lastTouch: 0,
+
+  canInteract(){
+
+  const now = performance.now();
+
+  // anti double trigger iOS
+  if(now - this.lastTouch < 180){
+    return false;
+  }
+
+  // lock multi-touch
+  if(this.touchLock){
+    return false;
+  }
+
+  this.lastTouch = now;
+  this.touchLock = true;
+
+  setTimeout(()=>{
+    this.touchLock = false;
+  }, 220);
+
+  return true;
+},
 
   async play(i){
 
@@ -932,11 +958,29 @@ async toggle(){
 // ===============================
 function bindControls(){
 
-  DOM.play.onclick = ()=>Engine.toggle();
+  DOM.play.onclick = ()=>{
 
-  DOM.next.onclick = ()=>Engine.play(Playlist.next());
+  if(!Engine.canInteract()) return;
 
-  DOM.prev.onclick = ()=>Engine.play(Playlist.prev());
+  Engine.toggle();
+
+};
+
+DOM.next.onclick = ()=>{
+
+  if(!Engine.canInteract()) return;
+
+  Engine.play(Playlist.next());
+
+};
+
+DOM.prev.onclick = ()=>{
+
+  if(!Engine.canInteract()) return;
+
+  Engine.play(Playlist.prev());
+
+};
 
   
 
@@ -956,8 +1000,11 @@ function bindControls(){
   });
 
   // REPEAT
+
   if(repeatBtn){
     repeatBtn.onclick = ()=>{
+
+      if(!Engine.canInteract()) return;
 
       State.repeat = !State.repeat;
 
@@ -978,6 +1025,8 @@ if(muteBtn){
 
   muteBtn.onclick = ()=>{
 
+    if(!Engine.canInteract()) return;
+
     State.muted = !State.muted;
 
     syncMute();
@@ -991,6 +1040,8 @@ if(muteBtn){
   if(togglePlayerBtn){
 
     togglePlayerBtn.onclick = ()=>{
+
+      if(!Engine.canInteract()) return;
 
       document.body.classList.toggle("playlist-open");
 
@@ -1064,9 +1115,17 @@ DOM.progress.addEventListener("mouseup", ()=>{
 
 });
 
-  DOM.tracks.forEach((el,i)=>{
-    el.onclick = ()=>Engine.play(i);
-  });
+DOM.tracks.forEach((el,i)=>{
+
+  el.onclick = ()=>{
+
+    if(!Engine.canInteract()) return;
+
+    Engine.play(i);
+
+  };
+
+});
 
 }
 
