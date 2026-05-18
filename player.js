@@ -2487,3 +2487,107 @@ IOSUnlock.init();
 });
 
 })();
+
+
+// ===============================
+//       SMART NETWORK RETRY
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{Engine}=window.__PLAYER_PART2__;
+
+// ===============================
+//          RETRY ENGINE
+// ===============================
+
+const SmartRetry={
+
+retrying:false,
+baseDelay:1500,
+maxDelay:12000,
+
+init(){
+
+Events.on("error",e=>this.handle(e));
+
+window.addEventListener("online",()=>this.recover());
+
+},
+
+getDelay(){
+
+return Math.min(
+this.baseDelay*Math.max(State.retries||1,1),
+this.maxDelay
+);
+
+},
+
+handle(){
+
+if(this.retrying)return;
+
+if(!navigator.onLine){
+Events.emit("network:offline");
+return;
+}
+
+this.retrying=true;
+State.retries=(State.retries||0)+1;
+
+const delay=this.getDelay();
+
+Events.emit("network:retry",{
+retry:State.retries,
+delay
+});
+
+setTimeout(()=>this.recover(),delay);
+
+},
+
+async recover(){
+
+try{
+
+const index=State.index;
+
+if(index==null){
+this.retrying=false;
+return;
+}
+
+//  ENGINE ONLY
+await Engine.play(index);
+
+State.retries=0;
+
+Events.emit("network:recovered");
+
+}catch(e){
+
+Events.emit("network:retryFailed",e);
+
+}
+
+this.retrying=false;
+
+}
+
+};
+
+// ===============================
+//              INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+SmartRetry.init();
+
+});
+
+})();
+
+
