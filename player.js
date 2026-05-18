@@ -2188,9 +2188,17 @@ const StallDetector={
 
      try{
 
+try{
+
   await a.play();
 
   Events.emit("stallRecovered");
+
+}catch(e){
+
+  Events.emit("stallError",e);
+
+}
 
 }catch(e){
 
