@@ -665,7 +665,15 @@ const Engine = {
   touchLock: false,
   lastTouch: 0,
 
-  canInteract(){
+  canInteract(type = "default"){
+
+  // volume/progress = jamais bloqués
+  if(
+    type === "volume" ||
+    type === "seek"
+  ){
+    return true;
+  }
 
   const now = performance.now();
 
