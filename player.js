@@ -2554,17 +2554,12 @@ IOSUnlock.init();
 
 // ===============================
 //       SMART NETWORK RETRY
-// adaptive retry system
+// adaptive retry system + crossfade fix
 // ===============================
 
 (function(){
 
 const{State,Events,AudioCore}=window.__PLAYER_PART1__;
-const{Engine}=window.__PLAYER_PART2__;
-
-// ===============================
-//        RETRY MANAGER
-// ===============================
 
 const SmartRetry={
 
@@ -2574,43 +2569,30 @@ maxDelay:12000,
 
 init(){
 
-Events.on("error",(e)=>{
+Events.on("error",e=>this.handle(e));
 
-this.handle(e);
-
-});
-
-window.addEventListener("online",()=>{
-
-this.retryNow();
-
-});
+window.addEventListener("online",()=>this.retryNow());
 
 },
 
 getDelay(){
 
-const delay=
-this.baseDelay*
-Math.max(State.retries,1);
-
-return Math.min(delay,this.maxDelay);
+return Math.min(
+this.baseDelay*Math.max(State.retries,1),
+this.maxDelay
+);
 
 },
 
 async handle(){
 
 if(this.retrying)return;
-
 if(!navigator.onLine){
-
 Events.emit("network:offline");
 return;
-
 }
 
 this.retrying=true;
-
 State.retries++;
 
 const delay=this.getDelay();
@@ -2620,17 +2602,14 @@ retry:State.retries,
 delay
 });
 
-setTimeout(async()=>{
-
-await this.retryNow();
-
-},delay);
+setTimeout(()=>this.retryNow(),delay);
 
 },
 
 async retryNow(){
 
 const a=AudioCore.current();
+const g=AudioCore.currentGain();
 
 if(!a){
 this.retrying=false;
@@ -2639,9 +2618,7 @@ return;
 
 try{
 
-// refresh stream
 const src=a.src;
-
 if(!src){
 this.retrying=false;
 return;
@@ -2649,20 +2626,21 @@ return;
 
 const time=a.currentTime||0;
 
+// 🔧 FIX CROSSFADE RESET
+g.gain.cancelScheduledValues(AudioCore.ctx.currentTime);
+g.gain.setValueAtTime(
+Math.max(State.volume,0.001),
+AudioCore.ctx.currentTime
+);
+
 a.pause();
-
 a.src="";
-
 a.src=src;
-
 a.load();
-
 a.currentTime=time;
 
 if(State.playing){
-
-await a.play();
-
+await a.play().catch(()=>{});
 }
 
 State.retries=0;
@@ -2680,10 +2658,6 @@ this.retrying=false;
 }
 
 };
-
-// ===============================
-//         AUTO INIT
-// ===============================
 
 document.addEventListener("DOMContentLoaded",()=>{
 
