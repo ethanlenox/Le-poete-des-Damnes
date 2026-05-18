@@ -2772,3 +2772,89 @@ Recycler.init();
 });
 
 })();
+
+
+// ===============================
+//     LAZY TRACK RENDERING
+// DOM + image + data-src optimize
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        LAZY ENGINE
+// ===============================
+
+const LazyTracks={
+
+items:[],
+observer:null,
+
+init(){
+
+this.items=document.querySelectorAll(".track");
+
+this.observe();
+
+},
+
+observe(){
+
+if(!("IntersectionObserver"in window))return;
+
+this.observer=new IntersectionObserver((entries)=>{
+
+entries.forEach(e=>{
+
+if(!e.isIntersecting)return;
+
+this.load(e.target);
+
+this.observer.unobserve(e.target);
+
+});
+
+},{rootMargin:"200px"});
+
+this.items.forEach(el=>this.observer.observe(el));
+
+},
+
+load(el){
+
+// lazy img
+const img=el.querySelector("img[data-src]");
+if(img){
+
+img.src=img.dataset.src;
+img.removeAttribute("data-src");
+
+}
+
+// lazy audio metadata
+const src=el.dataset.src;
+if(src&&!el.dataset.ready){
+
+el.dataset.ready="1";
+
+Events.emit("track:ready",{el,src});
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+LazyTracks.init();
+
+});
+
+})();
