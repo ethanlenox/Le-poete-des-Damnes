@@ -2014,3 +2014,125 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 })();
+
+// ===============================
+//        AUDIO WATCHDOG
+// ===============================
+
+(function(){
+const {State,Events,AudioCore}=window.__PLAYER_PART1__;
+const Watchdog={
+
+  // ===========================
+  // STATE
+  // ===========================
+  t:null,
+  lt:0,
+  s:0,
+  i:1500,
+  m:4,
+  r:false,
+
+  // ===========================
+  // START MONITORING
+  // ===========================
+  start(){
+    this.stop();
+    this.lt=0;
+    this.s=0;
+    this.t=setInterval(()=>this.check(),this.i);
+  },
+
+  // ===========================
+  // STOP MONITORING
+  // ===========================
+  stop(){
+    clearInterval(this.t);
+    this.t=null;
+  },
+
+  // ===========================
+  // AUTO RECOVERY
+  // ===========================
+  async recover(a){
+    if(this.r)return;
+    this.r=true;
+
+    try{
+      const t=a.currentTime||0;
+
+      a.pause();
+
+      await new Promise(r=>setTimeout(r,120));
+
+      if(AudioCore.ctx&&AudioCore.ctx.state!=="running"){
+        await AudioCore.ctx.resume().catch(()=>{});
+      }
+
+      a.currentTime=t;
+
+      await a.play().catch(()=>{});
+
+      Events.emit("watchdogRecovery");
+
+    }catch(e){
+      Events.emit("watchdogError",e);
+    }
+
+    setTimeout(()=>this.r=false,2000);
+  },
+
+  // ===========================
+  // CHECK AUDIO STATE
+  // ===========================
+  async check(){
+
+    if(!State.playing||State.seeking||document.hidden){
+      return;
+    }
+
+    const a=AudioCore.current();
+    if(!a||a.paused||!a.duration){
+      return;
+    }
+
+    const c=a.currentTime;
+
+    if(c===this.lt){
+      this.s++;
+    }else{
+      this.s=0;
+    }
+
+    if(this.s>=this.m){
+      this.s=0;
+      Events.emit("audioStalled");
+      await this.recover(a);
+    }
+
+    this.lt=c;
+  },
+
+  // ===========================
+  // INIT WATCHDOG
+  // ===========================
+  init(){
+
+    Events.on("play",()=>this.start());
+    Events.on("pause",()=>this.stop());
+
+    Events.on("trackChange",()=>{
+      this.lt=0;
+      this.s=0;
+    });
+
+    window.addEventListener("beforeunload",()=>this.stop());
+  }
+};
+
+// ===============================
+//        AUTO INIT
+// ===============================
+document.addEventListener("DOMContentLoaded",()=>Watchdog.init());
+
+})();
