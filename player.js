@@ -2186,9 +2186,17 @@ const StallDetector={
 
       a.currentTime=t;
 
-      await a.play().catch(()=>{});
+     try{
 
-      Events.emit("stallRecovered");
+  await a.play();
+
+  Events.emit("stallRecovered");
+
+}catch(e){
+
+  await this.deepRecover(a);
+
+}
 
     }catch(e){
 
@@ -2196,6 +2204,80 @@ const StallDetector={
 
     }
   },
+
+ // ===========================
+// DEEP PLAYBACK RECOVERY
+// ===========================
+async deepRecover(a){
+
+  try{
+
+    const src=a.src;
+    const t=a.currentTime||0;
+
+    a.pause();
+
+    await new Promise(r=>setTimeout(r,150));
+
+    a.src="";
+
+    await new Promise(r=>setTimeout(r,80));
+
+    a.src=src;
+
+    a.load();
+
+    await new Promise((resolve,reject)=>{
+
+      const ok=()=>{
+
+        cleanup();
+        resolve();
+
+      };
+
+      const fail=(e)=>{
+
+        cleanup();
+        reject(e);
+
+      };
+
+      const cleanup=()=>{
+
+        a.removeEventListener("canplay",ok);
+        a.removeEventListener("error",fail);
+
+      };
+
+      a.addEventListener("canplay",ok,{once:true});
+      a.addEventListener("error",fail,{once:true});
+
+      setTimeout(()=>{
+
+        cleanup();
+        reject("timeout");
+
+      },6000);
+
+    });
+
+    if(AudioCore.ctx&&AudioCore.ctx.state!=="running"){
+      await AudioCore.ctx.resume().catch(()=>{});
+    }
+
+    a.currentTime=t;
+
+    await a.play();
+
+    Events.emit("deepRecoverySuccess");
+
+  }catch(e){
+
+    Events.emit("deepRecoveryFail",e);
+
+  }
+},
 
   // ===========================
   // INIT HOOKS
