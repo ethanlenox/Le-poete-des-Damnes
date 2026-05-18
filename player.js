@@ -1717,15 +1717,49 @@ const Mobile = {
 
 };
 
-document.addEventListener(
+    document.addEventListener(
   "touchstart",
-  markGesture,
+  (e)=>{
+
+    // ignore sliders iOS
+    const t = e.target;
+
+    if(
+      t &&
+      (
+        t.id === "volumeBar" ||
+        t.id === "progressBar"
+      )
+    ){
+      return;
+    }
+
+    markGesture();
+
+  },
   { passive:true }
 );
 
 document.addEventListener(
   "touchend",
-  markGesture,
+  (e)=>{
+
+    // ignore sliders iOS
+    const t = e.target;
+
+    if(
+      t &&
+      (
+        t.id === "volumeBar" ||
+        t.id === "progressBar"
+      )
+    ){
+      return;
+    }
+
+    markGesture();
+
+  },
   { passive:true }
 );
 
