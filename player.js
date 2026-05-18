@@ -1058,6 +1058,22 @@ if(muteBtn){
   }
 
 // fin ajout boutons aux
+
+  DOM.volume.addEventListener("touchstart", ()=>{
+
+  Mobile.sliderInteracting = true;
+
+}, { passive:true });
+
+DOM.volume.addEventListener("touchend", ()=>{
+
+  setTimeout(()=>{
+    Mobile.sliderInteracting = false;
+  }, 120);
+
+}, { passive:true });
+
+
 DOM.volume.oninput = ()=>{
 
   State.volume = Number(DOM.volume.value);
@@ -1090,6 +1106,20 @@ DOM.volume.oninput = ()=>{
     now + 0.08
   );
 };
+
+  DOM.progress.addEventListener("touchstart", ()=>{
+
+  Mobile.sliderInteracting = true;
+
+}, { passive:true });
+
+DOM.progress.addEventListener("touchend", ()=>{
+
+  setTimeout(()=>{
+    Mobile.sliderInteracting = false;
+  }, 120);
+
+}, { passive:true });
 
 DOM.progress.oninput = ()=>{
 
@@ -1628,6 +1658,7 @@ const Media = {
 //   MOBILE / VISIBILITY HANDLER
 // ===============================
 const Mobile = {
+    sliderInteracting: false,
     recovering: false,
     lastUserGesture: 0,
     resumeLock: false,
@@ -1635,6 +1666,7 @@ const Mobile = {
   async recoverAudio(){
 
     if(this.recovering) return;
+    if(this.sliderInteracting) return;
     if(this.resumeLock) return;
 
     this.recovering = true;
