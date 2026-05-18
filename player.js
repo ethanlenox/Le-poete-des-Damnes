@@ -2858,3 +2858,174 @@ LazyTracks.init();
 });
 
 })();
+
+
+
+// ===============================
+//   ANTI REFLOW / REPAINT SYSTEM
+//   batch DOM updates
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        BATCH ENGINE
+// ===============================
+
+const ReflowGuard={
+
+queue:new Set(),
+scheduled:false,
+
+init(){
+
+this.patchDOM();
+
+},
+
+patchDOM(){
+
+// batch style writes
+this.flushLoop();
+
+},
+
+write(el,fn){
+
+this.queue.add(()=>fn(el));
+
+this.schedule();
+
+},
+
+schedule(){
+
+if(this.scheduled)return;
+
+this.scheduled=true;
+
+requestAnimationFrame(()=>{
+
+this.flush();
+
+this.scheduled=false;
+
+});
+
+},
+
+flush(){
+
+this.queue.forEach(fn=>fn());
+
+this.queue.clear();
+
+},
+
+flushLoop(){
+
+setInterval(()=>{
+
+if(this.queue.size)this.flush();
+
+},100);
+
+}
+
+};
+
+// ===============================
+//        GLOBAL PATCH
+// ===============================
+
+window.__reflowWrite=(el,fn)=>ReflowGuard.write(el,fn);
+
+// ===============================
+//         INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+ReflowGuard.init();
+
+});
+
+})();
+
+
+
+
+// ===============================
+//   GPU ACCELERATION LAYER
+//   targeted compositing
+// ===============================
+
+(function(){
+
+// ===============================
+//        GPU ENGINE
+// ===============================
+
+const GPUBoost={
+
+items:[],
+
+init(){
+
+this.apply();
+
+},
+
+apply(){
+
+// éléments critiques UI
+const targets=[
+"#miniPlayer",
+"#waveform",
+".track img",
+".cover-wrapper",
+"#progressBar"
+];
+
+targets.forEach(sel=>{
+
+document.querySelectorAll(sel).forEach(el=>{
+
+this.optimize(el);
+
+});
+
+});
+
+},
+
+optimize(el){
+
+if(!el)return;
+
+// force GPU layer
+el.style.transform="translateZ(0)";
+el.style.willChange="transform,opacity";
+
+// fallback safe
+el.style.backfaceVisibility="hidden";
+el.style.webkitBackfaceVisibility="hidden";
+
+}
+
+};
+
+// ===============================
+//         INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+GPUBoost.init();
+
+});
+
+})();
+
