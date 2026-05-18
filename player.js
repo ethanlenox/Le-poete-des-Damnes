@@ -2425,3 +2425,65 @@ PlayGuard.init();
 });
 
 })();
+
+
+// ===============================
+//      IOS AUTOPLAY UNLOCK 
+// ===============================
+
+(function(){
+
+const{Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//         UNLOCK ENGINE
+// ===============================
+
+const IOSUnlock={
+
+unlocked:false,
+events:["touchstart","touchend","click"],
+
+init(){
+
+this.events.forEach(ev=>{
+
+document.addEventListener(ev,()=>this.unlock(),{passive:true});
+
+});
+
+},
+
+unlock(){
+
+if(this.unlocked)return;
+if(!AudioCore.ctx)return;
+
+try{
+
+// 🔥 ONLY CONTEXT UNLOCK (NO AUDIO TOUCH)
+if(AudioCore.ctx.state!=="running"){
+AudioCore.ctx.resume().catch(()=>{});
+}
+
+this.unlocked=true;
+
+Events.emit("audio:unlocked");
+
+}catch(e){}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+IOSUnlock.init();
+
+});
+
+})();
