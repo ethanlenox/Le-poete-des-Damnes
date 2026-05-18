@@ -2196,3 +2196,155 @@ AudioWatchdog.init();
 });
 
 })();
+
+
+// ===============================
+//      AUDIO CONTEXT REBUILD
+// Safari/iOS/Android protection
+// ===============================
+
+(function(){
+
+const{State,Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//      CONTEXT REBUILDER
+// ===============================
+
+const ContextRebuilder={
+
+rebuilding:false,
+maxRetries:2,
+retries:0,
+
+init(){
+
+Events.on("audio:recoveryError",()=>{
+
+this.check();
+
+});
+
+document.addEventListener("visibilitychange",()=>{
+
+if(!document.hidden){
+this.check();
+}
+
+});
+
+window.addEventListener("focus",()=>{
+
+this.check();
+
+});
+
+},
+
+async check(){
+
+if(
+!AudioCore.ctx||
+AudioCore.ctx.state==="running"
+){
+return;
+}
+
+await this.rebuild();
+
+},
+
+async rebuild(){
+
+if(this.rebuilding)return;
+
+if(this.retries>=this.maxRetries)return;
+
+this.rebuilding=true;
+this.retries++;
+
+try{
+
+const oldCtx=AudioCore.ctx;
+
+if(oldCtx){
+
+try{
+await oldCtx.close();
+}catch(e){}
+
+}
+
+// nouveau contexte
+AudioCore.ctx=new(
+window.AudioContext||
+window.webkitAudioContext
+)();
+
+// rebuild nodes
+const srcA=AudioCore.ctx.createMediaElementSource(AudioCore.A);
+const srcB=AudioCore.ctx.createMediaElementSource(AudioCore.B);
+
+AudioCore.gainA=AudioCore.ctx.createGain();
+AudioCore.gainB=AudioCore.ctx.createGain();
+
+AudioCore.analyser=AudioCore.ctx.createAnalyser();
+AudioCore.analyser.fftSize=1024;
+
+AudioCore.bufferLength=
+AudioCore.analyser.frequencyBinCount;
+
+AudioCore.dataArray=
+new Uint8Array(AudioCore.bufferLength);
+
+srcA.connect(AudioCore.gainA)
+.connect(AudioCore.analyser)
+.connect(AudioCore.ctx.destination);
+
+srcB.connect(AudioCore.gainB)
+.connect(AudioCore.analyser)
+.connect(AudioCore.ctx.destination);
+
+// restore volume
+const activeGain=
+AudioCore.currentGain();
+
+const inactiveGain=
+AudioCore.nextGain();
+
+activeGain.gain.value=
+Math.max(State.volume,0.001);
+
+inactiveGain.gain.value=0;
+
+await AudioCore.ctx.resume().catch(()=>{});
+
+Events.emit("audio:contextRebuilt");
+
+}catch(e){
+
+Events.emit("audio:contextFailed",e);
+
+}
+
+setTimeout(()=>{
+
+this.rebuilding=false;
+
+},1500);
+
+}
+
+};
+
+// ===============================
+//         AUTO INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+ContextRebuilder.init();
+
+});
+
+})();
