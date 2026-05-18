@@ -2609,7 +2609,8 @@ setTimeout(()=>this.retryNow(),delay);
 async retryNow(){
 
 const a=AudioCore.current();
-const g=AudioCore.currentGain();
+const g1=AudioCore.gainA;
+const g2=AudioCore.gainB;
 
 if(!a){
 this.retrying=false;
@@ -2626,11 +2627,24 @@ return;
 
 const time=a.currentTime||0;
 
-// 🔧 FIX CROSSFADE RESET
-g.gain.cancelScheduledValues(AudioCore.ctx.currentTime);
-g.gain.setValueAtTime(
+// 🔧 RESTORE CROSSFADE STATE COMPLET
+const active=AudioCore.currentGain();
+const inactive=AudioCore.nextGain();
+
+const now=AudioCore.ctx.currentTime;
+
+active.gain.cancelScheduledValues(now);
+inactive.gain.cancelScheduledValues(now);
+
+// remet les 2 gains cohérents
+active.gain.setValueAtTime(
 Math.max(State.volume,0.001),
-AudioCore.ctx.currentTime
+now
+);
+
+inactive.gain.setValueAtTime(
+0.001,
+now
 );
 
 a.pause();
