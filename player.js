@@ -2608,34 +2608,31 @@ setTimeout(()=>this.retryNow(),delay);
 
 async retryNow(){
 
-const a=AudioCore.current();
-
-if(!a){
-this.retrying=false;
-return;
-}
-
-try{
-
-const src=a.src;
+const src=this._getSafeSource();
 if(!src){
 this.retrying=false;
 return;
 }
 
-const time=a.currentTime||0;
+this.retrying=false;
 
-//  AUCUN IMPACT CROSSFADE
+// 🔒 on passe par l’audio INACTIF uniquement (safe crossfade)
+const a=AudioCore.next();
 
+try{
+
+const time=AudioCore.current().currentTime||0;
+
+// ne jamais toucher l'audio actif
 a.pause();
 a.src="";
 a.src=src;
 a.load();
 a.currentTime=time;
 
-if(State.playing){
+// pré-charge silencieuse
 await a.play().catch(()=>{});
-}
+a.pause();
 
 State.retries=0;
 
@@ -2647,7 +2644,15 @@ Events.emit("network:retryFailed",e);
 
 }
 
-this.retrying=false;
+},
+
+_getSafeSource(){
+
+const a=AudioCore.current();
+
+if(!a||!a.src)return null;
+
+return a.src;
 
 }
 
