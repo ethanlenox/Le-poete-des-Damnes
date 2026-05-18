@@ -2352,3 +2352,76 @@ ContextRebuilder.init();
 
 
 
+// ===============================
+//    ANTI DOUBLE PLAY ANDROID 
+// ===============================
+
+(function(){
+
+const{Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//          PLAY GUARD
+// ===============================
+
+const PlayGuard={
+
+lastPlay:0,
+delay:400,
+bound:false,
+
+init(){
+
+if(this.bound)return;
+this.bound=true;
+
+//UN SEUL LISTENER GLOBAL
+Events.on("play",()=>this.onPlay());
+
+},
+
+onPlay(){
+
+const now=Date.now();
+
+if(now-this.lastPlay<this.delay){
+
+this.forceSync();
+
+return;
+
+}
+
+this.lastPlay=now;
+
+},
+
+forceSync(){
+
+const a=AudioCore.current();
+
+if(!a)return;
+
+try{
+
+if(a.paused){
+a.play().catch(()=>{});
+}
+
+}catch(e){}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+PlayGuard.init();
+
+});
+
+})();
