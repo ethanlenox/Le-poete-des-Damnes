@@ -2591,3 +2591,97 @@ SmartRetry.init();
 })();
 
 
+// ===============================
+//    VIRTUAL PLAYLIST RENDERER
+//     mobile performance boost
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{DOM}=window.__PLAYER_PART2__;
+
+// ===============================
+//         RENDER ENGINE
+// ===============================
+
+const VirtualPlaylist={
+
+items:[],
+rendered:false,
+chunkSize:6,
+
+init(){
+
+this.items=Array.from(document.querySelectorAll(".track"));
+
+this.optimize();
+
+this.bindScroll();
+
+},
+
+optimize(){
+
+// initial render light
+this.items.forEach((el,i)=>{
+
+if(i>this.chunkSize){
+el.style.display="none";
+}
+
+});
+
+this.rendered=true;
+
+},
+
+bindScroll(){
+
+let ticking=false;
+
+window.addEventListener("scroll",()=>{
+
+if(ticking)return;
+
+ticking=true;
+
+requestAnimationFrame(()=>{
+
+this.lazyLoad();
+
+ticking=false;
+
+});
+
+});
+
+},
+
+lazyLoad(){
+
+const scrollY=window.scrollY;
+const vh=window.innerHeight;
+
+this.items.forEach((el,i)=>{
+
+const rect=el.getBoundingClientRect();
+
+if(rect.top<vh+200){
+
+if(el.style.display==="none"){
+el.style.display="";
+}}});
+}};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+VirtualPlaylist.init();
+
+});
+
+})();
