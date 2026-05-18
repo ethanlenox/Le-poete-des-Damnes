@@ -2685,3 +2685,90 @@ VirtualPlaylist.init();
 });
 
 })();
+
+
+// ===============================
+//      RECYCLER DOM SYSTEM
+//      ultra perf playlist
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//          POOL ENGINE
+// ===============================
+
+const Recycler={
+
+pool:[],
+active:[],
+maxVisible:8,
+items:[],
+
+init(){
+
+this.items=Array.from(document.querySelectorAll(".track"));
+
+this.buildPool();
+
+this.render(0);
+
+window.addEventListener("scroll",()=>this.update());
+
+},
+
+buildPool(){
+
+this.items.forEach(el=>{
+
+this.pool.push(el);
+
+el.style.display="none";
+
+});
+
+},
+
+render(start){
+
+this.active=[];
+
+for(let i=start;i<start+this.maxVisible;i++){
+
+const el=this.items[i];
+
+if(!el)continue;
+
+el.style.display="";
+
+this.active.push(el);
+
+}
+
+},
+
+update(){
+
+const scrollY=window.scrollY;
+
+const index=Math.floor(scrollY/120);
+
+this.render(index);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+Recycler.init();
+
+});
+
+})();
