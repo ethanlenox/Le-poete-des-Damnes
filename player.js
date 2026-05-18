@@ -3029,3 +3029,226 @@ GPUBoost.init();
 
 })();
 
+
+
+// ===============================
+//   ADAPTIVE FPS ENGINE
+//   battery + performance aware
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        FPS CONTROLLER
+// ===============================
+
+const FPS={
+
+target:60,
+interval:16,
+low:30,
+ultraLow:15,
+
+mode:"high",
+active:true,
+
+init(){
+
+this.detect();
+
+this.patchRAF();
+
+},
+
+detect(){
+
+// battery API
+if(navigator.getBattery){
+
+navigator.getBattery().then(b=>{
+
+if(b.level<0.2){
+
+this.setMode("ultraLow");
+
+}else if(b.level<0.5){
+
+this.setMode("low");
+
+}
+
+b.addEventListener("levelchange",()=>{
+
+if(b.level<0.2)this.setMode("ultraLow");
+else if(b.level<0.5)this.setMode("low");
+else this.setMode("high");
+
+});
+
+});
+
+}
+
+// CPU hint
+const cores=navigator.hardwareConcurrency||4;
+
+if(cores<=2)this.setMode("low");
+
+},
+
+setMode(mode){
+
+this.mode=mode;
+
+if(mode==="high")this.interval=16;
+if(mode==="low")this.interval=33;
+if(mode==="ultraLow")this.interval=66;
+
+Events.emit("fps:mode",{mode});
+
+},
+
+patchRAF(){
+
+const original=requestAnimationFrame;
+
+let last=0;
+
+window.requestAnimationFrame=(cb)=>{
+
+return original((t)=>{
+
+if(!this.active)return;
+
+if(t-last>=this.interval){
+
+last=t;
+
+cb(t);
+}});
+};
+}};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+FPS.init();
+
+});
+
+})();
+
+
+
+// ===============================
+//   BATTERY AWARE RENDERING
+//   visibility + DOM throttle
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        RENDER CONTROLLER
+// ===============================
+
+const RenderControl={
+
+active:true,
+hidden:false,
+
+init(){
+
+this.bindVisibility();
+this.bindEvents();
+
+},
+
+bindVisibility(){
+
+document.addEventListener("visibilitychange",()=>{
+
+this.hidden=document.hidden;
+
+if(this.hidden){
+
+this.pauseAll();
+
+}else{
+
+this.resumeAll();
+
+}
+
+});
+
+},
+
+bindEvents(){
+
+Events.on("appHidden",()=>this.pauseAll());
+Events.on("appVisible",()=>this.resumeAll());
+
+},
+
+pauseAll(){
+
+this.active=false;
+
+document.body.classList.add("low-power");
+
+Events.emit("render:pause");
+
+},
+
+resumeAll(){
+
+this.active=true;
+
+document.body.classList.remove("low-power");
+
+Events.emit("render:resume");
+
+}
+
+};
+
+// ===============================
+//        RAF GUARD PATCH
+// ===============================
+
+(function(){
+
+const original=requestAnimationFrame;
+
+window.requestAnimationFrame=(cb)=>{
+
+return original((t)=>{
+
+if(!RenderControl.active)return;
+
+cb(t);
+
+});
+
+};
+
+})();
+
+// ===============================
+//         INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+RenderControl.init();
+
+});
+
+})();
