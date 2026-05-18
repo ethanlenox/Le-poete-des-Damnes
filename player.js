@@ -1709,7 +1709,20 @@ const Mobile = {
 
   init(){
 
-  const markGesture = ()=>{
+    const markGesture = (e)=>{
+
+  const t = e?.target;
+
+  // ignore sliders audio
+  if(
+    t &&
+    (
+      t.id === "volumeBar" ||
+      t.id === "progressBar"
+    )
+  ){
+    return;
+  }
 
   this.lastUserGesture = Date.now();
 
@@ -1719,24 +1732,13 @@ const Mobile = {
 
     document.addEventListener(
   "touchstart",
-  (e)=>{
+  markGesture,
+  { passive:true }
+);
 
-    // ignore sliders iOS
-    const t = e.target;
-
-    if(
-      t &&
-      (
-        t.id === "volumeBar" ||
-        t.id === "progressBar"
-      )
-    ){
-      return;
-    }
-
-    markGesture();
-
-  },
+document.addEventListener(
+  "touchend",
+  markGesture,
   { passive:true }
 );
 
