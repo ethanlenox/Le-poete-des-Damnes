@@ -1562,44 +1562,111 @@ const Media = {
 // ===============================
 const Mobile = {
     recovering: false,
+    lastUserGesture: 0,
+    resumeLock: false,
 
-    async recoverAudio(){
+  async recoverAudio(){
 
     if(this.recovering) return;
+    if(this.resumeLock) return;
 
     this.recovering = true;
+    this.resumeLock = true;
 
     try{
 
-      // resume context safari/iOS
+      const current = AudioCore.current();
+
+      // SAFARI / iOS AudioContext
       if(
         AudioCore.ctx &&
         AudioCore.ctx.state !== "running"
       ){
 
-        await AudioCore.ctx.resume().catch(()=>{});
+        try{
+          await AudioCore.ctx.resume();
+        }catch(e){}
       }
 
-      const current = AudioCore.current();
-
-      // audio cassé / suspendu
+      // élément audio suspendu
       if(
-        State.playing &&
         current &&
+        current.readyState >= 2 &&
+        State.playing &&
         current.paused
       ){
 
-        await current.play().catch(()=>{});
+        try{
+
+          const p = current.play();
+
+          if(p && typeof p.then === "function"){
+            await p.catch(()=>{});
+          }
+
+        }catch(e){}
+      }
+
+      // double sécurité iOS lockscreen
+      if(
+        current &&
+        current.currentTime > 0 &&
+        current.paused &&
+        !document.hidden &&
+        State.playing
+      ){
+
+        try{
+
+          current.load();
+
+          const retryPlay = current.play();
+
+          if(retryPlay && typeof retryPlay.then === "function"){
+            await retryPlay.catch(()=>{});
+          }
+
+        }catch(e){}
       }
 
     }catch(e){}
 
     setTimeout(()=>{
       this.recovering = false;
-    }, 1000);
+    }, 800);
+
+    setTimeout(()=>{
+      this.resumeLock = false;
+    }, 1500);
   },
 
   init(){
+
+  const markGesture = ()=>{
+
+  this.lastUserGesture = Date.now();
+
+  this.recoverAudio();
+
+};
+
+document.addEventListener(
+  "touchstart",
+  markGesture,
+  { passive:true }
+);
+
+document.addEventListener(
+  "touchend",
+  markGesture,
+  { passive:true }
+);
+
+document.addEventListener(
+  "click",
+  markGesture,
+  { passive:true }
+);
 
     document.addEventListener("visibilitychange", async ()=>{
 
