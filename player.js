@@ -2082,40 +2082,38 @@ const Watchdog={
     setTimeout(()=>this.r=false,2000);
   },
 
-// ===============================
-// CHECK AUDIO STATE
-// ===========================
-async check(){
+  // ===========================
+  // CHECK AUDIO STATE
+  // ===========================
+  async check(){
 
-  if(!State.playing||State.seeking||document.hidden){
-    return;
-  }
+    if(!State.playing||State.seeking||document.hidden){
+      return;
+    }
 
-  const a=AudioCore.current();
-  if(!a||a.paused||!a.duration){
-    return;
-  }
+    const a=AudioCore.current();
+    if(!a||a.paused||!a.duration){
+      return;
+    }
 
-  const c=a.currentTime;
+    const c=a.currentTime;
 
-  if(c===this.lt){
-    this.s++;
-  }else{
-    this.s=0;
-  }
+    if(c===this.lt){
+      this.s++;
+    }else{
+      this.s=0;
+    }
 
-  if(this.s>=this.m){
-    this.s=0;
-    Events.emit("audioStalled");
-    await this.recover(a);
-  }
+    if(this.s>=this.m){
+      this.s=0;
+      Events.emit("audioStalled");
+      await this.recover(a);
+    }
 
-  this.lt=c;
-}
+    this.lt=c;
+  },
 
-}; // <-- fermeture Watchdog
-
-// ===============================
+ // ===============================
 //   STALL DETECTION SMART
 // ===============================
 const StallDetector={
@@ -2186,25 +2184,9 @@ const StallDetector={
 
       a.currentTime=t;
 
-     try{
+      await a.play().catch(()=>{});
 
-try{
-
-  await a.play();
-
-  Events.emit("stallRecovered");
-
-}catch(e){
-
-  Events.emit("stallError",e);
-
-}
-
-}catch(e){
-
-  await this.deepRecover(a);
-
-}
+      Events.emit("stallRecovered");
 
     }catch(e){
 
@@ -2212,14 +2194,6 @@ try{
 
     }
   },
-
- // ===========================
-// DEEP PLAYBACK RECOVERY
-// ===========================
-
-   await a.play().catch(()=>{});
-
-   Events.emit("stallRecovered");
 
   // ===========================
   // INIT HOOKS
@@ -2243,28 +2217,26 @@ try{
   }
 };
 
-// ===========================
-// INIT WATCHDOG
-// ===========================
-Watchdog.init = function(){
+  // ===========================
+  // INIT WATCHDOG
+  // ===========================
+  init(){
 
-  Events.on("play",()=>this.start());
-  Events.on("pause",()=>this.stop());
+    Events.on("play",()=>this.start());
+    Events.on("pause",()=>this.stop());
 
-  Events.on("trackChange",()=>{
-    this.lt=0;
-    this.s=0;
-  });
+    Events.on("trackChange",()=>{
+      this.lt=0;
+      this.s=0;
+    });
 
-  window.addEventListener("beforeunload",()=>this.stop());
+    window.addEventListener("beforeunload",()=>this.stop());
+  }
 };
 
 // ===============================
-// AUTO INIT
+//        AUTO INIT
 // ===============================
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded",()=>Watchdog.init());
 
-  Watchdog.init();
-  StallDetector.init();
-
-});
+})();
