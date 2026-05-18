@@ -2608,53 +2608,32 @@ setTimeout(()=>this.retryNow(),delay);
 
 async retryNow(){
 
-const src=this._getSafeSource();
-if(!src){
+const current=AudioCore.current();
+
+if(!current||!current.src){
 this.retrying=false;
 return;
 }
 
 this.retrying=false;
 
-// 🔒 on passe par l’audio INACTIF uniquement (safe crossfade)
-const a=AudioCore.next();
-
 try{
 
-const time=AudioCore.current().currentTime||0;
+const src=current.src;
+const time=current.currentTime||0;
 
-// ne jamais toucher l'audio actif
-a.pause();
-a.src="";
-a.src=src;
-a.load();
-a.currentTime=time;
-
-// pré-charge silencieuse
-await a.play().catch(()=>{});
-a.pause();
+Events.emit("network:replayRequest",{
+src,
+time,
+index:State.index
+});
 
 State.retries=0;
-
-Events.emit("network:recovered");
 
 }catch(e){
 
 Events.emit("network:retryFailed",e);
-
-}
-
-},
-
-_getSafeSource(){
-
-const a=AudioCore.current();
-
-if(!a||!a.src)return null;
-
-return a.src;
-
-}
+}}
 
 };
 
@@ -2665,3 +2644,33 @@ SmartRetry.init();
 });
 
 })();
+
+
+// ===============================
+//  NETWORK SAFE REPLAY HANDLER
+// ===============================
+
+(function(){
+
+const{Events,AudioCore}=window.__PLAYER_PART1__;
+const{Engine}=window.__PLAYER_PART2__;
+
+Events.on("network:replayRequest",async({index,time})=>{
+
+try{
+
+//REJOUER VIA ENGINE
+await Engine.play(index);
+
+const a=AudioCore.current();
+
+if(a){
+a.currentTime=time;
+}
+
+}catch(e){
+
+Events.emit("network:replayFailed",e);
+}});
+})();
+
