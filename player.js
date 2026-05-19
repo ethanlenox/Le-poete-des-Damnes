@@ -2089,37 +2089,21 @@ this.stallCount=0;
 },
 
 async check(){
-
-const a=AudioCore.current();
-
-if(
-!a||
-a.paused||
-!State.playing||
-State.buffering
-){
-return;
-}
-const t=a.currentTime;
-{
-Events.emit("audio:stall",{
-count:this.stallCount
-});
-{
-await this.recover();
-}
-
-}else{
-
-this.stallCount=0;
-
-}
-
-this.lastTime=t;
-
+  const a = AudioCore.current();
+  if(
+    !a ||
+    a.paused ||
+    !State.playing ||
+    State.buffering
+  ){
+    return;
+  }
+  const t = a.currentTime;
+  if(t === 0){
+    return;
+  }
+  this.lastTime = t;
 },
-
-async recover(){
 
 if(this.recovering)return;
 
