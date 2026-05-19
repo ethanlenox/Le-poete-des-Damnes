@@ -3226,3 +3226,101 @@ AdaptiveFPS.init();
 });
 
 })();
+
+
+
+// ===============================
+//    BATTERY AWARE RENDERING
+// adaptive rendering by battery
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+const{RAF}=window.__PLAYER_PART3__;
+
+// ===============================
+//       BATTERY ENGINE
+// ===============================
+
+const BatteryRender={
+
+battery:null,
+low:false,
+
+async init(){
+
+if(!navigator.getBattery)return;
+
+try{
+
+this.battery=await navigator.getBattery();
+
+this.update();
+
+this.battery.addEventListener(
+"levelchange",
+()=>this.update()
+);
+
+this.battery.addEventListener(
+"chargingchange",
+()=>this.update()
+);
+
+}catch(e){}
+
+},
+
+update(){
+
+if(!this.battery)return;
+
+const level=this.battery.level||1;
+const charging=this.battery.charging;
+
+const low=
+level<=0.20&&!charging;
+
+if(low===this.low)return;
+
+this.low=low;
+
+document.body.classList.toggle(
+"battery-save",
+low
+);
+
+if(low){
+
+RAF.pause();
+
+setTimeout(()=>RAF.resume(),120);
+
+Events.emit("battery:saving",{
+level
+});
+
+}else{
+
+Events.emit("battery:normal",{
+level
+});
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+BatteryRender.init();
+});
+
+})();
