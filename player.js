@@ -739,6 +739,23 @@ newAudio.muted = State.muted;
 
 await newAudio.play();
 
+     //test
+
+     
+     // HARD RESET GAIN MOBILE
+newGain.gain.cancelScheduledValues(
+  AudioCore.ctx.currentTime
+);
+
+newGain.gain.value = State.volume;
+
+oldGain.gain.cancelScheduledValues(
+  AudioCore.ctx.currentTime
+); 
+     
+//test
+
+     
 // sécurité race condition async
 if(token !== this.playToken){
 
