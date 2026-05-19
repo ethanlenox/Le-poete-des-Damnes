@@ -3293,10 +3293,6 @@ low
 
 if(low){
 
-RAF.pause();
-
-setTimeout(()=>RAF.resume(),120);
-
 Events.emit("battery:saving",{
 level
 });
