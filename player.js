@@ -2100,21 +2100,13 @@ State.buffering
 ){
 return;
 }
-
 const t=a.currentTime;
-
-if(t===this.lastTime){
-
-this.stallCount++;
-
+{
 Events.emit("audio:stall",{
 count:this.stallCount
 });
-
-if(this.stallCount>=this.maxStall){
-
+{
 await this.recover();
-
 }
 
 }else{
