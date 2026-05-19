@@ -2018,161 +2018,149 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 // ===============================
 //     AUDIO CORE STABILITY
-// event-driven mobile-safe system
+//     soft mobile-safe watchdog
 // ===============================
 
 (function(){
 
 const { State, Events, AudioCore } = window.__PLAYER_PART1__;
-const { Engine } = window.__PLAYER_PART2__;
-
-// ===============================
-//        WATCHDOG SYSTEM
-// ===============================
 
 const AudioWatchdog = {
 
-  enabled: true,
+  timer: null,
 
-  state: "IDLE", // IDLE | PLAYING | BUFFERING | STALLED | RECOVERING
+  stallCount: 0,
 
-  lastProgressTime: 0,
-  stallTimer: null,
+  lastTime: -1,
 
-  recoverCooldown: false,
+  recovering: false,
 
-  maxStallDelay: 6000,
+  interval: 4000, // plus lent = plus stable mobile
+
+  maxStall: 2, // plus bas = moins de faux positifs
 
   init(){
 
-    const a = AudioCore.A;
-    const b = AudioCore.B;
+    Events.on("play", () => this.start());
+    Events.on("pause", () => this.stop());
 
-    [a, b].forEach(audio => {
-
-      audio.addEventListener("playing", () => {
-        this.setState("PLAYING");
-      });
-
-      audio.addEventListener("waiting", () => {
-        this.setState("BUFFERING");
-      });
-
-      audio.addEventListener("stalled", () => {
-        this.handlePotentialStall();
-      });
-
-      audio.addEventListener("suspend", () => {
-        this.handlePotentialStall();
-      });
-
-      audio.addEventListener("error", (e) => {
-        this.recover("error");
-      });
-
-      audio.addEventListener("pause", () => {
-        this.setState("IDLE");
-      });
-
-    });
-
-    document.addEventListener("visibilitychange", () => {
-      if(!document.hidden && State.playing){
-        this.softRecover();
-      }
-    });
-
-    window.addEventListener("pageshow", () => {
+    const recover = () => {
       if(State.playing){
         this.softRecover();
       }
-    });
+    };
+
+    document.addEventListener("visibilitychange", recover);
+    window.addEventListener("focus", recover);
+    window.addEventListener("pageshow", recover);
 
   },
 
-  setState(s){
-    this.state = s;
+  start(){
+
+    this.stop();
+
+    this.timer = setInterval(() => {
+      this.check();
+    }, this.interval);
+
   },
 
-  handlePotentialStall(){
+  stop(){
 
-    if(this.state !== "PLAYING") return;
+    clearInterval(this.timer);
+    this.timer = null;
+    this.lastTime = -1;
+    this.stallCount = 0;
 
-    clearTimeout(this.stallTimer);
+  },
 
-    this.stallTimer = setTimeout(() => {
+  check(){
 
-      const a = AudioCore.current();
+    const a = AudioCore.current();
 
-      if(
-        !a ||
-        a.paused ||
-        State.buffering ||
-        State.seeking
-      ){
-        return;
-      }
+    if(
+      !a ||
+      !State.playing ||
+      State.buffering ||
+      State.seeking
+    ){
+      return;
+    }
 
-      this.recover("stall");
+    const t = a.currentTime;
 
-    }, this.maxStallDelay);
+    // première frame
+    if(this.lastTime < 0){
+      this.lastTime = t;
+      return;
+    }
+
+    const delta = Math.abs(t - this.lastTime);
+
+    this.lastTime = t;
+
+    // 🔥 IMPORTANT MOBILE FIX :
+    // on ignore les micro variations + buffering normal
+    if(delta > 0.01){
+      this.stallCount = 0;
+      return;
+    }
+
+    this.stallCount++;
+
+    // pas de réaction immédiate (mobile delay safe)
+    if(this.stallCount < this.maxStall) return;
+
+    this.recover("stall");
 
   },
 
   softRecover(){
 
-    if(this.recoverCooldown) return;
+    if(this.recovering) return;
 
     this.recover("soft");
 
   },
 
-  async recover(reason){
+  recover(reason){
 
-    if(this.recoverCooldown) return;
+    if(this.recovering) return;
 
-    this.recoverCooldown = true;
-
-    this.setState("RECOVERING");
+    this.recovering = true;
 
     const a = AudioCore.current();
 
     try {
 
-      // 1. resume context si besoin
+      // juste contexte, PAS de reset agressif
       if(AudioCore.ctx && AudioCore.ctx.state !== "running"){
-        await AudioCore.ctx.resume().catch(()=>{});
+        AudioCore.ctx.resume().catch(()=>{});
       }
 
-      // 2. play recovery uniquement si nécessaire
+      // play only if needed
       if(State.playing && a && a.paused){
-        await a.play().catch(()=>{});
+        a.play().catch(()=>{});
       }
 
       Events.emit("audio:recovered", { reason });
 
-    } catch(e) {
+    } catch(e){
 
       Events.emit("audio:recoveryError", e);
 
     }
 
     setTimeout(() => {
-
-      this.recoverCooldown = false;
-
-      this.setState("PLAYING");
-
-    }, 3000);
+      this.recovering = false;
+    }, 1500);
 
   }
 
 };
 
-// ===============================
-//             INIT
-// ===============================
-
+// init
 document.addEventListener("DOMContentLoaded", () => {
   AudioWatchdog.init();
 });
