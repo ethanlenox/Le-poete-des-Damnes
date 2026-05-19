@@ -2020,7 +2020,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 // ===============================
 //     AUDIO CORE STABILITY
-// watchdog + stall + recovery
+//           watchdog 
 // ===============================
 
 (function(){
@@ -2028,178 +2028,158 @@ document.addEventListener("DOMContentLoaded", ()=>{
 const{State,Events,AudioCore}=window.__PLAYER_PART1__;
 
 // ===============================
-//        AUDIO WATCHDOG
+//   AUDIO WATCHDOG MOBILE SAFE
 // ===============================
 
-const AudioWatchdog={
+const AudioWatchdog = {
 
-timer:null,
-lastTime:0,
-stallCount:0,
-recovering:false,
+timer: null,
+lastTime: 0,
+stallCount: 0,
+recovering: false,
 
-interval:3000,
-maxStall:3,
+interval: 3000,
+maxStall: 4,
+
+// 🔥 nouveau
+bootTime: 0,
+ignoreUntil: 0,
 
 init(){
 
-Events.on("play",()=>this.start());
-Events.on("pause",()=>this.stop());
+  this.bootTime = performance.now();
 
-document.addEventListener("visibilitychange",()=>{
- 
-if (document.hidden) return;
-if(!document.hidden){
-this.recover();
-}
+  // 🔥 ignore stabilisation après refresh
+  this.ignoreUntil = this.bootTime + 6000;
 
-});
+  Events.on("play",()=>this.start());
+  Events.on("pause",()=>this.stop());
 
-window.addEventListener("focus",()=>{
+  document.addEventListener("visibilitychange",()=>{
 
-this.recover();
+    if(!document.hidden){
+      this.recover();
+    }
 
-});
+  });
 
-window.addEventListener("pageshow",()=>{
+  window.addEventListener("focus",()=>{
+    this.recover();
+  });
 
-this.recover();
-
-});
+  window.addEventListener("pageshow",()=>{
+    this.recover();
+  });
 
 },
 
 start(){
 
-this.stop();
+  this.stop();
 
-this.timer=setInterval(()=>{
-
-this.check();
-
-},this.interval);
+  this.timer = setInterval(()=>{
+    this.check();
+  }, this.interval);
 
 },
 
 stop(){
 
-clearInterval(this.timer);
+  clearInterval(this.timer);
 
-this.timer=null;
-this.lastTime=0;
-this.stallCount=0;
+  this.timer = null;
+  this.lastTime = 0;
+  this.stallCount = 0;
 
 },
 
-async check(){
+check(){
 
-const a=AudioCore.current();
+  const a = AudioCore.current();
 
-if(
-!a||
-a.paused||
-!State.playing||
-State.buffering
-){
-return;
-}
+  if(
+    !a ||
+    a.paused ||
+    !State.playing ||
+    State.buffering
+  ){
+    return;
+  }
 
-const t=a.currentTime;
+  const t = a.currentTime;
 
-if(t===this.lastTime){
+  // 🔥 IGNORE PHASE POST-REFRESH MOBILE
+  if(performance.now() < this.ignoreUntil){
+    this.lastTime = t;
+    return;
+  }
 
-this.stallCount++;
+  // 🔥 mobile-safe stall detection (tolérance + dérive)
+  const delta = Math.abs(t - this.lastTime);
 
-Events.emit("audio:stall",{
-count:this.stallCount
-});
+  if(delta < 0.08){
 
-if(this.stallCount>=this.maxStall){
+    this.stallCount++;
 
-await this.recover();
+    Events.emit("audio:stall",{
+      count:this.stallCount
+    });
 
-}
+    if(this.stallCount >= this.maxStall){
+      this.recover();
+    }
 
-}else{
+  } else {
 
-this.stallCount=0;
+    this.stallCount = 0;
 
-}
+  }
 
-this.lastTime=t;
+  this.lastTime = t;
 
 },
 
 async recover(){
 
-if(this.recovering)return;
+  if(this.recovering) return;
 
-this.recovering=true;
+  this.recovering = true;
 
-const a=AudioCore.current();
+  const a = AudioCore.current();
 
-try{
+  try{
 
-// resume AudioContext iOS/Safari
-if(
-AudioCore.ctx&&
-AudioCore.ctx.state!=="running"
-){
-await AudioCore.ctx.resume();
-}
+    // 🔥 safe resume only
+    if(
+      AudioCore.ctx &&
+      AudioCore.ctx.state !== "running"
+    ){
+      await AudioCore.ctx.resume().catch(()=>{});
+    }
 
-}catch(e){}
+    // 🔥 NE PAS TOUCHER AU TEMPS AUDIO (IMPORTANT MOBILE)
+    if(State.playing && a && a.paused){
 
-try{
+      const p = a.play();
+      if(p) await p.catch(()=>{});
 
-// pause fantôme Android/iOS
-if(
-State.playing&&
-a&&
-a.paused
-){
-if (!AudioCore.ctx || AudioCore.ctx.state !== "running") return;
+    }
 
-const p = a.play();
-if (p) await p.catch(()=>{});
-}
+    Events.emit("audio:recovered");
 
-// micro jump anti stall
-if(
-a&&
-!a.paused&&
-a.readyState>=2
-)
-Events.emit("audio:recovered");
+  }catch(e){
 
-}catch(e){
+    Events.emit("audio:recoveryError", e);
 
-Events.emit("audio:recoveryError",e);
+  }
 
-}
-
-setTimeout(()=>{
-
-this.recovering=false;
-
-},1200);
+  setTimeout(()=>{
+    this.recovering = false;
+  }, 1500);
 
 }
 
 };
-
-// ===============================
-//         AUTO INIT
-// ===============================
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-AudioWatchdog.init();
-
-});
-
-})();
-
 
 
 
