@@ -3353,12 +3353,15 @@ interval:15000,
 
 init(){
 
+setTimeout(()=>{
 this.detect();
 
 setInterval(
 ()=>this.detect(),
 this.interval
 );
+
+},8000);
 
 window.addEventListener(
 "memorypressure",
