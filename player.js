@@ -3031,6 +3031,430 @@ GPUBoost.init();
 
 
 
+// ===============================
+//      ADAPTIVE FPS ENGINE
+// dynamic RAF performance control
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{RAF}=window.__PLAYER_PART3__;
+
+// ===============================
+//         FPS ENGINE
+// ===============================
+
+const AdaptiveFPS={
+
+min:24,
+max:60,
+current:60,
+
+last:performance.now(),
+frames:0,
+
+hiddenFPS:8,
+lowBatteryFPS:30,
+
+init(){
+
+this.patchRAF();
+
+document.addEventListener(
+"visibilitychange",
+()=>this.update()
+);
+
+Events.on("battery:saving",()=>{
+this.set(this.lowBatteryFPS);
+});
+
+Events.on("battery:normal",()=>{
+this.set(this.max);
+});
+
+this.monitor();
+
+},
+
+patchRAF(){
+
+if(RAF.__adaptivePatched)return;
+
+RAF.__adaptivePatched=true;
+
+const originalRun=RAF.run.bind(RAF);
+
+RAF.run=()=>{
+
+if(RAF.running)return;
+
+RAF.running=true;
+
+const loop=(now)=>{
+
+if(document.hidden){
+
+this.set(this.hiddenFPS);
+
+}else{
+
+this.update();
+}
+
+const interval=1000/this.current;
+
+if(now-this.last>=interval){
+
+this.last=now;
+
+RAF.tasks.forEach(fn=>{
+try{fn();}catch(e){}
+});
+
+}
+
+RAF.rafId=requestAnimationFrame(loop);
+
+};
+
+RAF.rafId=requestAnimationFrame(loop);
+
+};
+
+},
+
+monitor(){
+
+setInterval(()=>{
+
+this.frames=0;
+
+const start=performance.now();
+
+const count=()=>{
+
+this.frames++;
+
+if(performance.now()-start<1000){
+
+requestAnimationFrame(count);
+
+}else{
+
+this.autoAdjust();
+
+}
+
+};
+
+count();
+
+},4000);
+
+},
+
+autoAdjust(){
+
+if(document.hidden){
+return;
+}
+
+if(this.frames<28){
+
+this.set(
+Math.max(
+this.min,
+this.current-6
+));
+
+}else if(this.frames>50){
+
+this.set(
+Math.min(
+this.max,
+this.current+4
+));
+
+}
+
+Events.emit("fps:update",this.current);
+
+},
+
+update(){
+
+const mem=navigator.deviceMemory||4;
+const cores=navigator.hardwareConcurrency||4;
+
+if(mem<=2||cores<=4){
+
+this.set(30);
+
+}else{
+
+this.set(this.max);
+
+}
+
+},
+
+set(v){
+
+if(v===this.current)return;
+
+this.current=v;
+
+document.documentElement.style.setProperty(
+"--adaptive-fps",
+v
+);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+AdaptiveFPS.init();
+});
+
+})();
 
 
 
+// ===============================
+//    BATTERY AWARE RENDERING
+// adaptive rendering by battery
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+const{RAF}=window.__PLAYER_PART3__;
+
+// ===============================
+//       BATTERY ENGINE
+// ===============================
+
+const BatteryRender={
+
+battery:null,
+low:false,
+
+async init(){
+
+if(!navigator.getBattery)return;
+
+try{
+
+this.battery=await navigator.getBattery();
+
+this.update();
+
+this.battery.addEventListener(
+"levelchange",
+()=>this.update()
+);
+
+this.battery.addEventListener(
+"chargingchange",
+()=>this.update()
+);
+
+}catch(e){}
+
+},
+
+update(){
+
+if(!this.battery)return;
+
+const level=this.battery.level||1;
+const charging=this.battery.charging;
+
+const low=
+level<=0.20&&!charging;
+
+if(low===this.low)return;
+
+this.low=low;
+
+document.body.classList.toggle(
+"battery-save",
+low
+);
+
+if(low){
+
+RAF.pause();
+
+setTimeout(()=>RAF.resume(),120);
+
+Events.emit("battery:saving",{
+level
+});
+
+}else{
+
+Events.emit("battery:normal",{
+level
+});
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+BatteryRender.init();
+});
+
+})();
+
+
+
+// ===============================
+//      RAM PRESSURE CLEANUP
+// adaptive memory protection
+// ===============================
+
+(function(){
+
+const{Events,Memory}=window.__PLAYER_PART1__;
+const{
+Cache,
+Preload
+}=window.__PLAYER_PART2__;
+
+// ===============================
+//        RAM CLEANER
+// ===============================
+
+const RAMCleanup={
+
+maxCacheLow:4,
+maxCacheNormal:10,
+
+interval:15000,
+
+init(){
+
+this.detect();
+
+setInterval(
+()=>this.detect(),
+this.interval
+);
+
+window.addEventListener(
+"memorypressure",
+()=>this.cleanup(true)
+);
+
+document.addEventListener(
+"visibilitychange",
+()=>{
+
+if(document.hidden){
+this.cleanup();
+}
+
+});
+
+},
+
+detect(){
+
+const mem=navigator.deviceMemory||4;
+
+if(mem<=2){
+
+this.cleanup(true);
+
+}else{
+
+Cache.max=this.maxCacheNormal;
+
+}
+
+},
+
+cleanup(aggressive=false){
+
+const limit=
+aggressive?
+this.maxCacheLow:
+6;
+
+Cache.max=limit;
+
+// purge preload queue
+Preload.queue.length=0;
+
+// purge old cache
+while(Cache.map.size>limit){
+
+let oldestKey=null;
+let oldestTime=Infinity;
+
+Cache.usage.forEach((t,k)=>{
+
+if(t<oldestTime){
+
+oldestTime=t;
+oldestKey=k;
+
+}
+
+});
+
+if(!oldestKey)break;
+
+const audio=Cache.map.get(oldestKey);
+
+if(audio){
+Memory.cleanupAudio(audio);
+}
+
+Cache.map.delete(oldestKey);
+Cache.usage.delete(oldestKey);
+
+}
+
+Events.emit(
+"memory:cleanup",
+{
+aggressive,
+cache:Cache.map.size
+}
+);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+RAMCleanup.init();
+});
+
+})();
