@@ -3464,160 +3464,101 @@ RAMCleanup.init();
 
 
 // ===============================
-//      MOBILE AUDIO PATCH
-//      safe non-intrusive fix
+//      MOBILE BF CACHE FIX
 // ===============================
 
 (function(){
 
-if(window.__MOBILE_AUDIO_PATCH__) return;
-window.__MOBILE_AUDIO_PATCH__ = true;
+if(window.__PLAYER_BFCACHE_FIX__) return;
+window.__PLAYER_BFCACHE_FIX__ = true;
 
-const {
-  State,
-  AudioCore,
-  Events
-} = window.__PLAYER_PART1__;
+function hardReloadPlayer(){
 
-if(!AudioCore) return;
+  try{
 
-const Patch = {
+    // reset flag
+    window.__ULTRA_PRO_PLAYER_V4__ = false;
 
-  started:false,
-  recovering:false,
+    // stop audios
+    if(window.__PLAYER_PART1__){
 
-  init(){
+      const { AudioCore } = window.__PLAYER_PART1__;
 
-    // iOS inline
-    try{
-      AudioCore.A.playsInline = true;
-      AudioCore.B.playsInline = true;
+      if(AudioCore){
 
-      AudioCore.A.setAttribute("playsinline","");
-      AudioCore.B.setAttribute("playsinline","");
+        [AudioCore.A, AudioCore.B].forEach(a=>{
 
-      AudioCore.A.setAttribute("webkit-playsinline","");
-      AudioCore.B.setAttribute("webkit-playsinline","");
+          try{
 
-    }catch(e){}
+            a.pause();
+            a.src = "";
+            a.load();
 
-    // réveil user interaction
-    [
-      "touchstart",
-      "touchend",
-      "click"
-    ].forEach(ev=>{
+          }catch(e){}
 
-      document.addEventListener(
-        ev,
-        ()=>this.unlock(),
-        { passive:true }
-      );
+        });
 
-    });
+        // close old context
+        if(AudioCore.ctx){
 
-    // retour app
-    window.addEventListener(
-      "pageshow",
-      ()=>this.recover()
-    );
+          try{
+            AudioCore.ctx.close();
+          }catch(e){}
 
-    window.addEventListener(
-      "focus",
-      ()=>this.recover()
-    );
-
-    document.addEventListener(
-      "visibilitychange",
-      ()=>{
-        if(!document.hidden){
-          this.recover();
-        }
-      }
-    );
-
-    // watchdog léger
-    setInterval(()=>{
-
-      if(
-        State.playing &&
-        AudioCore.current().paused
-      ){
-        this.recover();
-      }
-
-    },3000);
-
-  },
-
-  async unlock(){
-
-    if(this.started) return;
-
-    this.started = true;
-
-    try{
-
-      if(
-        AudioCore.ctx &&
-        AudioCore.ctx.state !== "running"
-      ){
-        await AudioCore.ctx.resume();
-      }
-
-    }catch(e){}
-
-  },
-
-  async recover(){
-
-    if(this.recovering) return;
-
-    this.recovering = true;
-
-    try{
-
-      const a = AudioCore.current();
-
-      // réveil context
-      if(
-        AudioCore.ctx &&
-        AudioCore.ctx.state !== "running"
-      ){
-
-        await AudioCore.ctx.resume()
-        .catch(()=>{});
-
-      }
-
-      // fake pause mobile
-      if(
-        State.playing &&
-        a &&
-        a.paused
-      ){
-
-        const p = a.play();
-
-        if(p){
-          await p.catch(()=>{});
         }
 
       }
 
-    }catch(e){}
+    }
 
-    setTimeout(()=>{
-      this.recovering = false;
-    },1500);
+  }catch(e){}
+
+  // FULL RELOAD MOBILE SAFE
+  setTimeout(()=>{
+
+    window.location.reload();
+
+  },100);
+
+}
+
+// iOS Safari / Android cache restore
+window.addEventListener("pageshow",(e)=>{
+
+  // page restaurée depuis cache navigateur
+  if(e.persisted){
+
+    hardReloadPlayer();
 
   }
 
-};
+});
 
-document.addEventListener(
-  "DOMContentLoaded",
-  ()=>Patch.init()
-);
+// Android Chrome parfois
+window.addEventListener("pagehide",()=>{
+
+  try{
+
+    if(window.__PLAYER_PART1__){
+
+      const { AudioCore } = window.__PLAYER_PART1__;
+
+      if(AudioCore){
+
+        [AudioCore.A, AudioCore.B].forEach(a=>{
+
+          try{
+            a.pause();
+          }catch(e){}
+
+        });
+
+      }
+
+    }
+
+  }catch(e){}
+
+});
 
 })();
