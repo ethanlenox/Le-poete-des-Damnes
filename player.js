@@ -3394,36 +3394,36 @@ Cache.max=this.maxCacheNormal;
 
 cleanup(aggressive=false){
 
-const limit=
-aggressive?
-this.maxCacheLow:
-6;
+// ne jamais cleaner pendant boot mobile
+if(!this._ready){
+  return;
+}
 
-Cache.max=limit;
+const limit = aggressive ? this.maxCacheLow : 6;
 
-// purge preload queue
-Preload.queue.length=0;
+Cache.max = limit;
 
-// purge old cache
-while(Cache.map.size>limit){
+// NE PAS vider preload brutalement sur mobile
+if(!document.hidden){
+  Preload.queue.length = 0;
+}
+
+// purge cache safe
+while(Cache.map.size > limit){
 
 let oldestKey=null;
 let oldestTime=Infinity;
 
 Cache.usage.forEach((t,k)=>{
-
-if(t<oldestTime){
-
-oldestTime=t;
-oldestKey=k;
-
+if(t < oldestTime){
+oldestTime = t;
+oldestKey = k;
 }
-
 });
 
-if(!oldestKey)break;
+if(!oldestKey) break;
 
-const audio=Cache.map.get(oldestKey);
+const audio = Cache.map.get(oldestKey);
 
 if(audio){
 Memory.cleanupAudio(audio);
@@ -3434,13 +3434,10 @@ Cache.usage.delete(oldestKey);
 
 }
 
-Events.emit(
-"memory:cleanup",
-{
+Events.emit("memory:cleanup",{
 aggressive,
 cache:Cache.map.size
-}
-);
+});
 
 }
 
@@ -3455,5 +3452,11 @@ document.addEventListener(
 ()=>{
 RAMCleanup.init();
 });
+
+this._ready = false;
+
+setTimeout(()=>{
+this._ready = true;
+},8000);
 
 })();
