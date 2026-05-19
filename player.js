@@ -2018,182 +2018,268 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 // ===============================
 //     AUDIO CORE STABILITY
-// watchdog + stall + recovery
+// soft mobile-safe watchdog
 // ===============================
 
 (function(){
 
-const{State,Events,AudioCore}=window.__PLAYER_PART1__;
+const {
+  State,
+  Events,
+  AudioCore
+} = window.__PLAYER_PART1__;
+
+const {
+  RAF
+} = window.__PLAYER_PART3__;
 
 // ===============================
 //        AUDIO WATCHDOG
 // ===============================
 
-const AudioWatchdog={
+const AudioWatchdog = {
 
-timer:null,
-lastTime:0,
-stallCount:0,
-recovering:false,
+  enabled: true,
 
-interval:3000,
-maxStall:3,
+  checking: false,
+  recovering: false,
 
-init(){
+  lastTime: 0,
+  stallCount: 0,
 
-Events.on("play",()=>this.start());
-Events.on("pause",()=>this.stop());
+  lastCheck: 0,
 
-document.addEventListener("visibilitychange",()=>{
+  interval: 5000,
+  maxStall: 3,
 
-if(!document.hidden){
-this.recover();
-}
+  recoverCooldown: 4000,
 
-});
+  recoverTimer: null,
 
-window.addEventListener("focus",()=>{
+  init(){
 
-this.recover();
+    Events.on("play", ()=>this.start());
 
-});
+    Events.on("pause", ()=>this.stop());
 
-window.addEventListener("pageshow",()=>{
+    // recovery léger uniquement
+    document.addEventListener(
+      "visibilitychange",
+      ()=>{
 
-this.recover();
+        if(
+          !document.hidden &&
+          State.playing
+        ){
+          this.queueRecover();
+        }
 
-});
+      }
+    );
 
-},
+    window.addEventListener(
+      "pageshow",
+      ()=>{
 
-start(){
+        if(State.playing){
+          this.queueRecover();
+        }
 
-this.stop();
+      }
+    );
 
-this.timer=setInterval(()=>{
+  },
 
-this.check();
+  start(){
 
-},this.interval);
+    if(this.checking) return;
 
-},
+    this.checking = true;
 
-stop(){
+    this.lastCheck = performance.now();
 
-clearInterval(this.timer);
+    RAF.add("audio-watchdog", ()=>{
 
-this.timer=null;
-this.lastTime=0;
-this.stallCount=0;
+      if(
+        !this.enabled ||
+        !State.playing ||
+        document.hidden
+      ){
+        return;
+      }
 
-},
+      const now = performance.now();
 
-async check(){
+      if(
+        now - this.lastCheck >= this.interval
+      ){
 
-const a=AudioCore.current();
+        this.lastCheck = now;
 
-if(
-!a||
-a.paused||
-!State.playing||
-State.buffering
-){
-return;
-}
+        this.check();
 
-const t=a.currentTime;
+      }
 
-if(t===this.lastTime){
+    });
 
-this.stallCount++;
+  },
 
-Events.emit("audio:stall",{
-count:this.stallCount
-});
+  stop(){
 
-if(this.stallCount>=this.maxStall){
+    this.checking = false;
 
-await this.recover();
+    RAF.remove("audio-watchdog");
 
-}
+    this.lastTime = 0;
+    this.stallCount = 0;
 
-}else{
+  },
 
-this.stallCount=0;
+  check(){
 
-}
+    if(this.recovering) return;
 
-this.lastTime=t;
+    const a = AudioCore.current();
 
-},
+    // états invalides
+    if(
+      !a ||
+      a.paused ||
+      State.buffering ||
+      State.seeking
+    ){
+      return;
+    }
 
-async recover(){
+    // pas assez de data
+    if(a.readyState < 2){
+      return;
+    }
 
-if(this.recovering)return;
+    const t = a.currentTime;
 
-this.recovering=true;
+    // tolérance mobile
+    const stalled =
+      Math.abs(t - this.lastTime) < 0.01;
 
-const a=AudioCore.current();
+    if(stalled){
 
-try{
+      this.stallCount++;
 
-// resume AudioContext iOS/Safari
-if(
-AudioCore.ctx&&
-AudioCore.ctx.state!=="running"
-){
-await AudioCore.ctx.resume();
-}
+      Events.emit(
+        "audio:stall",
+        {
+          count: this.stallCount
+        }
+      );
 
-}catch(e){}
+    }else{
 
-try{
+      this.stallCount = 0;
 
-// pause fantôme Android/iOS
-if(
-State.playing&&
-a&&
-a.paused
-){
-await a.play();
-}
+    }
 
-// micro jump anti stall
-if(
-a&&
-!a.paused&&
-a.readyState>=2
-){
-a.currentTime+=0.01;
-}
+    this.lastTime = t;
 
-Events.emit("audio:recovered");
+    // vrai stall long uniquement
+    if(
+      this.stallCount >= this.maxStall
+    ){
 
-}catch(e){
+      this.queueRecover();
 
-Events.emit("audio:recoveryError",e);
+    }
 
-}
+  },
 
-setTimeout(()=>{
+  queueRecover(){
 
-this.recovering=false;
+    if(this.recovering) return;
 
-},1200);
+    clearTimeout(this.recoverTimer);
 
-}
+    this.recoverTimer = setTimeout(()=>{
+
+      this.recover();
+
+    }, 500);
+
+  },
+
+  async recover(){
+
+    if(this.recovering) return;
+
+    this.recovering = true;
+
+    const a = AudioCore.current();
+
+    try{
+
+      // mini délai stabilité mobile
+      await new Promise(r=>setTimeout(r,300));
+
+      // resume context uniquement
+      if(
+        AudioCore.ctx &&
+        AudioCore.ctx.state !== "running"
+      ){
+
+        await AudioCore.ctx
+          .resume()
+          .catch(()=>{});
+
+      }
+
+      // ghost pause mobile
+      if(
+        State.playing &&
+        a &&
+        a.paused
+      ){
+
+        await a.play().catch(()=>{});
+
+      }
+
+      Events.emit(
+        "audio:recovered"
+      );
+
+    }catch(e){
+
+      Events.emit(
+        "audio:recoveryError",
+        e
+      );
+
+    }
+
+    // cooldown anti spam
+    setTimeout(()=>{
+
+      this.recovering = false;
+
+      this.stallCount = 0;
+
+    }, this.recoverCooldown);
+
+  }
 
 };
 
 // ===============================
-//         AUTO INIT
+//             INIT
 // ===============================
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
 
-AudioWatchdog.init();
+    AudioWatchdog.init();
 
-});
+  }
+);
 
 })();
 
