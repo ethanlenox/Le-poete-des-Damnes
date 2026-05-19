@@ -737,32 +737,7 @@ const newGain = AudioCore.nextGain();
       newAudio.currentTime = 0;
 newAudio.muted = State.muted;
 
-
-
-     //T E S T
-     
-      aconst p = newAudio.play();
-
-if (p !== undefined) {
-
-  await p.catch(err => {
-
-    console.error("PLAY ERROR:", err);
-
-    alert(
-      "PLAY ERROR: " +
-      err.name +
-      " / " +
-      err.message
-    );
-
-    throw err;
-
-  });
-
-}
-
-     //T E S T 
+await newAudio.play();
 
 // sécurité race condition async
 if(token !== this.playToken){
