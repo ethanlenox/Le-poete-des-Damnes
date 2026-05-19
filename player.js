@@ -3324,3 +3324,137 @@ BatteryRender.init();
 });
 
 })();
+
+
+
+// ===============================
+//      RAM PRESSURE CLEANUP
+// adaptive memory protection
+// ===============================
+
+(function(){
+
+const{Events,Memory}=window.__PLAYER_PART1__;
+const{
+Cache,
+Preload
+}=window.__PLAYER_PART2__;
+
+// ===============================
+//        RAM CLEANER
+// ===============================
+
+const RAMCleanup={
+
+maxCacheLow:4,
+maxCacheNormal:10,
+
+interval:15000,
+
+init(){
+
+this.detect();
+
+setInterval(
+()=>this.detect(),
+this.interval
+);
+
+window.addEventListener(
+"memorypressure",
+()=>this.cleanup(true)
+);
+
+document.addEventListener(
+"visibilitychange",
+()=>{
+
+if(document.hidden){
+this.cleanup();
+}
+
+});
+
+},
+
+detect(){
+
+const mem=navigator.deviceMemory||4;
+
+if(mem<=2){
+
+this.cleanup(true);
+
+}else{
+
+Cache.max=this.maxCacheNormal;
+
+}
+
+},
+
+cleanup(aggressive=false){
+
+const limit=
+aggressive?
+this.maxCacheLow:
+6;
+
+Cache.max=limit;
+
+// purge preload queue
+Preload.queue.length=0;
+
+// purge old cache
+while(Cache.map.size>limit){
+
+let oldestKey=null;
+let oldestTime=Infinity;
+
+Cache.usage.forEach((t,k)=>{
+
+if(t<oldestTime){
+
+oldestTime=t;
+oldestKey=k;
+
+}
+
+});
+
+if(!oldestKey)break;
+
+const audio=Cache.map.get(oldestKey);
+
+if(audio){
+Memory.cleanupAudio(audio);
+}
+
+Cache.map.delete(oldestKey);
+Cache.usage.delete(oldestKey);
+
+}
+
+Events.emit(
+"memory:cleanup",
+{
+aggressive,
+cache:Cache.map.size
+}
+);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+RAMCleanup.init();
+});
+
+})();
