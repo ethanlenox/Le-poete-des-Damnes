@@ -1135,7 +1135,7 @@ function initPart2(){
   Playlist.buildFromDOM();
   bindControls();
   bindAudioLogic();
-  Engine.restore();
+ // Engine.restore();
 
 }
 
