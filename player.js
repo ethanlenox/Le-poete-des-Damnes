@@ -2089,21 +2089,45 @@ this.stallCount=0;
 },
 
 async check(){
-  const a = AudioCore.current();
-  if(
-    !a ||
-    a.paused ||
-    !State.playing ||
-    State.buffering
-  ){
-    return;
-  }
-  const t = a.currentTime;
-  if(t === 0){
-    return;
-  }
-  this.lastTime = t;
+
+const a=AudioCore.current();
+
+if(
+!a||
+a.paused||
+!State.playing||
+State.buffering
+){
+return;
+}
+
+const t=a.currentTime;
+
+if(t===this.lastTime){
+
+this.stallCount++;
+
+Events.emit("audio:stall",{
+count:this.stallCount
+});
+
+if(this.stallCount>=this.maxStall){
+
+await this.recover();
+
+}
+
+}else{
+
+this.stallCount=0;
+
+}
+
+this.lastTime=t;
+
 },
+
+async recover(){
 
 if(this.recovering)return;
 
