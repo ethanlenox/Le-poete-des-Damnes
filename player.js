@@ -737,8 +737,8 @@ const newGain = AudioCore.nextGain();
       newAudio.currentTime = 0;
 newAudio.muted = State.muted;
 
-await newAudio.play();
-     
+      await newAudio.play();
+
 // sécurité race condition async
 if(token !== this.playToken){
 
@@ -2016,11 +2016,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
 })();
 
 
-
-
 // ===============================
 //     AUDIO CORE STABILITY
-//           watchdog 
+// watchdog + stall + recovery
 // ===============================
 
 (function(){
@@ -2028,160 +2026,176 @@ document.addEventListener("DOMContentLoaded", ()=>{
 const{State,Events,AudioCore}=window.__PLAYER_PART1__;
 
 // ===============================
-//   AUDIO WATCHDOG MOBILE SAFE
+//        AUDIO WATCHDOG
 // ===============================
 
-const AudioWatchdog = {
+const AudioWatchdog={
 
-timer: null,
-lastTime: 0,
-stallCount: 0,
-recovering: false,
+timer:null,
+lastTime:0,
+stallCount:0,
+recovering:false,
 
-interval: 3000,
-maxStall: 4,
-
-// 🔥 nouveau
-bootTime: 0,
-ignoreUntil: 0,
+interval:3000,
+maxStall:3,
 
 init(){
 
-  this.bootTime = performance.now();
+Events.on("play",()=>this.start());
+Events.on("pause",()=>this.stop());
 
-  // 🔥 ignore stabilisation après refresh
-  this.ignoreUntil = this.bootTime + 6000;
+document.addEventListener("visibilitychange",()=>{
 
-  Events.on("play",()=>this.start());
-  Events.on("pause",()=>this.stop());
+if(!document.hidden){
+this.recover();
+}
 
-  document.addEventListener("visibilitychange",()=>{
+});
 
-    if(!document.hidden){
-      this.recover();
-    }
+window.addEventListener("focus",()=>{
 
-  });
+this.recover();
 
-  window.addEventListener("focus",()=>{
-    this.recover();
-  });
+});
 
-  window.addEventListener("pageshow",()=>{
-    this.recover();
-  });
+window.addEventListener("pageshow",()=>{
+
+this.recover();
+
+});
 
 },
 
 start(){
 
-  this.stop();
+this.stop();
 
-  this.timer = setInterval(()=>{
-    this.check();
-  }, this.interval);
+this.timer=setInterval(()=>{
+
+this.check();
+
+},this.interval);
 
 },
 
 stop(){
 
-  clearInterval(this.timer);
+clearInterval(this.timer);
 
-  this.timer = null;
-  this.lastTime = 0;
-  this.stallCount = 0;
+this.timer=null;
+this.lastTime=0;
+this.stallCount=0;
 
 },
 
-check(){
+async check(){
 
-  const a = AudioCore.current();
+const a=AudioCore.current();
 
-  if(
-    !a ||
-    a.paused ||
-    !State.playing ||
-    State.buffering
-  ){
-    return;
-  }
+if(
+!a||
+a.paused||
+!State.playing||
+State.buffering
+){
+return;
+}
 
-  const t = a.currentTime;
+const t=a.currentTime;
 
-  // 🔥 IGNORE PHASE POST-REFRESH MOBILE
-  if(performance.now() < this.ignoreUntil){
-    this.lastTime = t;
-    return;
-  }
+if(t===this.lastTime){
 
-  // 🔥 mobile-safe stall detection (tolérance + dérive)
-  const delta = Math.abs(t - this.lastTime);
+this.stallCount++;
 
-  if(delta < 0.08){
+Events.emit("audio:stall",{
+count:this.stallCount
+});
 
-    this.stallCount++;
+if(this.stallCount>=this.maxStall){
 
-    Events.emit("audio:stall",{
-      count:this.stallCount
-    });
+await this.recover();
 
-    if(this.stallCount >= this.maxStall){
-      this.recover();
-    }
+}
 
-  } else {
+}else{
 
-    this.stallCount = 0;
+this.stallCount=0;
 
-  }
+}
 
-  this.lastTime = t;
+this.lastTime=t;
 
 },
 
 async recover(){
 
-  if(this.recovering) return;
+if(this.recovering)return;
 
-  this.recovering = true;
+this.recovering=true;
 
-  const a = AudioCore.current();
+const a=AudioCore.current();
 
-  try{
+try{
 
-    // 🔥 safe resume only
-    if(
-      AudioCore.ctx &&
-      AudioCore.ctx.state !== "running"
-    ){
-      await AudioCore.ctx.resume().catch(()=>{});
-    }
+// resume AudioContext iOS/Safari
+if(
+AudioCore.ctx&&
+AudioCore.ctx.state!=="running"
+){
+await AudioCore.ctx.resume();
+}
 
-    // 🔥 NE PAS TOUCHER AU TEMPS AUDIO (IMPORTANT MOBILE)
-    if(State.playing && a && a.paused){
+}catch(e){}
 
-      const p = a.play();
-      if(p) await p.catch(()=>{});
+try{
 
-    }
+// pause fantôme Android/iOS
+if(
+State.playing&&
+a&&
+a.paused
+){
+await a.play();
+}
 
-    Events.emit("audio:recovered");
+// micro jump anti stall
+if(
+a&&
+!a.paused&&
+a.readyState>=2
+){
+a.currentTime+=0.01;
+}
 
-  }catch(e){
+Events.emit("audio:recovered");
 
-    Events.emit("audio:recoveryError", e);
+}catch(e){
 
-  }
+Events.emit("audio:recoveryError",e);
 
-  setTimeout(()=>{
-    this.recovering = false;
-  }, 1500);
+}
+
+setTimeout(()=>{
+
+this.recovering=false;
+
+},1200);
 
 }
 
 };
 
+// ===============================
+//         AUTO INIT
+// ===============================
 
+document.addEventListener("DOMContentLoaded",()=>{
+
+AudioWatchdog.init();
+
+});
+
+})();
 
 
 // ===============================
@@ -2475,9 +2489,6 @@ IOSUnlock.init();
 })();
 
 
-
-
-
 // ===============================
 //       SMART NETWORK RETRY
 // ===============================
@@ -2761,7 +2772,6 @@ Recycler.init();
 });
 
 })();
-
 
 
 // ===============================
