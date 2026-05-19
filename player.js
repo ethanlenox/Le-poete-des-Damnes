@@ -3464,100 +3464,123 @@ RAMCleanup.init();
 
 
 // ===============================
-//      MOBILE BF CACHE FIX
+//   HARD MOBILE AUDIO UNLOCK
 // ===============================
 
 (function(){
 
-if(window.__PLAYER_BFCACHE_FIX__) return;
-window.__PLAYER_BFCACHE_FIX__ = true;
+if(window.__HARD_MOBILE_UNLOCK__) return;
+window.__HARD_MOBILE_UNLOCK__ = true;
 
-function hardReloadPlayer(){
+const unlock = async ()=>{
 
   try{
 
-    // reset flag
-    window.__ULTRA_PRO_PLAYER_V4__ = false;
+    const core = window.__PLAYER_PART1__;
 
-    // stop audios
-    if(window.__PLAYER_PART1__){
+    if(!core || !core.AudioCore) return;
 
-      const { AudioCore } = window.__PLAYER_PART1__;
+    const { AudioCore } = core;
 
-      if(AudioCore){
+    const a = AudioCore.A;
+    const b = AudioCore.B;
 
-        [AudioCore.A, AudioCore.B].forEach(a=>{
+    // iOS inline
+    [a,b].forEach(el=>{
 
-          try{
+      el.setAttribute("playsinline","");
+      el.setAttribute("webkit-playsinline","");
 
-            a.pause();
-            a.src = "";
-            a.load();
+      el.playsInline = true;
+      el.muted = true;
 
-          }catch(e){}
+    });
 
-        });
+    // HARD UNLOCK
+    const silent = new Audio();
 
-        // close old context
-        if(AudioCore.ctx){
+    silent.playsInline = true;
+    silent.muted = true;
 
-          try{
-            AudioCore.ctx.close();
-          }catch(e){}
+    silent.src =
+      "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA";
 
-        }
+    try{
 
-      }
+      await silent.play();
+
+      silent.pause();
+
+    }catch(e){}
+
+    // CONTEXT
+    if(
+      AudioCore.ctx &&
+      AudioCore.ctx.state !== "running"
+    ){
+
+      await AudioCore.ctx.resume()
+      .catch(()=>{});
 
     }
 
-  }catch(e){}
+    // vrai unlock elements
+    try{
 
-  // FULL RELOAD MOBILE SAFE
-  setTimeout(()=>{
+      await a.play().catch(()=>{});
+      a.pause();
 
-    window.location.reload();
+    }catch(e){}
 
-  },100);
+    try{
 
-}
+      await b.play().catch(()=>{});
+      b.pause();
 
-// iOS Safari / Android cache restore
-window.addEventListener("pageshow",(e)=>{
+    }catch(e){}
 
-  // page restaurée depuis cache navigateur
-  if(e.persisted){
+    // restore mute
+    a.muted = false;
+    b.muted = false;
 
-    hardReloadPlayer();
+    // cleanup listeners
+    remove();
+
+    console.log("MOBILE AUDIO UNLOCKED");
+
+  }catch(e){
+
+    console.log("UNLOCK FAIL",e);
 
   }
 
-});
+};
 
-// Android Chrome parfois
-window.addEventListener("pagehide",()=>{
+function remove(){
 
-  try{
+  [
+    "touchstart",
+    "touchend",
+    "click"
+  ].forEach(ev=>{
 
-    if(window.__PLAYER_PART1__){
+    document.removeEventListener(ev,unlock);
 
-      const { AudioCore } = window.__PLAYER_PART1__;
+  });
 
-      if(AudioCore){
+}
 
-        [AudioCore.A, AudioCore.B].forEach(a=>{
+[
+  "touchstart",
+  "touchend",
+  "click"
+].forEach(ev=>{
 
-          try{
-            a.pause();
-          }catch(e){}
-
-        });
-
-      }
-
-    }
-
-  }catch(e){}
+  document.addEventListener(
+    ev,
+    unlock,
+    { passive:true }
+  );
 
 });
 
