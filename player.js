@@ -2018,4 +2018,1453 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 
 
+// ===============================
+//     AUDIO CORE STABILITY
+// watchdog + stall + recovery
+// ===============================
 
+(function(){
+
+const{State,Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//        AUDIO WATCHDOG
+// ===============================
+
+const AudioWatchdog={
+
+timer:null,
+lastTime:0,
+stallCount:0,
+recovering:false,
+
+interval:3000,
+maxStall:3,
+
+init(){
+
+Events.on("play",()=>this.start());
+Events.on("pause",()=>this.stop());
+
+document.addEventListener("visibilitychange",()=>{
+ 
+if (document.hidden) return;
+if(!document.hidden){
+this.recover();
+}
+
+});
+
+window.addEventListener("focus",()=>{
+
+this.recover();
+
+});
+
+window.addEventListener("pageshow",()=>{
+
+this.recover();
+
+});
+
+},
+
+start(){
+
+this.stop();
+
+this.timer=setInterval(()=>{
+
+this.check();
+
+},this.interval);
+
+},
+
+stop(){
+
+clearInterval(this.timer);
+
+this.timer=null;
+this.lastTime=0;
+this.stallCount=0;
+
+},
+
+async check(){
+
+const a=AudioCore.current();
+
+if(
+!a||
+a.paused||
+!State.playing||
+State.buffering
+){
+return;
+}
+
+const t=a.currentTime;
+
+if(t===this.lastTime){
+
+this.stallCount++;
+
+Events.emit("audio:stall",{
+count:this.stallCount
+});
+
+if(this.stallCount>=this.maxStall){
+
+await this.recover();
+
+}
+
+}else{
+
+this.stallCount=0;
+
+}
+
+this.lastTime=t;
+
+},
+
+async recover(){
+
+if(this.recovering)return;
+
+this.recovering=true;
+
+const a=AudioCore.current();
+
+try{
+
+// resume AudioContext iOS/Safari
+if(
+AudioCore.ctx&&
+AudioCore.ctx.state!=="running"
+){
+await AudioCore.ctx.resume();
+}
+
+}catch(e){}
+
+try{
+
+// pause fantôme Android/iOS
+if(
+State.playing&&
+a&&
+a.paused
+){
+if (!AudioCore.ctx || AudioCore.ctx.state !== "running") return;
+
+const p = a.play();
+if (p) await p.catch(()=>{});
+}
+
+// micro jump anti stall
+if(
+a&&
+!a.paused&&
+a.readyState>=2
+)
+Events.emit("audio:recovered");
+
+}catch(e){
+
+Events.emit("audio:recoveryError",e);
+
+}
+
+setTimeout(()=>{
+
+this.recovering=false;
+
+},1200);
+
+}
+
+};
+
+// ===============================
+//         AUTO INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+AudioWatchdog.init();
+
+});
+
+})();
+
+
+
+
+
+// ===============================
+//      AUDIO CONTEXT REBUILD
+// Safari/iOS/Android protection
+// ===============================
+
+(function(){
+
+const{State,Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//      CONTEXT REBUILDER
+// ===============================
+
+const ContextRebuilder={
+
+rebuilding:false,
+maxRetries:2,
+retries:0,
+
+init(){
+
+Events.on("audio:recoveryError",()=>{
+
+this.check();
+
+});
+
+document.addEventListener("visibilitychange",()=>{
+
+if(!document.hidden){
+this.check();
+}
+
+});
+
+window.addEventListener("focus",()=>{
+
+this.check();
+
+});
+
+},
+
+async check(){
+
+if(
+!AudioCore.ctx||
+AudioCore.ctx.state==="running"
+){
+return;
+}
+
+await this.rebuild();
+
+},
+
+async rebuild(){
+
+if(this.rebuilding)return;
+
+if(this.retries>=this.maxRetries)return;
+
+this.rebuilding=true;
+this.retries++;
+
+try{
+
+const oldCtx=AudioCore.ctx;
+
+if(oldCtx){
+
+try{
+await oldCtx.close();
+}catch(e){}
+
+}
+
+// nouveau contexte
+AudioCore.ctx=new(
+window.AudioContext||
+window.webkitAudioContext
+)();
+
+// rebuild nodes
+const srcA=AudioCore.ctx.createMediaElementSource(AudioCore.A);
+const srcB=AudioCore.ctx.createMediaElementSource(AudioCore.B);
+
+AudioCore.gainA=AudioCore.ctx.createGain();
+AudioCore.gainB=AudioCore.ctx.createGain();
+
+AudioCore.analyser=AudioCore.ctx.createAnalyser();
+AudioCore.analyser.fftSize=1024;
+
+AudioCore.bufferLength=
+AudioCore.analyser.frequencyBinCount;
+
+AudioCore.dataArray=
+new Uint8Array(AudioCore.bufferLength);
+
+srcA.connect(AudioCore.gainA)
+.connect(AudioCore.analyser)
+.connect(AudioCore.ctx.destination);
+
+srcB.connect(AudioCore.gainB)
+.connect(AudioCore.analyser)
+.connect(AudioCore.ctx.destination);
+
+// restore volume
+const activeGain=
+AudioCore.currentGain();
+
+const inactiveGain=
+AudioCore.nextGain();
+
+activeGain.gain.value=
+Math.max(State.volume,0.001);
+
+inactiveGain.gain.value=0;
+
+await AudioCore.ctx.resume().catch(()=>{});
+
+Events.emit("audio:contextRebuilt");
+
+}catch(e){
+
+Events.emit("audio:contextFailed",e);
+
+}
+
+setTimeout(()=>{
+
+this.rebuilding=false;
+
+},1500);
+
+}
+
+};
+
+// ===============================
+//         AUTO INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+ContextRebuilder.init();
+
+});
+
+})();
+
+
+
+
+// ===============================
+//    ANTI DOUBLE PLAY ANDROID 
+// ===============================
+
+(function(){
+
+const{Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//          PLAY GUARD
+// ===============================
+
+const PlayGuard={
+
+lastPlay:0,
+delay:400,
+bound:false,
+
+init(){
+
+if(this.bound)return;
+this.bound=true;
+
+//UN SEUL LISTENER GLOBAL
+Events.on("play",()=>this.onPlay());
+
+},
+
+onPlay(){
+
+const now=Date.now();
+
+if(now-this.lastPlay<this.delay){
+
+this.forceSync();
+
+return;
+
+}
+
+this.lastPlay=now;
+
+},
+
+forceSync(){
+
+const a=AudioCore.current();
+
+if(!a)return;
+
+try{
+
+if(a.paused){
+a.play().catch(()=>{});
+}
+
+}catch(e){}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+PlayGuard.init();
+
+});
+
+})();
+
+
+// ===============================
+//      IOS AUTOPLAY UNLOCK 
+// ===============================
+
+(function(){
+
+const{Events,AudioCore}=window.__PLAYER_PART1__;
+
+// ===============================
+//         UNLOCK ENGINE
+// ===============================
+
+const IOSUnlock={
+
+unlocked:false,
+events:["touchstart","touchend","click"],
+
+init(){
+
+this.events.forEach(ev=>{
+
+document.addEventListener(ev,()=>this.unlock(),{passive:true});
+
+});
+
+},
+
+unlock(){
+
+if(this.unlocked)return;
+if(!AudioCore.ctx)return;
+
+try{
+
+// 🔥 ONLY CONTEXT UNLOCK (NO AUDIO TOUCH)
+if(AudioCore.ctx.state!=="running"){
+AudioCore.ctx.resume().catch(()=>{});
+}
+
+this.unlocked=true;
+
+Events.emit("audio:unlocked");
+
+}catch(e){}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+IOSUnlock.init();
+
+});
+
+})();
+
+
+
+
+
+// ===============================
+//       SMART NETWORK RETRY
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{Engine}=window.__PLAYER_PART2__;
+
+// ===============================
+//          RETRY ENGINE
+// ===============================
+
+const SmartRetry={
+
+retrying:false,
+baseDelay:1500,
+maxDelay:12000,
+
+init(){
+
+Events.on("error",e=>this.handle(e));
+
+window.addEventListener("online",()=>this.recover());
+
+},
+
+getDelay(){
+
+return Math.min(
+this.baseDelay*Math.max(State.retries||1,1),
+this.maxDelay
+);
+
+},
+
+handle(){
+
+if(this.retrying)return;
+
+if(!navigator.onLine){
+Events.emit("network:offline");
+return;
+}
+
+this.retrying=true;
+State.retries=(State.retries||0)+1;
+
+const delay=this.getDelay();
+
+Events.emit("network:retry",{
+retry:State.retries,
+delay
+});
+
+setTimeout(()=>this.recover(),delay);
+
+},
+
+async recover(){
+
+try{
+
+const index=State.index;
+
+if(index==null){
+this.retrying=false;
+return;
+}
+
+//  ENGINE ONLY
+await Engine.play(index);
+
+State.retries=0;
+
+Events.emit("network:recovered");
+
+}catch(e){
+
+Events.emit("network:retryFailed",e);
+
+}
+
+this.retrying=false;
+
+}
+
+};
+
+// ===============================
+//              INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+SmartRetry.init();
+
+});
+
+})();
+
+
+// ===============================
+//    VIRTUAL PLAYLIST RENDERER
+//     mobile performance boost
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{DOM}=window.__PLAYER_PART2__;
+
+// ===============================
+//         RENDER ENGINE
+// ===============================
+
+const VirtualPlaylist={
+
+items:[],
+rendered:false,
+chunkSize:6,
+
+init(){
+
+this.items=Array.from(document.querySelectorAll(".track"));
+
+this.optimize();
+
+this.bindScroll();
+
+},
+
+optimize(){
+
+// initial render light
+this.items.forEach((el,i)=>{
+
+if(i>this.chunkSize){
+el.style.display="none";
+}
+
+});
+
+this.rendered=true;
+
+},
+
+bindScroll(){
+
+let ticking=false;
+
+window.addEventListener("scroll",()=>{
+
+if(ticking)return;
+
+ticking=true;
+
+requestAnimationFrame(()=>{
+
+this.lazyLoad();
+
+ticking=false;
+
+});
+
+});
+
+},
+
+lazyLoad(){
+
+const scrollY=window.scrollY;
+const vh=window.innerHeight;
+
+this.items.forEach((el,i)=>{
+
+const rect=el.getBoundingClientRect();
+
+if(rect.top<vh+200){
+
+if(el.style.display==="none"){
+el.style.display="";
+}}});
+}};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+VirtualPlaylist.init();
+
+});
+
+})();
+
+
+// ===============================
+//      RECYCLER DOM SYSTEM
+//      ultra perf playlist
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//          POOL ENGINE
+// ===============================
+
+const Recycler={
+
+pool:[],
+active:[],
+maxVisible:8,
+items:[],
+
+init(){
+
+this.items=Array.from(document.querySelectorAll(".track"));
+
+this.buildPool();
+
+this.render(0);
+
+window.addEventListener("scroll",()=>this.update());
+
+},
+
+buildPool(){
+
+this.items.forEach(el=>{
+
+this.pool.push(el);
+
+el.style.display="none";
+
+});
+
+},
+
+render(start){
+
+this.active=[];
+
+for(let i=start;i<start+this.maxVisible;i++){
+
+const el=this.items[i];
+
+if(!el)continue;
+
+el.style.display="";
+
+this.active.push(el);
+
+}
+
+},
+
+update(){
+
+const scrollY=window.scrollY;
+
+const index=Math.floor(scrollY/120);
+
+this.render(index);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+Recycler.init();
+
+});
+
+})();
+
+
+
+// ===============================
+//     LAZY TRACK RENDERING
+// DOM + image + data-src optimize
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        LAZY ENGINE
+// ===============================
+
+const LazyTracks={
+
+items:[],
+observer:null,
+
+init(){
+
+this.items=document.querySelectorAll(".track");
+
+this.observe();
+
+},
+
+observe(){
+
+if(!("IntersectionObserver"in window))return;
+
+this.observer=new IntersectionObserver((entries)=>{
+
+entries.forEach(e=>{
+
+if(!e.isIntersecting)return;
+
+this.load(e.target);
+
+this.observer.unobserve(e.target);
+
+});
+
+},{rootMargin:"200px"});
+
+this.items.forEach(el=>this.observer.observe(el));
+
+},
+
+load(el){
+
+// lazy img
+const img=el.querySelector("img[data-src]");
+if(img){
+
+img.src=img.dataset.src;
+img.removeAttribute("data-src");
+
+}
+
+// lazy audio metadata
+const src=el.dataset.src;
+if(src&&!el.dataset.ready){
+
+el.dataset.ready="1";
+
+Events.emit("track:ready",{el,src});
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+LazyTracks.init();
+
+});
+
+})();
+
+
+
+// ===============================
+//   ANTI REFLOW / REPAINT SYSTEM
+//   batch DOM updates
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+
+// ===============================
+//        BATCH ENGINE
+// ===============================
+
+const ReflowGuard={
+
+queue:new Set(),
+scheduled:false,
+
+init(){
+
+this.patchDOM();
+
+},
+
+patchDOM(){
+
+// batch style writes
+this.flushLoop();
+
+},
+
+write(el,fn){
+
+this.queue.add(()=>fn(el));
+
+this.schedule();
+
+},
+
+schedule(){
+
+if(this.scheduled)return;
+
+this.scheduled=true;
+
+requestAnimationFrame(()=>{
+
+this.flush();
+
+this.scheduled=false;
+
+});
+
+},
+
+flush(){
+
+this.queue.forEach(fn=>fn());
+
+this.queue.clear();
+
+},
+
+flushLoop(){
+
+setInterval(()=>{
+
+if(this.queue.size)this.flush();
+
+},100);
+
+}
+
+};
+
+// ===============================
+//        GLOBAL PATCH
+// ===============================
+
+window.__reflowWrite=(el,fn)=>ReflowGuard.write(el,fn);
+
+// ===============================
+//         INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+ReflowGuard.init();
+
+});
+
+})();
+
+
+
+
+// ===============================
+//   GPU ACCELERATION LAYER
+//   targeted compositing
+// ===============================
+
+(function(){
+
+// ===============================
+//        GPU ENGINE
+// ===============================
+
+const GPUBoost={
+
+items:[],
+
+init(){
+
+this.apply();
+
+},
+
+apply(){
+
+// éléments critiques UI
+const targets=[
+"#miniPlayer",
+"#waveform",
+".track img",
+".cover-wrapper",
+"#progressBar"
+];
+
+targets.forEach(sel=>{
+
+document.querySelectorAll(sel).forEach(el=>{
+
+this.optimize(el);
+
+});
+
+});
+
+},
+
+optimize(el){
+
+if(!el)return;
+
+// force GPU layer
+el.style.transform="translateZ(0)";
+el.style.willChange="transform,opacity";
+
+// fallback safe
+el.style.backfaceVisibility="hidden";
+el.style.webkitBackfaceVisibility="hidden";
+
+}
+
+};
+
+// ===============================
+//         INIT
+// ===============================
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+GPUBoost.init();
+
+});
+
+})();
+
+
+
+// ===============================
+//      ADAPTIVE FPS ENGINE
+// dynamic RAF performance control
+// ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{RAF}=window.__PLAYER_PART3__;
+
+// ===============================
+//         FPS ENGINE
+// ===============================
+
+const AdaptiveFPS={
+
+min:24,
+max:60,
+current:60,
+
+last:performance.now(),
+frames:0,
+
+hiddenFPS:8,
+lowBatteryFPS:30,
+
+init(){
+
+this.patchRAF();
+
+document.addEventListener(
+"visibilitychange",
+()=>this.update()
+);
+
+Events.on("battery:saving",()=>{
+this.set(this.lowBatteryFPS);
+});
+
+Events.on("battery:normal",()=>{
+this.set(this.max);
+});
+
+this.monitor();
+
+},
+
+patchRAF(){
+
+if(RAF.__adaptivePatched)return;
+
+RAF.__adaptivePatched=true;
+
+const originalRun=RAF.run.bind(RAF);
+
+RAF.run=()=>{
+
+if(RAF.running)return;
+
+RAF.running=true;
+
+const loop=(now)=>{
+
+if(document.hidden){
+
+this.set(this.hiddenFPS);
+
+}else{
+
+this.update();
+}
+
+const interval=1000/this.current;
+
+if(now-this.last>=interval){
+
+this.last=now;
+
+RAF.tasks.forEach(fn=>{
+try{fn();}catch(e){}
+});
+
+}
+
+RAF.rafId=requestAnimationFrame(loop);
+
+};
+
+RAF.rafId=requestAnimationFrame(loop);
+
+};
+
+},
+
+monitor(){
+
+setInterval(()=>{
+
+this.frames=0;
+
+const start=performance.now();
+
+const count=()=>{
+
+this.frames++;
+
+if(performance.now()-start<1000){
+
+requestAnimationFrame(count);
+
+}else{
+
+this.autoAdjust();
+
+}
+
+};
+
+count();
+
+},4000);
+
+},
+
+autoAdjust(){
+
+if(document.hidden){
+return;
+}
+
+if(this.frames<28){
+
+this.set(
+Math.max(
+this.min,
+this.current-6
+));
+
+}else if(this.frames>50){
+
+this.set(
+Math.min(
+this.max,
+this.current+4
+));
+
+}
+
+Events.emit("fps:update",this.current);
+
+},
+
+update(){
+
+const mem=navigator.deviceMemory||4;
+const cores=navigator.hardwareConcurrency||4;
+
+if(mem<=2||cores<=4){
+
+this.set(30);
+
+}else{
+
+this.set(this.max);
+
+}
+
+},
+
+set(v){
+
+if(v===this.current)return;
+
+this.current=v;
+
+document.documentElement.style.setProperty(
+"--adaptive-fps",
+v
+);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+AdaptiveFPS.init();
+});
+
+})();
+
+
+
+// ===============================
+//    BATTERY AWARE RENDERING
+// adaptive rendering by battery
+// ===============================
+
+(function(){
+
+const{Events}=window.__PLAYER_PART1__;
+const{RAF}=window.__PLAYER_PART3__;
+
+// ===============================
+//       BATTERY ENGINE
+// ===============================
+
+const BatteryRender={
+
+battery:null,
+low:false,
+
+async init(){
+
+if(!navigator.getBattery)return;
+
+try{
+
+this.battery=await navigator.getBattery();
+
+this.update();
+
+this.battery.addEventListener(
+"levelchange",
+()=>this.update()
+);
+
+this.battery.addEventListener(
+"chargingchange",
+()=>this.update()
+);
+
+}catch(e){}
+
+},
+
+update(){
+
+if(!this.battery)return;
+
+const level=this.battery.level||1;
+const charging=this.battery.charging;
+
+const low=
+level<=0.20&&!charging;
+
+if(low===this.low)return;
+
+this.low=low;
+
+document.body.classList.toggle(
+"battery-save",
+low
+);
+
+if(low){
+
+RAF.pause();
+
+setTimeout(()=>RAF.resume(),120);
+
+Events.emit("battery:saving",{
+level
+});
+
+}else{
+
+Events.emit("battery:normal",{
+level
+});
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+BatteryRender.init();
+});
+
+})();
+
+
+
+// ===============================
+//      RAM PRESSURE CLEANUP
+// adaptive memory protection
+// ===============================
+
+(function(){
+
+const{Events,Memory}=window.__PLAYER_PART1__;
+const{
+Cache,
+Preload
+}=window.__PLAYER_PART2__;
+
+// ===============================
+//        RAM CLEANER
+// ===============================
+
+const RAMCleanup={
+
+maxCacheLow:4,
+maxCacheNormal:10,
+
+interval:15000,
+
+init(){
+
+this.detect();
+
+setInterval(
+()=>this.detect(),
+this.interval
+);
+
+window.addEventListener(
+"memorypressure",
+()=>this.cleanup(true)
+);
+
+document.addEventListener(
+"visibilitychange",
+()=>{
+
+if(document.hidden){
+this.cleanup();
+}
+
+});
+
+},
+
+detect(){
+
+const mem=navigator.deviceMemory||4;
+
+if(mem<=2){
+
+this.cleanup(true);
+
+}else{
+
+Cache.max=this.maxCacheNormal;
+
+}
+
+},
+
+cleanup(aggressive=false){
+
+const limit=
+aggressive?
+this.maxCacheLow:
+6;
+
+Cache.max=limit;
+
+// purge preload queue
+Preload.queue.length=0;
+
+// purge old cache
+while(Cache.map.size>limit){
+
+let oldestKey=null;
+let oldestTime=Infinity;
+
+Cache.usage.forEach((t,k)=>{
+
+if(t<oldestTime){
+
+oldestTime=t;
+oldestKey=k;
+
+}
+
+});
+
+if(!oldestKey)break;
+
+const audio=Cache.map.get(oldestKey);
+
+if(audio){
+Memory.cleanupAudio(audio);
+}
+
+Cache.map.delete(oldestKey);
+Cache.usage.delete(oldestKey);
+
+}
+
+Events.emit(
+"memory:cleanup",
+{
+aggressive,
+cache:Cache.map.size
+}
+);
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+RAMCleanup.init();
+});
+
+})();
