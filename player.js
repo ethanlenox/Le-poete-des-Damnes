@@ -3458,54 +3458,78 @@ RAMCleanup.init();
 
   if (!tracks.length || !audio) return;
 
-  function getCurrentTrackEl(index) {
-    return document.querySelector(`.track[data-index='${index}']`);
-  }
-
+  // ===============================
+  // SCROLL INERTIEL TYPE SPOTIFY
+  // ===============================
   function scrollToTrack(index) {
-    const el = getCurrentTrackEl(index);
+    const el = document.querySelector(`.track[data-index='${index}']`);
     if (!el) return;
 
     const rect = el.getBoundingClientRect();
+
     const targetY =
       window.scrollY +
       rect.top -
       (window.innerHeight / 2) +
       (rect.height / 2);
 
-    window.scrollTo({
-      top: targetY,
-      behavior: 'smooth'
-    });
+    const startY = window.scrollY;
+    const distance = targetY - startY;
 
+    const duration = 900; // ⬅️ ici la vitesse scroll (800-1200 idéal)
+    let startTime = null;
+
+    function easeInOutCubic(t) {
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function animate(time) {
+      if (!startTime) startTime = time;
+
+      const progress = Math.min((time - startTime) / duration, 1);
+      const eased = easeInOutCubic(progress);
+
+      window.scrollTo(0, startY + distance * eased);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+    // ACTIVE TRACK VISUEL
     tracks.forEach(t => t.classList.remove('active-track'));
     el.classList.add('active-track');
   }
 
-  function getState() {
-    return window.__PLAYER_PART1__?.State;
+  // ===============================
+  // LECTURE INDEX PLAYER
+  // ===============================
+  function getIndex() {
+    return window.__PLAYER_PART1__?.State?.index;
   }
 
   function sync() {
-    const state = getState();
-    if (!state) return;
-    scrollToTrack(state.index);
+    const index = getIndex();
+    if (index === undefined || index === null) return;
+    scrollToTrack(index);
   }
 
-
-  // AUTO SYNC PLAYER
-
+  // ===============================
+  // EVENTS PLAYER
+  // ===============================
   const Events = window.__PLAYER_PART1__?.Events;
 
   if (Events) {
-    Events.on('trackChange', () => {
-      sync();
-    });
+    Events.on('trackChange', sync);
   }
 
-
-  // NEXT / PREV BUTTONS
-
+  // ===============================
+  // BOUTONS MINI PLAYER
+  // ===============================
   document.getElementById('nextBtn')?.addEventListener('click', () => {
     setTimeout(sync, 50);
   });
@@ -3514,16 +3538,16 @@ RAMCleanup.init();
     setTimeout(sync, 50);
   });
 
-
-  // AUTO NEXT (FIN TRACK)
-
+  // ===============================
+  // FIN DE TRACK
+  // ===============================
   audio.addEventListener('ended', () => {
     setTimeout(sync, 50);
   });
 
-
-  // CLICK TRACK LIST
-
+  // ===============================
+  // CLICK SUR PLAYLIST
+  // ===============================
   tracks.forEach(track => {
     track.addEventListener('click', () => {
       setTimeout(sync, 50);
