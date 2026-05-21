@@ -3453,35 +3453,65 @@ RAMCleanup.init();
 
 (function() {
 
-  // Fonction pour scroller vers la piste actuelle
-  function scrollToCurrent(index) {
+  const audio = document.getElementById('audioPlayer');
+  const tracks = document.querySelectorAll('.track');
+  let currentIndex = 0;
+
+  if (!audio || tracks.length === 0) return;
+
+  // Fonction pour scroller vers la piste active
+  function scrollToTrack(index) {
     const track = document.querySelector(`.track[data-index='${index}']`);
     if (!track) return;
 
     track.scrollIntoView({
       behavior: 'smooth',
-      block: 'center' // centre le cover dans la fenêtre
+      block: 'center'
     });
+
+    // Ajouter la classe active pour le CSS si besoin
+    tracks.forEach(t => t.classList.remove('active-track'));
+    track.classList.add('active-track');
   }
 
-  // Observer les changements sur le player
-  const audio = document.getElementById('audioPlayer');
-  const tracks = document.querySelectorAll('.track');
-
-  if (!audio || tracks.length === 0) return;
-
-  let currentIndex = 0;
-
-  // Au début, scroll sur la piste 0
+  // Initial scroll sur la piste courante
   document.addEventListener('DOMContentLoaded', () => {
-    scrollToCurrent(currentIndex);
+    scrollToTrack(currentIndex);
   });
 
-  // Quand la piste change
-  audio.addEventListener('ended', () => {
+  // Fonction pour passer à la piste suivante
+  function nextTrack() {
     currentIndex++;
-    if (currentIndex >= tracks.length) currentIndex = 0; // boucle
-    scrollToCurrent(currentIndex);
+    if (currentIndex >= tracks.length) currentIndex = 0;
+    scrollToTrack(currentIndex);
+  }
+
+  // Fonction pour piste précédente
+  function prevTrack() {
+    currentIndex--;
+    if (currentIndex < 0) currentIndex = tracks.length - 1;
+    scrollToTrack(currentIndex);
+  }
+
+  // Ecoute des boutons miniPlayer
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+
+  nextBtn && nextBtn.addEventListener('click', nextTrack);
+  prevBtn && prevBtn.addEventListener('click', prevTrack);
+
+  // Quand la piste actuelle se termine
+  audio.addEventListener('ended', nextTrack);
+
+  // Pour gérer le scroll si tu changes manuellement via la playlist
+  tracks.forEach(track => {
+    track.addEventListener('click', () => {
+      const index = parseInt(track.dataset.index, 10);
+      if (!isNaN(index)) {
+        currentIndex = index;
+        scrollToTrack(currentIndex);
+      }
+    });
   });
 
 })();
