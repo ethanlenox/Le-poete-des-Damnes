@@ -3433,3 +3433,94 @@ RAMCleanup.init();
 });
 
 })();       
+
+
+
+
+// ===============================
+//         SWAP COVER TRACK
+// ===============================
+(function(){
+
+const { State, Events } = window.__PLAYER_PART1__;
+
+// ===============================
+//   UI TRACK SYNCHRONIZER
+// ===============================
+const UISync = {
+
+  covers: [],
+  tracks: [],
+
+  init(){
+
+    this.covers = Array.from(document.querySelectorAll(".cover"));
+    this.tracks = Array.from(document.querySelectorAll(".track"));
+
+    Events.on("trackChange", ()=>this.update());
+    Events.on("play", ()=>this.update());
+    Events.on("ended", ()=>this.update());
+
+    // sync initial si déjà chargé
+    this.update();
+
+  },
+
+  update(){
+
+    const i = State.index;
+
+    if(i == null) return;
+
+    // 1. RESET ALL UI
+    this.covers.forEach((el, idx)=>{
+
+      el.classList.remove("active", "playing");
+
+      if(idx === i){
+        el.classList.add("active");
+
+        // petit effet visuel optionnel
+        el.style.transform = "scale(1.05)";
+      } else {
+        el.style.transform = "scale(1)";
+      }
+
+    });
+
+    this.tracks.forEach((el, idx)=>{
+
+      el.classList.remove("active", "playing");
+
+      if(idx === i){
+        el.classList.add("active", "playing");
+      }
+
+    });
+
+    // 2. MINI PLAYER COVER (si existe)
+    const miniCover = document.querySelector("#miniPlayer .cover, #miniPlayer img");
+    if(miniCover && this.covers[i]){
+
+      const src = this.covers[i].dataset?.src || this.covers[i].src;
+
+      if(src){
+        miniCover.src = src;
+      }
+
+    }
+
+  }
+
+};
+
+// ===============================
+//        INIT
+// ===============================
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  UISync.init();
+
+});
+
+})();
