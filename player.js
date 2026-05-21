@@ -3448,44 +3448,40 @@ RAMCleanup.init();
 
 
 // ===============================
-//      DYNAMIC COVER SYSTEM
+//   DYNAMIC COVER TRACK SYSTEM
 // ===============================
 
-(function(){
-  const { State, Events, Playlist } = window.__PLAYER_PART1__ ? window.__PLAYER_PART1__ : {};
+(function() {
 
-  if (!State || !Events || !Playlist) {
-    console.warn("Player objects not found!");
-    return;
+  // Fonction pour scroller vers la piste actuelle
+  function scrollToCurrent(index) {
+    const track = document.querySelector(`.track[data-index='${index}']`);
+    if (!track) return;
+
+    track.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center' // centre le cover dans la fenêtre
+    });
   }
 
-  const AutoScroll = {
+  // Observer les changements sur le player
+  const audio = document.getElementById('audioPlayer');
+  const tracks = document.querySelectorAll('.track');
 
-    init() {
-      Events.on("trackChange", () => {
-        this.scrollToCurrent();
-      });
+  if (!audio || tracks.length === 0) return;
 
-      // Au chargement, scroll sur la piste actuelle
-      setTimeout(() => {
-        this.scrollToCurrent();
-      }, 500);
-    },
+  let currentIndex = 0;
 
-    scrollToCurrent() {
-      const currentTrackEl = document.querySelector(`.track[data-index='${State.index}']`);
-      if (!currentTrackEl) return;
+  // Au début, scroll sur la piste 0
+  document.addEventListener('DOMContentLoaded', () => {
+    scrollToCurrent(currentIndex);
+  });
 
-      currentTrackEl.scrollIntoView({
-        behavior: "smooth",
-        block: "center" // centre le cover dans la fenêtre
-      });
-    }
-
-  };
-
-  document.addEventListener("DOMContentLoaded", () => {
-    AutoScroll.init();
+  // Quand la piste change
+  audio.addEventListener('ended', () => {
+    currentIndex++;
+    if (currentIndex >= tracks.length) currentIndex = 0; // boucle
+    scrollToCurrent(currentIndex);
   });
 
 })();
