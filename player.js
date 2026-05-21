@@ -3438,5 +3438,82 @@ RAMCleanup.init();
 
 
 // ===============================
-//         SWAP COVER TRACK
+//      DYNAMIC COVER SYSTEM
 // ===============================
+
+(function(){
+
+const{State,Events}=window.__PLAYER_PART1__;
+const{Playlist}=window.__PLAYER_PART2__;
+
+// ===============================
+//         COVER ENGINE
+// ===============================
+
+const DynamicCover={
+
+el:null,
+
+init(){
+
+this.el=document.getElementById("cover");
+
+if(!this.el)return;
+
+Events.on("trackChange",(track)=>{
+
+this.update(track);
+
+});
+
+// restore reload
+setTimeout(()=>{
+
+const track=Playlist.get(State.index);
+
+if(track){
+this.update(track);
+}
+
+},300);
+
+},
+
+update(track){
+
+if(!track)return;
+
+const src=
+track.cover||
+track.image||
+track.art||
+track.poster||
+track.thumb;
+
+if(!src)return;
+
+if(this.el.tagName==="IMG"){
+
+this.el.src=src;
+
+}else{
+
+this.el.style.backgroundImage=`url("${src}")`;
+
+}
+
+}
+
+};
+
+// ===============================
+//             INIT
+// ===============================
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+DynamicCover.init();
+});
+
+})();
