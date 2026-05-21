@@ -2242,7 +2242,7 @@ const oldCtx=AudioCore.ctx;
 if(oldCtx){
 
 try{
-await oldCtx.close();
+//await oldCtx.close();
 }catch(e){}
 
 }
@@ -2315,7 +2315,7 @@ this.rebuilding=false;
 
 document.addEventListener("DOMContentLoaded",()=>{
 
-ContextRebuilder.init();
+//ContextRebuilder.init();
 
 });
 
