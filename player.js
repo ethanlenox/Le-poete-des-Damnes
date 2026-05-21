@@ -3453,85 +3453,80 @@ RAMCleanup.init();
 
 (function() {
 
-  const audio = document.getElementById('audioPlayer');
   const tracks = document.querySelectorAll('.track');
-  let currentIndex = 0;
+  const audio = document.getElementById('audioPlayer');
 
-  if (!audio || tracks.length === 0) return;
+  if (!tracks.length || !audio) return;
 
-  // Fonction pour scroller vers la piste active avec contrôle de la vitesse
-  function scrollToTrack(index) {
-    const track = document.querySelector(`.track[data-index='${index}']`);
-    if (!track) return;
-
-    const rect = track.getBoundingClientRect();
-    const targetY = window.scrollY + rect.top - (window.innerHeight / 2) + (rect.height / 2);
-    const startY = window.scrollY;
-    const distance = targetY - startY;
-    const duration = 800; // durée du scroll en ms, tu peux ajuster
-    let startTime = null;
-
-    function animateScroll(currentTime) {
-      if (!startTime) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-
-      // Fonction easing pour un mouvement fluide
-      const ease = progress < 0.5
-        ? 2 * progress * progress
-        : -1 + (4 - 2 * progress) * progress;
-
-      window.scrollTo(0, startY + distance * ease);
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animateScroll);
-      }
-    }
-
-    requestAnimationFrame(animateScroll);
-
-    // Classe active pour le CSS
-    tracks.forEach(t => t.classList.remove('active-track'));
-    track.classList.add('active-track');
+  function getCurrentTrackEl(index) {
+    return document.querySelector(`.track[data-index='${index}']`);
   }
 
-  // Initial scroll sur la piste courante
-  document.addEventListener('DOMContentLoaded', () => {
-    scrollToTrack(currentIndex);
+  function scrollToTrack(index) {
+    const el = getCurrentTrackEl(index);
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const targetY =
+      window.scrollY +
+      rect.top -
+      (window.innerHeight / 2) +
+      (rect.height / 2);
+
+    window.scrollTo({
+      top: targetY,
+      behavior: 'smooth'
+    });
+
+    tracks.forEach(t => t.classList.remove('active-track'));
+    el.classList.add('active-track');
+  }
+
+  function getState() {
+    return window.__PLAYER_PART1__?.State;
+  }
+
+  function sync() {
+    const state = getState();
+    if (!state) return;
+    scrollToTrack(state.index);
+  }
+
+
+  // AUTO SYNC PLAYER
+
+  const Events = window.__PLAYER_PART1__?.Events;
+
+  if (Events) {
+    Events.on('trackChange', () => {
+      sync();
+    });
+  }
+
+
+  // NEXT / PREV BUTTONS
+
+  document.getElementById('nextBtn')?.addEventListener('click', () => {
+    setTimeout(sync, 50);
   });
 
-  // Fonction pour passer à la piste suivante
-  function nextTrack() {
-    currentIndex++;
-    if (currentIndex >= tracks.length) currentIndex = 0;
-    scrollToTrack(currentIndex);
-  }
+  document.getElementById('prevBtn')?.addEventListener('click', () => {
+    setTimeout(sync, 50);
+  });
 
-  // Fonction pour piste précédente
-  function prevTrack() {
-    currentIndex--;
-    if (currentIndex < 0) currentIndex = tracks.length - 1;
-    scrollToTrack(currentIndex);
-  }
 
-  // Ecoute des boutons miniPlayer
-  const nextBtn = document.getElementById('nextBtn');
-  const prevBtn = document.getElementById('prevBtn');
+  // AUTO NEXT (FIN TRACK)
 
-  nextBtn && nextBtn.addEventListener('click', nextTrack);
-  prevBtn && prevBtn.addEventListener('click', prevTrack);
+  audio.addEventListener('ended', () => {
+    setTimeout(sync, 50);
+  });
 
-  // Quand la piste actuelle se termine, passer à la suivante
-  audio.addEventListener('ended', nextTrack);
 
-  // Pour gérer le scroll si tu changes manuellement via la playlist
+  // CLICK TRACK LIST
+
   tracks.forEach(track => {
     track.addEventListener('click', () => {
-      const index = parseInt(track.dataset.index, 10);
-      if (!isNaN(index)) {
-        currentIndex = index;
-        scrollToTrack(currentIndex);
-      }
+      setTimeout(sync, 50);
     });
   });
 
