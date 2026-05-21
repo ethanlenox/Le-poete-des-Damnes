@@ -629,13 +629,22 @@ const Preload = {
 const Playlist = {
 
   list: [],
+  
+// track liste dynamique cover
+buildFromDOM(){
+  this.list = Array.from(DOM.tracks).map(el=>({
+    src: el.dataset.src,
+    title: el.dataset.title,
 
-  buildFromDOM(){
-    this.list = Array.from(DOM.tracks).map(el=>({
-      src: el.dataset.src,
-      title: el.dataset.title
-    }));
-  },
+    // cover support
+    cover:
+      el.dataset.cover ||
+      el.dataset.image ||
+      el.dataset.art ||
+      el.dataset.poster ||
+      el.dataset.thumb
+  }));
+},
 
   get(i){
     return this.list[i];
