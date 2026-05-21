@@ -3454,14 +3454,21 @@ RAMCleanup.init();
 (function() {
 
   const tracks = document.querySelectorAll('.track');
-  const audio = document.getElementById('audioPlayer');
 
-  if (!tracks.length || !audio) return;
+  if (!tracks.length) return;
+
+  let startY = 0;
+  let currentY = 0;
+  let startTime = 0;
+  let isTouching = false;
+  let velocity = 0;
+  let lastMoveY = 0;
+  let lastMoveTime = 0;
 
   // ===============================
-  // SCROLL INERTIEL TYPE SPOTIFY
+  // UTIL : SCROLL VERS TRACK
   // ===============================
-  function scrollToTrack(index) {
+  function scrollToTrack(index, forceVelocity = 1) {
     const el = document.querySelector(`.track[data-index='${index}']`);
     if (!el) return;
 
@@ -3473,85 +3480,126 @@ RAMCleanup.init();
       (window.innerHeight / 2) +
       (rect.height / 2);
 
-    const startY = window.scrollY;
-    const distance = targetY - startY;
+    let current = window.scrollY;
+    let v = velocity * forceVelocity;
 
-    const duration = 900; // ⬅️ ici la vitesse scroll (800-1200 idéal)
-    let startTime = null;
+    function animate() {
+      const diff = targetY - current;
 
-    function easeInOutCubic(t) {
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
+      v += diff * 0.08;   // attraction
+      v *= 0.82;          // friction
 
-    function animate(time) {
-      if (!startTime) startTime = time;
+      current += v;
 
-      const progress = Math.min((time - startTime) / duration, 1);
-      const eased = easeInOutCubic(progress);
+      window.scrollTo(0, current);
 
-      window.scrollTo(0, startY + distance * eased);
-
-      if (progress < 1) {
+      if (Math.abs(v) > 0.5) {
         requestAnimationFrame(animate);
       }
     }
 
     requestAnimationFrame(animate);
 
-    // ACTIVE TRACK VISUEL
     tracks.forEach(t => t.classList.remove('active-track'));
     el.classList.add('active-track');
   }
 
   // ===============================
-  // LECTURE INDEX PLAYER
+  // FIND CLOSEST TRACK
   // ===============================
-  function getIndex() {
-    return window.__PLAYER_PART1__?.State?.index;
-  }
+  function getClosestIndex() {
+    let closest = 0;
+    let minDist = Infinity;
 
-  function sync() {
-    const index = getIndex();
-    if (index === undefined || index === null) return;
-    scrollToTrack(index);
-  }
+    tracks.forEach((t, i) => {
+      const rect = t.getBoundingClientRect();
+      const dist = Math.abs(rect.top);
 
-  // ===============================
-  // EVENTS PLAYER
-  // ===============================
-  const Events = window.__PLAYER_PART1__?.Events;
-
-  if (Events) {
-    Events.on('trackChange', sync);
-  }
-
-  // ===============================
-  // BOUTONS MINI PLAYER
-  // ===============================
-  document.getElementById('nextBtn')?.addEventListener('click', () => {
-    setTimeout(sync, 50);
-  });
-
-  document.getElementById('prevBtn')?.addEventListener('click', () => {
-    setTimeout(sync, 50);
-  });
-
-  // ===============================
-  // FIN DE TRACK
-  // ===============================
-  audio.addEventListener('ended', () => {
-    setTimeout(sync, 50);
-  });
-
-  // ===============================
-  // CLICK SUR PLAYLIST
-  // ===============================
-  tracks.forEach(track => {
-    track.addEventListener('click', () => {
-      setTimeout(sync, 50);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = i;
+      }
     });
+
+    return closest;
+  }
+
+  // ===============================
+  // TOUCH / SWIPE DETECTION
+  // ===============================
+  document.addEventListener('touchstart', (e) => {
+    isTouching = true;
+    startY = e.touches[0].clientY;
+    currentY = startY;
+    startTime = Date.now();
+
+    velocity = 0;
+    lastMoveY = startY;
+    lastMoveTime = startTime;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!isTouching) return;
+
+    const y = e.touches[0].clientY;
+    const now = Date.now();
+
+    const deltaY = y - lastMoveY;
+    const deltaTime = now - lastMoveTime;
+
+    velocity = deltaY / (deltaTime || 1);
+
+    lastMoveY = y;
+    lastMoveTime = now;
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    isTouching = false;
+
+    const index = getClosestIndex();
+
+    // accélération basée sur vitesse swipe
+    const speedFactor = Math.min(Math.abs(velocity) * 2, 3);
+
+    scrollToTrack(index, speedFactor);
+  });
+
+  // ===============================
+  // MOUSE SUPPORT (DESKTOP TEST)
+  // ===============================
+  let mouseDown = false;
+
+  document.addEventListener('mousedown', (e) => {
+    mouseDown = true;
+    startY = e.clientY;
+    lastMoveY = startY;
+    lastMoveTime = Date.now();
+    velocity = 0;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!mouseDown) return;
+
+    const y = e.clientY;
+    const now = Date.now();
+
+    const deltaY = y - lastMoveY;
+    const deltaTime = now - lastMoveTime;
+
+    velocity = deltaY / (deltaTime || 1);
+
+    lastMoveY = y;
+    lastMoveTime = now;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!mouseDown) return;
+    mouseDown = false;
+
+    const index = getClosestIndex();
+    const speedFactor = Math.min(Math.abs(velocity) * 2, 3);
+
+    scrollToTrack(index, speedFactor);
   });
 
 })();
