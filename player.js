@@ -3453,75 +3453,81 @@ RAMCleanup.init();
 
 (function() {
 
+  const tracks = document.querySelectorAll('.track');
   const audio = document.getElementById('audioPlayer');
 
-  if (!audio) return;
+  if (!tracks.length || !audio) return;
 
-  let startY = 0;
-  let startTime = 0;
-
-  function triggerNext() {
-    document.getElementById('nextBtn')?.click();
+  function getCurrentTrackEl(index) {
+    return document.querySelector(`.track[data-index='${index}']`);
   }
 
-  function triggerPrev() {
-    document.getElementById('prevBtn')?.click();
+  function scrollToTrack(index) {
+    const el = getCurrentTrackEl(index);
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const targetY =
+      window.scrollY +
+      rect.top -
+      (window.innerHeight / 2) +
+      (rect.height / 2);
+
+    window.scrollTo({
+      top: targetY,
+      behavior: 'smooth'
+    });
+
+    tracks.forEach(t => t.classList.remove('active-track'));
+    el.classList.add('active-track');
   }
 
-  // =========================
-  // MOBILE SWIPE
-  // =========================
-  document.addEventListener('touchstart', (e) => {
-    startY = e.touches[0].clientY;
-    startTime = Date.now();
-  }, { passive: true });
+  function getState() {
+    return window.__PLAYER_PART1__?.State;
+  }
 
-  document.addEventListener('touchend', (e) => {
-    const endY = e.changedTouches[0].clientY;
-    const deltaY = endY - startY;
-    const deltaTime = Date.now() - startTime;
+  function sync() {
+    const state = getState();
+    if (!state) return;
+    scrollToTrack(state.index);
+  }
 
-    const speed = Math.abs(deltaY) / (deltaTime || 1);
 
-    // filtre anti faux swipe
-    if (Math.abs(deltaY) < 50) return;
+  // AUTO SYNC PLAYER
 
-    // swipe rapide vers le haut = next
-    if (deltaY < 0) {
-      triggerNext();
-    }
+  const Events = window.__PLAYER_PART1__?.Events;
 
-    // swipe vers le bas = prev
-    else {
-      triggerPrev();
-    }
+  if (Events) {
+    Events.on('trackChange', () => {
+      sync();
+    });
+  }
 
-  }, { passive: true });
 
-  // =========================
-  // DESKTOP MOUSE SWIPE
-  // =========================
-  let mouseDown = false;
-  let mStartY = 0;
-
-  document.addEventListener('mousedown', (e) => {
-    mouseDown = true;
-    mStartY = e.clientY;
+  // NEXT / PREV BUTTONS
+  
+  document.getElementById('nextBtn')?.addEventListener('click', () => {
+    setTimeout(sync, 50);
   });
 
-  document.addEventListener('mouseup', (e) => {
-    if (!mouseDown) return;
-    mouseDown = false;
+  document.getElementById('prevBtn')?.addEventListener('click', () => {
+    setTimeout(sync, 50);
+  });
 
-    const deltaY = e.clientY - mStartY;
+ 
+  // AUTO NEXT (FIN TRACK)
+  
+  audio.addEventListener('ended', () => {
+    setTimeout(sync, 50);
+  });
 
-    if (Math.abs(deltaY) < 80) return;
 
-    if (deltaY < 0) {
-      triggerNext();
-    } else {
-      triggerPrev();
-    }
+  // CLICK TRACK LIST
+
+  tracks.forEach(track => {
+    track.addEventListener('click', () => {
+      setTimeout(sync, 50);
+    });
   });
 
 })();
