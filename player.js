@@ -3443,71 +3443,79 @@ RAMCleanup.init();
 (function(){
 
 const { State, Events } = window.__PLAYER_PART1__;
+const { Playlist } = window.__PLAYER_PART2__;
 
 // ===============================
-//   UI TRACK SYNCHRONIZER
+//          UI TRACK SYNC
 // ===============================
 const UISync = {
 
-  covers: [],
-  tracks: [],
-
   init(){
 
-    this.covers = Array.from(document.querySelectorAll(".cover"));
-    this.tracks = Array.from(document.querySelectorAll(".track"));
+    Events.on("trackChange", (track)=>{
 
-    Events.on("trackChange", ()=>this.update());
-    Events.on("play", ()=>this.update());
-    Events.on("ended", ()=>this.update());
-
-    // sync initial si déjà chargé
-    this.update();
-
-  },
-
-  update(){
-
-    const i = State.index;
-
-    if(i == null) return;
-
-    // 1. RESET ALL UI
-    this.covers.forEach((el, idx)=>{
-
-      el.classList.remove("active", "playing");
-
-      if(idx === i){
-        el.classList.add("active");
-
-        // petit effet visuel optionnel
-        el.style.transform = "scale(1.05)";
-      } else {
-        el.style.transform = "scale(1)";
-      }
+      this.sync(track);
 
     });
 
-    this.tracks.forEach((el, idx)=>{
+    Events.on("play", ()=>{
+
+      const track = Playlist.get(State.index);
+      if(track) this.sync(track);
+
+    });
+
+    this.sync(Playlist.get(State.index));
+
+  },
+
+  sync(track){
+
+    if(!track) return;
+
+    const index = State.index;
+
+    // TRACK LIST UI
+    document.querySelectorAll(".track").forEach((el, i)=>{
 
       el.classList.remove("active", "playing");
 
-      if(idx === i){
+      if(i === index){
         el.classList.add("active", "playing");
       }
 
     });
 
-    // 2. MINI PLAYER COVER (si existe)
-    const miniCover = document.querySelector("#miniPlayer .cover, #miniPlayer img");
-    if(miniCover && this.covers[i]){
+    // COVER ACTIVE 
+    document.querySelectorAll(".cover").forEach((el, i)=>{
 
-      const src = this.covers[i].dataset?.src || this.covers[i].src;
+      el.classList.remove("active", "playing");
 
-      if(src){
-        miniCover.src = src;
+      if(i === index){
+        el.classList.add("active", "playing");
       }
 
+    });
+
+    // MINI PLAYER COVER
+    const mini = document.querySelector("#miniPlayer img, #miniPlayer .cover img");
+
+    if(mini){
+
+      // priorité au dataset du track
+      if(track.cover){
+        mini.src = track.cover;
+      }
+      else if(track.src){
+        mini.src = track.src;
+      }
+
+    }
+
+    // TITLE SYNC
+    const title = document.getElementById("trackTitle");
+    if(title && track.title){
+      title.textContent = track.title;
     }
 
   }
@@ -3515,7 +3523,7 @@ const UISync = {
 };
 
 // ===============================
-//        INIT
+// INIT
 // ===============================
 document.addEventListener("DOMContentLoaded", ()=>{
 
