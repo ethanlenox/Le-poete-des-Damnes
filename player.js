@@ -3451,79 +3451,68 @@ RAMCleanup.init();
 //      DYNAMIC COVER SYSTEM
 // ===============================
 
-(function(){
+(function() {
 
-const{State,Events}=window.__PLAYER_PART1__;
-const{Playlist}=window.__PLAYER_PART2__;
+  const { State, Events } = window.__PLAYER_PART1__ || {};
+  const { Playlist } = window.__PLAYER_PART2__ || {};
 
-// ===============================
-//         COVER ENGINE
-// ===============================
+  if (!State || !Events || !Playlist) {
+    console.warn("DynamicCover: Player objects not found!");
+    return;
+  }
 
-const DynamicCover={
+  // ===============================
+  //         COVER ENGINE
+  // ===============================
+  const DynamicCover = {
 
-el:null,
+    el: null,
 
-init(){
+    init() {
+      this.el = document.getElementById("cover");
+      if (!this.el) {
+        console.warn("DynamicCover: Cover element not found!");
+        return;
+      }
 
-this.el=document.getElementById("cover");
+      // Quand la piste change
+      Events.on("trackChange", (track) => {
+        this.update(track);
+      });
 
-if(!this.el)return;
+      // Au rechargement, mettre le cover actuel
+      setTimeout(() => {
+        const track = Playlist.get(State.index);
+        if (track) this.update(track);
+      }, 300);
+    },
 
-Events.on("trackChange",(track)=>{
+    update(track) {
+      if (!track) return;
 
-this.update(track);
+      const src =
+        track.cover ||
+        track.image ||
+        track.art ||
+        track.poster ||
+        track.thumb;
 
-});
+      if (!src) return;
 
-// restore reload
-setTimeout(()=>{
+      if (this.el.tagName === "IMG") {
+        this.el.src = src;
+      } else {
+        this.el.style.backgroundImage = `url("${src}")`;
+      }
+    }
 
-const track=Playlist.get(State.index);
+  };
 
-if(track){
-this.update(track);
-}
-
-},300);
-
-},
-
-update(track){
-
-if(!track)return;
-
-const src=
-track.cover||
-track.image||
-track.art||
-track.poster||
-track.thumb;
-
-if(!src)return;
-
-if(this.el.tagName==="IMG"){
-
-this.el.src=src;
-
-}else{
-
-this.el.style.backgroundImage=`url("${src}")`;
-
-}
-
-}
-
-};
-
-// ===============================
-//             INIT
-// ===============================
-
-document.addEventListener(
-"DOMContentLoaded",
-()=>{
-DynamicCover.init();
-});
+  // ===============================
+  //             INIT
+  // ===============================
+  document.addEventListener("DOMContentLoaded", () => {
+    DynamicCover.init();
+  });
 
 })();
