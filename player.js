@@ -3453,153 +3453,75 @@ RAMCleanup.init();
 
 (function() {
 
-  const tracks = document.querySelectorAll('.track');
+  const audio = document.getElementById('audioPlayer');
 
-  if (!tracks.length) return;
+  if (!audio) return;
 
   let startY = 0;
-  let currentY = 0;
   let startTime = 0;
-  let isTouching = false;
-  let velocity = 0;
-  let lastMoveY = 0;
-  let lastMoveTime = 0;
 
-  // ===============================
-  // UTIL : SCROLL VERS TRACK
-  // ===============================
-  function scrollToTrack(index, forceVelocity = 1) {
-    const el = document.querySelector(`.track[data-index='${index}']`);
-    if (!el) return;
+  function triggerNext() {
+    document.getElementById('nextBtn')?.click();
+  }
 
-    const rect = el.getBoundingClientRect();
+  function triggerPrev() {
+    document.getElementById('prevBtn')?.click();
+  }
 
-    const targetY =
-      window.scrollY +
-      rect.top -
-      (window.innerHeight / 2) +
-      (rect.height / 2);
+  // =========================
+  // MOBILE SWIPE
+  // =========================
+  document.addEventListener('touchstart', (e) => {
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+  }, { passive: true });
 
-    let current = window.scrollY;
-    let v = velocity * forceVelocity;
+  document.addEventListener('touchend', (e) => {
+    const endY = e.changedTouches[0].clientY;
+    const deltaY = endY - startY;
+    const deltaTime = Date.now() - startTime;
 
-    function animate() {
-      const diff = targetY - current;
+    const speed = Math.abs(deltaY) / (deltaTime || 1);
 
-      v += diff * 0.08;   // attraction
-      v *= 0.82;          // friction
+    // filtre anti faux swipe
+    if (Math.abs(deltaY) < 50) return;
 
-      current += v;
-
-      window.scrollTo(0, current);
-
-      if (Math.abs(v) > 0.5) {
-        requestAnimationFrame(animate);
-      }
+    // swipe rapide vers le haut = next
+    if (deltaY < 0) {
+      triggerNext();
     }
 
-    requestAnimationFrame(animate);
+    // swipe vers le bas = prev
+    else {
+      triggerPrev();
+    }
 
-    tracks.forEach(t => t.classList.remove('active-track'));
-    el.classList.add('active-track');
-  }
-
-  // ===============================
-  // FIND CLOSEST TRACK
-  // ===============================
-  function getClosestIndex() {
-    let closest = 0;
-    let minDist = Infinity;
-
-    tracks.forEach((t, i) => {
-      const rect = t.getBoundingClientRect();
-      const dist = Math.abs(rect.top);
-
-      if (dist < minDist) {
-        minDist = dist;
-        closest = i;
-      }
-    });
-
-    return closest;
-  }
-
-  // ===============================
-  // TOUCH / SWIPE DETECTION
-  // ===============================
-  document.addEventListener('touchstart', (e) => {
-    isTouching = true;
-    startY = e.touches[0].clientY;
-    currentY = startY;
-    startTime = Date.now();
-
-    velocity = 0;
-    lastMoveY = startY;
-    lastMoveTime = startTime;
   }, { passive: true });
 
-  document.addEventListener('touchmove', (e) => {
-    if (!isTouching) return;
-
-    const y = e.touches[0].clientY;
-    const now = Date.now();
-
-    const deltaY = y - lastMoveY;
-    const deltaTime = now - lastMoveTime;
-
-    velocity = deltaY / (deltaTime || 1);
-
-    lastMoveY = y;
-    lastMoveTime = now;
-  }, { passive: true });
-
-  document.addEventListener('touchend', () => {
-    isTouching = false;
-
-    const index = getClosestIndex();
-
-    // accélération basée sur vitesse swipe
-    const speedFactor = Math.min(Math.abs(velocity) * 2, 3);
-
-    scrollToTrack(index, speedFactor);
-  });
-
-  // ===============================
-  // MOUSE SUPPORT (DESKTOP TEST)
-  // ===============================
+  // =========================
+  // DESKTOP MOUSE SWIPE
+  // =========================
   let mouseDown = false;
+  let mStartY = 0;
 
   document.addEventListener('mousedown', (e) => {
     mouseDown = true;
-    startY = e.clientY;
-    lastMoveY = startY;
-    lastMoveTime = Date.now();
-    velocity = 0;
+    mStartY = e.clientY;
   });
 
-  document.addEventListener('mousemove', (e) => {
-    if (!mouseDown) return;
-
-    const y = e.clientY;
-    const now = Date.now();
-
-    const deltaY = y - lastMoveY;
-    const deltaTime = now - lastMoveTime;
-
-    velocity = deltaY / (deltaTime || 1);
-
-    lastMoveY = y;
-    lastMoveTime = now;
-  });
-
-  document.addEventListener('mouseup', () => {
+  document.addEventListener('mouseup', (e) => {
     if (!mouseDown) return;
     mouseDown = false;
 
-    const index = getClosestIndex();
-    const speedFactor = Math.min(Math.abs(velocity) * 2, 3);
+    const deltaY = e.clientY - mStartY;
 
-    scrollToTrack(index, speedFactor);
+    if (Math.abs(deltaY) < 80) return;
+
+    if (deltaY < 0) {
+      triggerNext();
+    } else {
+      triggerPrev();
+    }
   });
 
 })();
