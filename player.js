@@ -3452,46 +3452,40 @@ RAMCleanup.init();
 // ===============================
 
 (function(){
-
   const { State, Events, Playlist } = window.__PLAYER_PART1__ ? window.__PLAYER_PART1__ : {};
 
   if (!State || !Events || !Playlist) {
-    console.warn("ScrollToTrack: Player objects not found!");
+    console.warn("Player objects not found!");
     return;
   }
 
-  const ScrollToTrack = {
+  const AutoScroll = {
 
     init() {
-      Events.on("trackChange", (track) => {
-        this.scrollTo(track);
+      Events.on("trackChange", () => {
+        this.scrollToCurrent();
       });
 
       // Au chargement, scroll sur la piste actuelle
       setTimeout(() => {
-        const track = Playlist.get(State.index);
-        if (track) this.scrollTo(track);
-      }, 300);
+        this.scrollToCurrent();
+      }, 500);
     },
 
-    scrollTo(track) {
-      if (!track) return;
+    scrollToCurrent() {
+      const currentTrackEl = document.querySelector(`.track[data-index='${State.index}']`);
+      if (!currentTrackEl) return;
 
-      // On cherche l'élément track correspondant
-      const trackEl = document.querySelector(`.track[data-index='${track.index}']`);
-      if (!trackEl) return;
-
-      // Scroll fluide jusqu'au cover
-      trackEl.scrollIntoView({
+      currentTrackEl.scrollIntoView({
         behavior: "smooth",
-        block: "center"  // centrer le cover dans la vue
+        block: "center" // centre le cover dans la fenêtre
       });
     }
 
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    ScrollToTrack.init();
+    AutoScroll.init();
   });
 
 })();
