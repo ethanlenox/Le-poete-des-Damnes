@@ -3451,68 +3451,47 @@ RAMCleanup.init();
 //      DYNAMIC COVER SYSTEM
 // ===============================
 
-(function() {
+(function(){
 
-  const { State, Events } = window.__PLAYER_PART1__ || {};
-  const { Playlist } = window.__PLAYER_PART2__ || {};
+  const { State, Events, Playlist } = window.__PLAYER_PART1__ ? window.__PLAYER_PART1__ : {};
 
   if (!State || !Events || !Playlist) {
-    console.warn("DynamicCover: Player objects not found!");
+    console.warn("ScrollToTrack: Player objects not found!");
     return;
   }
 
-  // ===============================
-  //         COVER ENGINE
-  // ===============================
-  const DynamicCover = {
-
-    el: null,
+  const ScrollToTrack = {
 
     init() {
-      this.el = document.getElementById("cover");
-      if (!this.el) {
-        console.warn("DynamicCover: Cover element not found!");
-        return;
-      }
-
-      // Quand la piste change
       Events.on("trackChange", (track) => {
-        this.update(track);
+        this.scrollTo(track);
       });
 
-      // Au rechargement, mettre le cover actuel
+      // Au chargement, scroll sur la piste actuelle
       setTimeout(() => {
         const track = Playlist.get(State.index);
-        if (track) this.update(track);
+        if (track) this.scrollTo(track);
       }, 300);
     },
 
-    update(track) {
+    scrollTo(track) {
       if (!track) return;
 
-      const src =
-        track.cover ||
-        track.image ||
-        track.art ||
-        track.poster ||
-        track.thumb;
+      // On cherche l'élément track correspondant
+      const trackEl = document.querySelector(`.track[data-index='${track.index}']`);
+      if (!trackEl) return;
 
-      if (!src) return;
-
-      if (this.el.tagName === "IMG") {
-        this.el.src = src;
-      } else {
-        this.el.style.backgroundImage = `url("${src}")`;
-      }
+      // Scroll fluide jusqu'au cover
+      trackEl.scrollIntoView({
+        behavior: "smooth",
+        block: "center"  // centrer le cover dans la vue
+      });
     }
 
   };
 
-  // ===============================
-  //             INIT
-  // ===============================
   document.addEventListener("DOMContentLoaded", () => {
-    DynamicCover.init();
+    ScrollToTrack.init();
   });
 
 })();
