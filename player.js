@@ -3443,80 +3443,59 @@ RAMCleanup.init();
 (function(){
 
 const { State, Events } = window.__PLAYER_PART1__;
-const { Playlist } = window.__PLAYER_PART2__;
+const { DOM } = window.__PLAYER_PART2__;
 
 // ===============================
-//          UI TRACK SYNC
+//   COVER SYNC FROM DOM STATE
 // ===============================
-const UISync = {
+const CoverSync = {
 
   init(){
 
-    Events.on("trackChange", (track)=>{
+    Events.on("trackChange", () => this.sync());
+    Events.on("play", () => this.sync());
 
-      this.sync(track);
-
-    });
-
-    Events.on("play", ()=>{
-
-      const track = Playlist.get(State.index);
-      if(track) this.sync(track);
-
-    });
-
-    this.sync(Playlist.get(State.index));
+    document.addEventListener("DOMContentLoaded", () => this.sync());
 
   },
 
-  sync(track){
-
-    if(!track) return;
+  sync(){
 
     const index = State.index;
 
-    // TRACK LIST UI
-    document.querySelectorAll(".track").forEach((el, i)=>{
+    // cherche cover dans track actif
+    const activeTrack = document.querySelectorAll(".track")[index];
+    if(!activeTrack) return;
 
-      el.classList.remove("active", "playing");
+    // CAS 1 : image dans la track
+    const img =
+      activeTrack.querySelector("img") ||
+      activeTrack.querySelector("[data-cover]");
 
-      if(i === index){
-        el.classList.add("active", "playing");
-      }
+    const coverSrc =
+      img?.src ||
+      img?.dataset?.cover ||
+      activeTrack.dataset?.cover;
 
-    });
+    // cible cover principal (adaptatif)
+    const mainCover =
+      document.getElementById("cover") ||
+      document.querySelector("#miniPlayer img") ||
+      document.querySelector(".player-cover img");
 
-    // COVER ACTIVE 
-    document.querySelectorAll(".cover").forEach((el, i)=>{
+    if(!mainCover || !coverSrc) return;
 
-      el.classList.remove("active", "playing");
-
-      if(i === index){
-        el.classList.add("active", "playing");
-      }
-
-    });
-
-    // MINI PLAYER COVER
-    const mini = document.querySelector("#miniPlayer img, #miniPlayer .cover img");
-
-    if(mini){
-
-      // priorité au dataset du track
-      if(track.cover){
-        mini.src = track.cover;
-      }
-      else if(track.src){
-        mini.src = track.src;
-      }
-
+    // applique selon type élément
+    if(mainCover.tagName === "IMG"){
+      mainCover.src = coverSrc;
+    } else {
+      mainCover.style.backgroundImage = `url(${coverSrc})`;
     }
 
-    // TITLE SYNC
-    const title = document.getElementById("trackTitle");
-    if(title && track.title){
-      title.textContent = track.title;
-    }
+    // highlight visuel playlist
+    document.querySelectorAll(".track").forEach((el, i) => {
+      el.classList.toggle("active", i === index);
+    });
 
   }
 
@@ -3525,10 +3504,8 @@ const UISync = {
 // ===============================
 // INIT
 // ===============================
-document.addEventListener("DOMContentLoaded", ()=>{
-
-  UISync.init();
-
+document.addEventListener("DOMContentLoaded", () => {
+  CoverSync.init();
 });
 
 })();
