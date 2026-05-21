@@ -3453,56 +3453,78 @@ RAMCleanup.init();
 
 (function() {
 
-  const tracks = document.querySelectorAll('.track');
   const audio = document.getElementById('audioPlayer');
+  const tracks = document.querySelectorAll('.track');
   let currentIndex = 0;
 
-  if (tracks.length === 0) return;
+  if (!audio || tracks.length === 0) return;
 
-  // ======= SCROLL VERS LA PISTE ACTIVE =======
+  // Fonction pour scroller vers la piste active avec contrôle de la vitesse
   function scrollToTrack(index) {
     const track = document.querySelector(`.track[data-index='${index}']`);
     if (!track) return;
 
-    track.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
+    const rect = track.getBoundingClientRect();
+    const targetY = window.scrollY + rect.top - (window.innerHeight / 2) + (rect.height / 2);
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const duration = 800; // durée du scroll en ms, tu peux ajuster
+    let startTime = null;
 
+    function animateScroll(currentTime) {
+      if (!startTime) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // Fonction easing pour un mouvement fluide
+      const ease = progress < 0.5
+        ? 2 * progress * progress
+        : -1 + (4 - 2 * progress) * progress;
+
+      window.scrollTo(0, startY + distance * ease);
+
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animateScroll);
+      }
+    }
+
+    requestAnimationFrame(animateScroll);
+
+    // Classe active pour le CSS
     tracks.forEach(t => t.classList.remove('active-track'));
     track.classList.add('active-track');
   }
 
-  // ======= INIT SCROLL =======
+  // Initial scroll sur la piste courante
   document.addEventListener('DOMContentLoaded', () => {
     scrollToTrack(currentIndex);
   });
 
-  // ======= BOUTONS MINI-PLAYER =======
+  // Fonction pour passer à la piste suivante
+  function nextTrack() {
+    currentIndex++;
+    if (currentIndex >= tracks.length) currentIndex = 0;
+    scrollToTrack(currentIndex);
+  }
+
+  // Fonction pour piste précédente
+  function prevTrack() {
+    currentIndex--;
+    if (currentIndex < 0) currentIndex = tracks.length - 1;
+    scrollToTrack(currentIndex);
+  }
+
+  // Ecoute des boutons miniPlayer
   const nextBtn = document.getElementById('nextBtn');
   const prevBtn = document.getElementById('prevBtn');
-
-  function nextTrack() {
-    if (window.__PLAYER_PART2__ && window.__PLAYER_PART2__.Playlist) {
-      const playlist = window.__PLAYER_PART2__.Playlist;
-      currentIndex = (window.__PLAYER_PART1__.State.index + 1) % playlist.length;
-      scrollToTrack(currentIndex);
-    }
-  }
-
-  function prevTrack() {
-    if (window.__PLAYER_PART2__ && window.__PLAYER_PART2__.Playlist) {
-      const playlist = window.__PLAYER_PART2__.Playlist;
-      currentIndex = window.__PLAYER_PART1__.State.index - 1;
-      if (currentIndex < 0) currentIndex = playlist.length - 1;
-      scrollToTrack(currentIndex);
-    }
-  }
 
   nextBtn && nextBtn.addEventListener('click', nextTrack);
   prevBtn && prevBtn.addEventListener('click', prevTrack);
 
-  // ======= CLICK SUR LA PLAYLIST =======
+  // Quand la piste actuelle se termine, passer à la suivante
+  audio.addEventListener('ended', nextTrack);
+
+  // Pour gérer le scroll si tu changes manuellement via la playlist
   tracks.forEach(track => {
     track.addEventListener('click', () => {
       const index = parseInt(track.dataset.index, 10);
@@ -3512,14 +3534,5 @@ RAMCleanup.init();
       }
     });
   });
-
-  // ======= ECOUTE DU PLAYER POUR AUTO-SCROLL =======
-  if (window.__PLAYER_PART1__ && window.__PLAYER_PART1__.Events) {
-    const { Events, State } = window.__PLAYER_PART1__;
-    Events.on('trackChange', () => {
-      currentIndex = State.index;
-      scrollToTrack(currentIndex);
-    });
-  }
 
 })();
