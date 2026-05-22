@@ -1205,9 +1205,8 @@ body {
              propre / stable 
    ====================================*/
 
-
   /* =========================================================
-     TRACK CARD
+     TRACK CARD (profondeur PC)
      ========================================================= */
 
   .track {
@@ -1221,7 +1220,9 @@ body {
 
     border: 1px solid rgba(255,255,255,0.08);
 
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    box-shadow:
+      0 10px 28px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.05);
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -1234,28 +1235,7 @@ body {
   }
 
   /* =========================================================
-     TRACK CENTER (sécurité layout)
-     ========================================================= */
-
-  .track-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* =========================================================
-     COVER WRAPPER (CENTER FIX)
-     ========================================================= */
-
-  .cover-wrapper {
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* =========================================================
-     COVER IMAGE
+     COVER
      ========================================================= */
 
   .cover-wrapper img {
@@ -1266,12 +1246,13 @@ body {
 
     border-radius: 16px;
 
-    box-shadow: 0 10px 24px rgba(0,0,0,0.40);
+    box-shadow:
+      0 12px 26px rgba(0,0,0,0.45);
   }
 
-  /* ===================
-         BUTTON BASE
-     =================== */
+  /* =========================================================
+     BUTTON BASE + GLOW SOFT
+     ========================================================= */
 
   .music-btn,
   .lyrics-btn {
@@ -1284,6 +1265,9 @@ body {
     font-weight: 600;
 
     transition: all 0.2s ease;
+
+    box-shadow:
+      0 6px 14px rgba(0,0,0,0.25);
   }
 
   .music-btn:active,
@@ -1291,27 +1275,37 @@ body {
     transform: scale(0.96);
   }
 
-  /* =======================
-       BANDCAMP (BLEU SITE)
-     ======================= */
+  /* =========================================================
+     BANDCAMP (GLOW BLEU)
+     ========================================================= */
 
   .bandcamp {
+
     background: #3b82f6;
+
     color: #fff;
+
+    box-shadow:
+      0 6px 16px rgba(59,130,246,0.35);
   }
 
-  /* ========================
-      SPOTIFY (VERT OFFICIEL)
-     ========================*/
+  /* =========================================================
+     SPOTIFY (GLOW VERT)
+     ========================================================= */
 
   .spotify {
+
     background: #1db954;
+
     color: #fff;
+
+    box-shadow:
+      0 6px 16px rgba(29,185,84,0.35);
   }
 
-  /* ======================
-      PAROLES (GLASS STYLE)
-     ====================== */
+  /* =========================================================
+     PAROLES (GLASS PREMIUM)
+     ========================================================= */
 
   .lyrics-btn {
 
@@ -1324,7 +1318,9 @@ body {
 
     color: #fff;
 
-    box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+    box-shadow:
+      0 6px 18px rgba(0,0,0,0.35),
+      0 0 10px rgba(255,255,255,0.06);
   }
  
 /* mode par défaut = compact */
