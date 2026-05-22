@@ -775,7 +775,7 @@ if(!oldAudio.src){
 
 }
 
-      if(DOM.title) DOM.title.textContent = track.title;
+    //if(DOM.title) DOM.title.textContent = track.title;
 
       Events.emit("trackChange", track);
 
