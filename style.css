@@ -1058,11 +1058,11 @@ body {
     width: 100%;
   }
 
-  /* SUPPRESSION ÉLÉMENTS NON ESSENTIELS MOBILE */
+  /* SUPPRESSION ÉLÉMENTS NON ESSENTIELS MOBILE 
   #volumeBar,
   #waveform {
     display: none;
-  }
+  } */
 
 /* état compact */
 #miniPlayer.compact {
@@ -1208,6 +1208,16 @@ body {
   padding 0.35s ease,
   gap 0.35s ease,
   background 0.35s ease;
+  
+/* MOBILE GLASS PLAYER*/
+
+  background: rgba(20, 20, 20, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 4px 18px rgba(0,0,0,0.35);
+  border-radius: 18px;
 }
 
 /* ===================== */
@@ -2066,24 +2076,3 @@ body {
   50% { transform: scaleY(1.2); opacity: 1; }
 }
 
-/* ---------- MOBILE CLEAN ---------- */
-@media (max-width: 600px) {
-  #miniPlayer {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding-bottom: 14px;
-  }
-
-  #trackTitle {
-    max-width: 120px;
-  }
-
-  .track {
-    margin: 14px 10px;
-  }
-
-  /* aide GPU sur animations */
-.track, .cover-wrapper img, .play-btn {
-  will-change: transform;
-  }
-}  
