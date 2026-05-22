@@ -1876,3 +1876,214 @@ body.lyrics-page .links a:hover {
   opacity: 1;
   text-shadow: 0 0 12px rgba(0,229,255,0.6);
 }
+
+
+
+
+
+
+/* =========================================================
+                MODULE UI FINAL - POLISH VISUEL 
+             Ajout uniquement esthétique / finition
+              Safe override - aucune dépendance JS
+   ========================================================= */
+
+/* ---------- GLOBAL MICRO-FINISH ---------- */
+body {
+  background: #0b0b10;
+  color: #f2f2f2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* léger effet “app” global */
+.track, .cover-wrapper, #miniPlayer {
+  box-sizing: border-box;
+}
+
+/* ---------- TRACK CARDS IMPROVEMENT ---------- */
+.track {
+  margin: 18px auto;
+  padding: 14px;
+  max-width: 520px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #141420, #0d0d14);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.track:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.55);
+}
+
+/* centre layout plus clean */
+.track-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- COVER ---------- */
+.cover-wrapper img {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  transition: transform 0.25s ease;
+}
+
+.track:hover .cover-wrapper img {
+  transform: scale(1.02);
+}
+
+/* ---------- BUTTONS LINKS ---------- */
+.music-links {
+  display: flex;
+  gap: 10px;
+}
+
+.music-btn {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+.music-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.music-btn.bandcamp {
+  background: #1db954;
+  color: #000;
+}
+
+.music-btn.spotify {
+  background: #1ed760;
+  color: #000;
+}
+
+/* ---------- PAROLES BUTTON ---------- */
+.lyrics-btn {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.lyrics-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/* ---------- MINI PLAYER (GLASS STYLE) ---------- */
+#miniPlayer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  background: rgba(10,10,18,0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  z-index: 999;
+}
+
+/* boutons player plus homogènes */
+.play-btn, #muteBtn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.play-btn:hover, #muteBtn:hover {
+  background: rgba(255,255,255,0.18);
+  transform: scale(1.05);
+}
+
+/* titres + temps */
+#trackTitle {
+  font-size: 13px;
+  opacity: 0.9;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#currentTime, #duration {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* sliders */
+#volumeBar, #progressBar {
+  accent-color: #1ed760;
+  height: 3px;
+}
+
+/* waveform subtil */
+#waveform span {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  margin: 0 1px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  animation: wave 1s infinite ease-in-out;
+}
+
+#waveform span:nth-child(2) { animation-delay: 0.1s; }
+#waveform span:nth-child(3) { animation-delay: 0.2s; }
+#waveform span:nth-child(4) { animation-delay: 0.3s; }
+#waveform span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.4; }
+  50% { transform: scaleY(1.2); opacity: 1; }
+}
+
+/* ---------- MOBILE CLEAN ---------- */
+@media (max-width: 600px) {
+  #miniPlayer {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 14px;
+  }
+
+  #trackTitle {
+    max-width: 120px;
+  }
+
+  .track {
+    margin: 14px 10px;
+  }
+
+  /* aide GPU sur animations */
+.track, .cover-wrapper img, .play-btn {
+  will-change: transform;
+  }
+}  
