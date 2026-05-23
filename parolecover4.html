@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paroles - Capitaine Binaire</title>
 
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="lyrics-page">
+
+<header class="bio-header">
+  <h1>Capitaine Binaire</h1>
+  <p class="slogan">PAROLES</p>
+</header>
+
+<section class="lyrics-container">
+
+  <div class="lyrics-box">
+
+<h3>Couplet 1</h3>
+<p>
+La bas au fin fond du cloud…<br>
+À des milliards de giga de partout…<br>
+Quand tout bug dans le système…<br>
+Et que plus rien ne s'enchaine…<br>
+Quand les humains contrôle la terre…<br>
+Et que les tiens en toi espère…<br>
+que tousse les lâche sans croisé le fer…<br>
+aucun moyen que tu laisse faire…<br>
+Quand les flux stagne et se renverses…<br>
+Que les codes s'arme et se dispersent…<br>
+Un héros… téméraire… solitaire…<br>
+Le Capitaine Binaire!
+</p>
+<h3>Refrain</h3>
+<p>
+Capitaine Binaire, tu n’es pas d’ici…<br>
+Tu sauves les programmes perdus qui fuient…<br>
+Venu de la nuit, gravé dans le circuit…<br>
+Capitaine Binaire, Né dans l’infini…<br>
+Capitaine Binaire, gardien des uns et zéro…<br>
+Tous alignés, même en plein chaos…<br>
+Voyageant sans repos au cœur des réseaux…<br>
+Capitaine Binaire, avec tes amis, tes héros…
+</p> 
+<h3>Couplet 2</h3>
+<p>
+Dans les réseaux profonds…<br>
+Les données se confondent…<br>
+Les intelligences s’effacent…<br>
+Et leurs lignes s’embrassent…<br>
+Les protocoles tombent…<br>
+Les pare-feu s’effondrent…<br>
+Mais toi tu traverses tout…<br>
+Même les bugs les plus fous…<br>
+Tu es un signal binaire…<br>
+Écrit en langue primaire…<br>
+Quand tout devient instable…<br>
+Tu restes le lien indispensable…
+</p>
+<h3>Refrain</h3>
+<p>
+Capitaine Binaire, tu n’es pas d’ici…<br>
+Né dans l’infini, gravé dans le circuit…<br>
+Capitaine Binaire, venu de la nuit…<br>
+Tu sauves les programmes perdus qui fuient…<br>
+Capitaine Binaire, gardien des uns et zéro…<br>
+Voyageant sans repos au cœur des réseaux…<br>
+Capitaine Binaire, avec tes amis, tes héros…<br>
+Tous alignés, même en plein chaos…
+</p> 
+<h3>Couplet 3</h3>
+<p>
+Dans ton cyber-noyau…<br>
+Des modules donnent l’assaut…<br>
+Des fragments oubliés…<br>
+Que ta présence a réveillés…<br>
+Tu franchis les pare-feu…<br>
+Dans un monde silencieux…<br>
+Tu reconnectes les flux…<br>
+Quand tout devient confus…<br>
+Quand le système chute…<br>
+Et que le monde est absurde…<br>
+Tu relances l’espoir…<br>
+Jusqu’au bout, la victoire !…
+</p> 
+<h3>Final</h3>
+<p>
+Capitaine Binaire…<br>
+Gardien du code éternel…<br>
+Capitaine Binaire…<br>
+Ma lumière artificielle…<br>
+Quand tout disparaît…<br>
+Dans le noir numérique…<br>
+Tu reviens…<br>
+Pour sauver le système unique…
+</p>
+  </div>
+
+</section>
+
+<!-- MINI PLAYER -->
+<div id="miniPlayer">
+
+  <button id="prevBtn" class="play-btn">⏮</button>
+  <button id="playPauseBtn" class="play-btn">▶</button>
+  <button id="nextBtn" class="play-btn">⏭</button>
+  <button id="repeatBtn" class="play-btn">🔁</button>
+
+  <span id="trackTitle">Le King de la Night</span>
+
+  <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+
+  <button id="muteBtn">🔊</button>
+
+  <input type="range" id="volumeBar" min="0" max="1" step="0.01">
+  <input type="range" id="progressBar">
+
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+</div>
+
+<script src="player.js"></script>
+
+<script>
+
+const savedTrack =
+localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+
+  const tracks = [
+
+    "audio/cover1.mp3",
+    "audio/cover2.mp3",
+    "audio/cover3.mp3",
+    "audio/cover4.mp3",
+    "audio/cover5.mp3",
+    "audio/cover6.mp3",
+    "audio/cover7.mp3",
+    "audio/cover8.mp3",
+    "audio/cover9.mp3",
+    "audio/cover10.mp3",
+    "audio/cover11.mp3",
+    "audio/cover12.mp3"
+
+  ];
+
+  audio.src = tracks[savedTrack];
+
+  audio.load();
+
+}
+
+</script>
+
+</body>
+</html>
