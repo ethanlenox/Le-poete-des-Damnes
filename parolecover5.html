@@ -1,1 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paroles - Je Scroll</title>
 
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="lyrics-page">
+
+<header class="bio-header">
+  <h1>Je Scroll</h1>
+  <p class="slogan">PAROLES</p>
+</header>
+
+<section class="lyrics-container">
+
+  <div class="lyrics-box">
+
+<h3>Intro</h3>
+<p>
+Pas d’temps… pas d’pause…<br>
+J’perds un peu le contrôle…<br>
+Juste une seconde…<br>
+Et j’suis déjà… dans le scroll…
+</p>
+<h3>Couplet 1</h3>
+<p>
+Le réveil sonne, j’ouvre à peine les yeux<br>
+Lumière bleue, déjà pris dans le jeu<br>
+Juste une minute… ou peut-être deux<br>
+Mais j’sens déjà… que j’vais rester un peu<br>
+Je swipe, je like, je vois les mêmes visages<br>
+Des vies parfaites, des filtres, des mirages<br>
+J’voulais partir, décrocher du réseau<br>
+Mais j’suis coincé… encore un peu plus haut
+</p>
+<h3>Refrain</h3>
+<p>
+J’voulais juste m’évader…<br>
+Mais j’me suis laissé piéger…<br>
+Plus j’essaie d’arrêter…<br>
+Plus j’ai besoin de rester…<br>
+JE SCROLL…<br>
+je m’emmêle et j’oublie qui je suis…<br>
+JE SCROLL…<br>
+toute la nuit j’vois ma vie qui fuit…<br>
+JE SCROLL…<br>
+tout défile et m’éloigne de moi…<br>
+JE SCROLL…<br>
+mais j’arrive pas à lâcher ça…
+</p>
+<h3>Couplet 2</h3>
+<p>
+Une notif et tout s’accélère<br>
+J’plonge encore sans voir la lumière<br>
+Les heures passent sans faire de bruit<br>
+J’suis là sans être vraiment en vie<br>
+Je ris, je commente sans penser<br>
+Mais au fond j’me sens déconnecté<br>
+Tout va trop vite, j’perds le contrôle<br>
+Encore une fois… je replonge dans le scroll
+</p>
+<h3>Refrain</h3>
+<p>
+J’voulais juste respirer…<br>
+Retrouver la réalité…<br>
+Mais tout m’rappelle à rester…<br>
+Impossible de m’arrêter…<br>
+JE SCROLL…<br>
+je m’emmêle et j’oublie qui je suis…<br>
+JE SCROLL…<br>
+toute la nuit j’vois ma vie qui fuit…<br>
+JE SCROLL…<br>
+tout défile et m’éloigne de moi…<br>
+JE SCROLL…<br>
+mais j’arrive pas à lâcher ça…
+</p>
+<h3>Final</h3>
+<p>
+Silence… écran noir…<br>
+Mais j’entends encore l’histoire…<br>
+Si j’éteins tout ce soir…<br>
+Est-ce que j’vais me revoir… ?<br>
+JE SCROLL…<br>
+JE SCROLL… <br>
+I CAN’T LET GO…<br>
+Le jour revient…<br>
+La nuit s’éteint…<br>
+Au file des liens…<br>
+Je scroll sans fin…<br>
+JE SCROLL… 
+</p>
+  </div>
+
+</section>
+
+<!-- MINI PLAYER -->
+<div id="miniPlayer">
+
+  <button id="prevBtn" class="play-btn">⏮</button>
+  <button id="playPauseBtn" class="play-btn">▶</button>
+  <button id="nextBtn" class="play-btn">⏭</button>
+  <button id="repeatBtn" class="play-btn">🔁</button>
+
+  <span id="trackTitle">Le King de la Night</span>
+
+  <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+
+  <button id="muteBtn">🔊</button>
+
+  <input type="range" id="volumeBar" min="0" max="1" step="0.01">
+  <input type="range" id="progressBar">
+
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+</div>
+
+<script src="player.js"></script>
+
+<script>
+
+const savedTrack =
+localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+
+  const tracks = [
+
+    "audio/cover1.mp3",
+    "audio/cover2.mp3",
+    "audio/cover3.mp3",
+    "audio/cover4.mp3",
+    "audio/cover5.mp3",
+    "audio/cover6.mp3",
+    "audio/cover7.mp3",
+    "audio/cover8.mp3",
+    "audio/cover9.mp3",
+    "audio/cover10.mp3",
+    "audio/cover11.mp3",
+    "audio/cover12.mp3"
+
+  ];
+
+  audio.src = tracks[savedTrack];
+
+  audio.load();
+
+}
+
+</script>
+
+</body>
+</html>
