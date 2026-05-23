@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paroles - Encore Nous</title>
 
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="lyrics-page">
+
+<header class="bio-header">
+  <h1>Encore Nous</h1>
+  <p class="slogan">PAROLES</p>
+</header>
+
+<section class="lyrics-container">
+
+  <div class="lyrics-box">
+
+<h3>Intro</h3>
+<p>
+Encore…<br>
+Juste… encore nous…<br>
+Oh…
+</p>
+<h3>Couplet 1</h3>
+<p>
+On court dans la nuit…<br>
+Sans regarder demain…<br>
+Ton cœur contre le mien…<br>
+Et plus rien ne tient…<br>
+Le monde disparaît…<br>
+Et tout devient clair…<br>
+Dis-moi qu’on ne s’arrête pas…<br>
+Même si le monde s’en va…<br>
+Encore… encore…
+</p>
+<h3>Refrain</h3>
+<p>
+Encore nous — oh oh !<br>
+Contre tout — oh oh !<br>
+Encore nous — encore !<br>
+Jusqu’au bout du décor !<br>
+Encore nous — oh oh !<br>
+On brûle encore…<br>
+Encore… encore…<br>
+Encore nous !
+</p> 
+<h3>Couplet 2</h3>
+<p>
+Tes mains sur ma peau…<br>
+Le tempo nous prend…<br>
+On perd le contrôle…<br>
+Mais j’aime ça vraiment…<br>
+Dis-moi qu’on ne redescend pas…<br>
+On touche déjà le ciel…<br>
+Encore… encore…
+</p>
+<h3>Refrain</h3>
+<p>
+Encore nous — oh oh !<br>
+Contre tout — oh oh !<br>
+Encore nous — encore !<br>
+Jusqu’au bout du décor !<br>
+Encore nous — oh oh !<br>
+On brûle encore…<br>
+Encore… encore…<br>
+Encore nous !
+</p> 
+<h3>Final</h3>
+<p>
+Encore… encore…<br>
+Encore nous…
+</p>
+  </div>
+
+</section>
+
+<!-- MINI PLAYER -->
+<div id="miniPlayer">
+
+  <button id="prevBtn" class="play-btn">⏮</button>
+  <button id="playPauseBtn" class="play-btn">▶</button>
+  <button id="nextBtn" class="play-btn">⏭</button>
+  <button id="repeatBtn" class="play-btn">🔁</button>
+
+  <span id="trackTitle">Le King de la Night</span>
+
+  <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+
+  <button id="muteBtn">🔊</button>
+
+  <input type="range" id="volumeBar" min="0" max="1" step="0.01">
+  <input type="range" id="progressBar">
+
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+</div>
+
+<script src="player.js"></script>
+
+<script>
+
+const savedTrack =
+localStorage.getItem("lastTrack");
+
+if (savedTrack !== null) {
+
+  const tracks = [
+
+    "audio/cover1.mp3",
+    "audio/cover2.mp3",
+    "audio/cover3.mp3",
+    "audio/cover4.mp3",
+    "audio/cover5.mp3",
+    "audio/cover6.mp3",
+    "audio/cover7.mp3",
+    "audio/cover8.mp3",
+    "audio/cover9.mp3",
+    "audio/cover10.mp3",
+    "audio/cover11.mp3",
+    "audio/cover12.mp3"
+
+  ];
+
+  audio.src = tracks[savedTrack];
+
+  audio.load();
+
+}
+
+</script>
+
+</body>
+</html>
