@@ -29,24 +29,7 @@ body {
   overflow-y: auto;
 }
 
-/* INTRO */
-#intro {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  transition: 1.2s ease;
-}
 
-.intro-title {
-  font-size: 60px;
-  letter-spacing: 4px;
-  animation: introGlow 2s ease;
-}
 
 /* HERO */
 .hero {
