@@ -2412,7 +2412,7 @@ body {
     0 0 90px rgba(0,229,255,0.18);
 
   animation:
-    introReveal 2s cubic-bezier(.22,.61,.36,1),
+    introReveal 2.8s cubic-bezier(.22,.61,.36,1),
     introFloat 6s ease-in-out infinite;
 }
 
@@ -2443,7 +2443,7 @@ body {
   filter: blur(6px);
 
   animation:
-    introSweep 2.8s ease forwards;
+    introSweep 4s ease forwards;
 }
 
 /* =========================================================
