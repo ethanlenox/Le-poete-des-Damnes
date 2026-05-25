@@ -26,7 +26,7 @@ window.addEventListener("load", () => {
   };
 
   // auto fermeture
-  setTimeout(closeIntro, 3200);
+  setTimeout(closeIntro, 5200);
 
   // skip
   skip.addEventListener("click", closeIntro);
