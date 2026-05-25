@@ -1,1 +1,370 @@
+/* =========================
+   MOBILE ONLY
+========================= */
 
+@media (max-width:768px) {
+
+/* =========================
+   BODY
+========================= */
+
+body {
+
+  background:
+    radial-gradient(
+      circle at top,
+      #0f0f14 0%,
+      #07070a 60%,
+      #050508 100%
+    );
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+
+  min-height: 100dvh;
+
+  padding: 20px;
+
+  text-align: center;
+}
+
+.hero-content {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+.main-title {
+
+  font-size:
+    clamp(28px, 8vw, 42px);
+
+  line-height: 1.2;
+
+  text-shadow:
+    0 0 10px rgba(0,229,255,0.4);
+
+  animation:
+    pulseBlue 3s infinite;
+}
+
+.highlight {
+
+  font-size: 16px;
+
+  line-height: 1.6;
+
+  animation:
+    redGlowPulse 3s infinite;
+}
+
+/* =========================
+   HERO BUTTONS
+========================= */
+
+.hero-buttons {
+
+  display: flex;
+
+  flex-direction: column;
+
+  width: 100%;
+
+  gap: 12px;
+}
+
+.hero-buttons a {
+
+  width: 100%;
+
+  max-width: 280px;
+
+  text-align: center;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(10px);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.bio-header {
+
+  text-align: center;
+
+  padding:
+    18px
+    10px;
+}
+
+.bio-header h1 {
+
+  font-size: 28px;
+
+  letter-spacing: 2px;
+}
+
+.slogan {
+
+  font-size: 12px;
+
+  opacity: .7;
+}
+
+/* =========================
+   TRACKS
+========================= */
+
+.track {
+
+  width: 92%;
+
+  margin: 14px auto;
+
+  padding: 14px;
+
+  border-radius: 18px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  backdrop-filter: blur(10px);
+
+  animation:
+    fadeUp .6s ease;
+}
+
+.track img {
+
+  width: 78vw;
+
+  max-width: 340px;
+
+  height: auto;
+
+  border-radius: 14px;
+}
+
+/* =========================
+   TRACK CENTER
+========================= */
+
+.track-center {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  gap: 10px;
+}
+
+/* =========================
+   MUSIC LINKS
+========================= */
+
+.music-links {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+}
+
+.music-btn {
+
+  font-size: 11px;
+
+  padding:
+    6px
+    10px;
+
+  border-radius: 10px;
+}
+
+/* =========================
+   LYRICS BUTTON
+========================= */
+
+.lyrics-btn {
+
+  position: absolute;
+
+  bottom: 8px;
+  right: 8px;
+
+  padding:
+    5px
+    8px;
+
+  border-radius: 10px;
+
+  font-size: 10px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(10px);
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+}
+
+/* =========================
+   ALBUMS
+========================= */
+
+.albums-grid-page {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 20px;
+
+  scroll-snap-type: y mandatory;
+}
+
+.album-card {
+
+  width: 82vw;
+
+  max-width: 320px;
+
+  scroll-snap-align: center;
+
+  opacity: .85;
+
+  transform:
+    scale(.98);
+}
+
+.album-cover {
+
+  width: 100%;
+
+  height: auto;
+}
+
+.album-title {
+
+  font-size: 14px;
+}
+
+/* =========================
+   BIO
+========================= */
+
+.bio-container {
+
+  padding:
+    25px
+    16px
+    120px;
+}
+
+.bio-text {
+
+  padding:
+    28px
+    22px;
+
+  border-radius: 18px;
+
+  backdrop-filter: blur(10px);
+}
+
+.bio-text p {
+
+  font-size: 16px;
+
+  line-height: 1.9;
+}
+
+/* =========================
+   GALLERY
+========================= */
+
+.gallery-img {
+
+  width: 95px;
+
+  height: 95px;
+
+  border-radius: 12px;
+}
+
+/* =========================
+   LIGHTBOX
+========================= */
+
+#lightbox img {
+
+  max-width: 96vw;
+
+  max-height: 80vh;
+}
+
+#closeLightbox {
+
+  top: 16px;
+  right: 20px;
+
+  font-size: 28px;
+}
+
+/* =========================
+   MOBILE PERFORMANCE
+========================= */
+
+* {
+
+  -webkit-backface-visibility: hidden;
+
+  backface-visibility: hidden;
+}
+
+/* =========================
+   REDUCED GPU
+========================= */
+
+.hero-bg {
+
+  filter:
+    brightness(0.4)
+    saturate(1.1);
+}
+
+}
