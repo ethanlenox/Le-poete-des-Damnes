@@ -1112,11 +1112,172 @@ body {
   background: #aaa;
 }
 
-/* ===================== */
-/* 📱    MOBILE */
-/* ===================== */
+/* ===================== 
+   _____________________
+      📱 MOBILE         
+   _____OPTIMISER_______
+   ===================== */
+/* ==============
+     📱 INTRO 
+   ______________
+   ==============*/
 
 @media (max-width: 768px) {
+
+  #intro {
+    background:
+      radial-gradient(
+        circle at center,
+        #0b1120 0%,
+        #030305 70%,
+        #000 100%
+      );
+
+    transition:
+      opacity .8s ease,
+      visibility .8s ease;
+  }
+
+  /* glow simplifié */
+  .intro-overlay {
+    background:
+      radial-gradient(
+        circle,
+        rgba(0,229,255,0.08),
+        transparent 65%
+      );
+
+    animation:
+      ambientPulseMobile 10s ease-in-out infinite;
+
+    opacity: .7;
+  }
+
+  /* suppression du film grain lourd */
+  #intro::after {
+    display: none;
+  }
+
+  /* particles beaucoup plus light */
+  .intro-particles {
+
+    background-image:
+      radial-gradient(
+        rgba(255,255,255,0.08) 1px,
+        transparent 1px
+      );
+
+    background-size: 90px 90px;
+
+    opacity: .12;
+
+    animation:
+      particlesMoveMobile 28s linear infinite;
+  }
+
+  /* titre mobile optimisé */
+  .intro-title {
+
+    font-size:
+      clamp(34px, 10vw, 58px);
+
+    letter-spacing: 5px;
+
+    line-height: 1.1;
+
+    padding: 0 20px;
+
+    text-shadow:
+      0 0 8px rgba(255,255,255,0.12),
+      0 0 18px rgba(0,229,255,0.22);
+
+    animation:
+      introRevealMobile 1.4s ease-out;
+  }
+
+  /* sweep allégé */
+  .intro-title::before {
+
+    width: 45%;
+
+    filter: blur(2px);
+
+    opacity: .6;
+
+    animation:
+      introSweepMobile 3.5s ease forwards;
+  }
+
+/* =========================
+   📱 ANIMATIONS MOBILE
+   ========================= */
+
+@keyframes introRevealMobile {
+
+  from {
+    opacity: 0;
+    transform:
+      translateY(20px)
+      scale(.96);
+
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter: blur(0);
+  }
+}
+
+@keyframes ambientPulseMobile {
+
+  0% {
+    opacity: .45;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: .75;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: .45;
+    transform: scale(1);
+  }
+}
+
+@keyframes particlesMoveMobile {
+
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-50px);
+  }
+}
+
+@keyframes introSweepMobile {
+
+  0% {
+    left: -120%;
+    opacity: 0;
+  }
+
+  40% {
+    opacity: .7;
+  }
+
+  100% {
+    left: 160%;
+    opacity: 0;
+  }
+}
 
 
 /* ===================== */
@@ -1367,8 +1528,6 @@ body {
       0 0 10px rgba(0,229,255,0.5),
       0 0 20px rgba(0,229,255,0.3);
     }
-  }
-
 /* =================================
          MOBILE = PC EXPERIENCE 
             propre / stable
@@ -1566,9 +1725,6 @@ body {
   * {
     -webkit-tap-highlight-color: transparent;
   }
-  
-
-  
  
 /* mode par défaut = compact */
   
@@ -1588,10 +1744,8 @@ body {
   box-shadow:
     0 4px 18px rgba(0,0,0,0.35);
   border-radius: 18px;
-  }
-}
-
-
+    }
+  } 
 /* ===================== */
 /* 🔥 ANIMATION TRACK */
 /* ===================== */
