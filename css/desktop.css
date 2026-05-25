@@ -1,1 +1,287 @@
+/* =========================
+   DESKTOP ONLY
+========================= */
 
+@media (min-width:769px) {
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+
+  position: relative;
+
+  min-height: 100dvh;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.hero-bg {
+
+  position: absolute;
+
+  inset: -5%;
+
+  width: 110%;
+  height: 110%;
+
+  z-index: 0;
+
+  background:
+    url("../img/hero.jpg")
+    center center / cover no-repeat;
+
+  transform-origin: center;
+
+  will-change:
+    transform,
+    filter;
+
+  animation:
+    cinematicHero 18s ease-in-out infinite alternate;
+
+  filter:
+    brightness(0.35)
+    saturate(1.2);
+}
+
+.hero-content {
+
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  gap: 16px;
+}
+
+/* =========================
+   TITLES
+========================= */
+
+.main-title {
+
+  font-size: 34px;
+
+  letter-spacing: 2px;
+
+  text-align: center;
+
+  text-shadow:
+    0 0 10px rgba(0,229,255,0.7),
+    0 0 25px rgba(0,229,255,0.5);
+
+  animation:
+    pulseBlue 3s infinite,
+    floatTitle 5s ease-in-out infinite;
+}
+
+.highlight {
+
+  font-size: 20px;
+
+  letter-spacing: 1px;
+
+  text-shadow:
+    0 0 8px rgba(255,0,0,0.5),
+    0 0 20px rgba(255,0,0,0.35);
+
+  animation:
+    redGlowPulse 3s infinite,
+    breathe 4s infinite;
+}
+
+/* =========================
+   HERO BUTTONS
+========================= */
+
+.hero-buttons {
+
+  display: flex;
+
+  gap: 14px;
+}
+
+.hero-buttons a {
+
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 12px 28px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(0,229,255,0.25);
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    .25s ease;
+}
+
+.hero-buttons a:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 0 15px rgba(0,229,255,0.6);
+}
+
+/* =========================
+   TRACKS
+========================= */
+
+.track {
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 40px;
+
+  width: 760px;
+
+  margin: 18px auto;
+
+  padding: 20px;
+}
+
+.track img {
+
+  width: 250px !important;
+
+  height: 250px !important;
+
+  object-fit: cover;
+}
+
+/* =========================
+   MUSIC LINKS
+========================= */
+
+.music-links {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  min-width: 120px;
+}
+
+/* =========================
+   ALBUM GRID
+========================= */
+
+.albums-grid-page {
+
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 30px;
+
+  margin-top: 50px;
+
+  padding: 20px;
+}
+
+.album-card {
+
+  width: 260px;
+}
+
+.album-card:hover {
+
+  transform:
+    translateY(-6px);
+}
+
+.album-card:hover .album-cover {
+
+  transform:
+    scale(1.05);
+
+  box-shadow:
+    0 0 25px rgba(0,229,255,0.6);
+}
+
+/* =========================
+   BIO HEADER
+========================= */
+
+.bio-header {
+
+  text-align: center;
+
+  padding-top: 40px;
+}
+
+.bio-header h1 {
+
+  font-size: 52px;
+
+  margin-bottom: 10px;
+}
+
+.bio-header .slogan {
+
+  font-size: 20px;
+}
+
+/* =========================
+   LYRICS PAGE
+========================= */
+
+body.lyrics-page .lyrics-box {
+
+  padding:
+    40px
+    30px;
+}
+
+body.lyrics-page .lyrics-box p {
+
+  line-height: 2;
+
+  font-size: 16px;
+}
+
+/* =========================
+   VIDEO
+========================= */
+
+.video-box iframe {
+
+  width: 320px;
+
+  height: 180px;
+
+  border-radius: 20px;
+}
+
+}
