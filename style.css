@@ -2295,40 +2295,52 @@ body {
   align-items: center;
   justify-content: center;
 
-  background: #000;
-
-  z-index: 99999;
+  flex-direction: column;
 
   overflow: hidden;
 
+  background:
+    radial-gradient(
+      circle at center,
+      #111827 0%,
+      #050507 60%,
+      #000 100%
+    );
+
+  z-index: 999999;
+
   transition:
-    opacity 1.2s ease,
-    visibility 1.2s ease,
-    transform 1.2s ease,
-    filter 1.2s ease;
+    opacity 1.4s ease,
+    visibility 1.4s ease,
+    filter 1.4s ease,
+    transform 1.4s ease;
 }
 
-/* glow fond */
+/* =========================================================
+   🌌 AMBIENT GLOW
+========================================================= */
 
-#intro::before {
-
-  content: "";
+.intro-overlay {
 
   position: absolute;
   inset: 0;
 
   background:
     radial-gradient(
-      circle at center,
-      rgba(0,229,255,0.10),
+      circle,
+      rgba(0,229,255,0.12),
       transparent 60%
     );
 
+  mix-blend-mode: screen;
+
   animation:
-    introAmbient 6s ease-in-out infinite;
+    ambientPulse 7s ease-in-out infinite;
 }
 
-/* grain cinéma */
+/* =========================================================
+   🎞 FILM GRAIN
+========================================================= */
 
 #intro::after {
 
@@ -2343,33 +2355,68 @@ body {
     url("https://grainy-gradients.vercel.app/noise.svg");
 
   mix-blend-mode: soft-light;
+
+  pointer-events: none;
 }
 
-/* titre */
+/* =========================================================
+   ✨ PARTICLES
+========================================================= */
+
+.intro-particles {
+
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(
+      rgba(255,255,255,0.14) 1px,
+      transparent 1px
+    );
+
+  background-size: 140px 140px;
+
+  opacity: 0.22;
+
+  animation:
+    particlesMove 18s linear infinite;
+}
+
+/* =========================================================
+   🔥 TITLE
+========================================================= */
 
 .intro-title {
 
   position: relative;
 
-  font-size: clamp(52px, 8vw, 96px);
+  z-index: 2;
 
-  letter-spacing: 8px;
+  font-size: clamp(52px, 8vw, 110px);
 
-  color: white;
+  font-weight: 700;
+
+  letter-spacing: 12px;
 
   text-transform: uppercase;
 
+  color: white;
+
+  text-align: center;
+
+  mix-blend-mode: screen;
+
   text-shadow:
-    0 0 15px rgba(255,255,255,0.15),
-    0 0 35px rgba(0,229,255,0.4),
-    0 0 80px rgba(0,229,255,0.18);
+    0 0 12px rgba(255,255,255,0.15),
+    0 0 35px rgba(0,229,255,0.45),
+    0 0 90px rgba(0,229,255,0.18);
 
   animation:
-    introReveal 1.8s cubic-bezier(.22,.61,.36,1),
-    introFloat 5s ease-in-out infinite;
+    introReveal 2s cubic-bezier(.22,.61,.36,1),
+    introFloat 6s ease-in-out infinite;
 }
 
-/* sweep lumière */
+/* lumière sweep */
 
 .intro-title::before {
 
@@ -2387,19 +2434,67 @@ body {
     linear-gradient(
       90deg,
       transparent,
-      rgba(255,255,255,0.7),
+      rgba(255,255,255,0.8),
       transparent
     );
 
   transform: skewX(-18deg);
 
-  filter: blur(5px);
+  filter: blur(6px);
 
   animation:
-    introSweep 2.5s ease forwards;
+    introSweep 2.8s ease forwards;
 }
 
-/* état hide */
+/* =========================================================
+   ⏭ SKIP
+========================================================= */
+
+#skipIntro {
+
+  position: absolute;
+
+  bottom: 40px;
+
+  z-index: 5;
+
+  padding: 10px 16px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.05);
+
+  color: rgba(255,255,255,0.7);
+
+  font-size: 11px;
+
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(12px);
+
+  transition: 0.25s ease;
+}
+
+#skipIntro:hover {
+
+  color: white;
+
+  border-color:
+    rgba(0,229,255,0.4);
+
+  box-shadow:
+    0 0 18px rgba(0,229,255,0.2);
+}
+
+/* =========================================================
+   🎬 HIDE
+========================================================= */
 
 #intro.hide {
 
@@ -2407,14 +2502,16 @@ body {
 
   visibility: hidden;
 
-  transform: scale(1.04);
+  filter: blur(14px);
 
-  filter: blur(10px);
+  transform: scale(1.05);
 
   pointer-events: none;
 }
 
-/* animations */
+/* =========================================================
+   🎞 ANIMATIONS
+========================================================= */
 
 @keyframes introReveal {
 
@@ -2423,10 +2520,10 @@ body {
     opacity: 0;
 
     transform:
-      scale(0.92)
-      translateY(30px);
+      scale(0.9)
+      translateY(40px);
 
-    filter: blur(14px);
+    filter: blur(20px);
   }
 
   to {
@@ -2444,15 +2541,15 @@ body {
 @keyframes introFloat {
 
   0% {
-    transform: translateY(0);
+    transform: translateY(0px);
   }
 
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
 
   100% {
-    transform: translateY(0);
+    transform: translateY(0px);
   }
 }
 
@@ -2473,20 +2570,37 @@ body {
   }
 }
 
-@keyframes introAmbient {
+@keyframes ambientPulse {
 
   0% {
+
     opacity: 0.4;
+
     transform: scale(1);
   }
 
   50% {
+
     opacity: 1;
+
     transform: scale(1.08);
   }
 
   100% {
+
     opacity: 0.4;
+
     transform: scale(1);
+  }
+}
+
+@keyframes particlesMove {
+
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-120px);
   }
 }
