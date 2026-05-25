@@ -1616,16 +1616,17 @@ body {
      COVER WRAPPER
   --------------------------*/
   .cover-wrapper {
+    aspect-ratio: 1 / 1;
     position: relative;
     width: 100%;
-    display: flex;
+    display: block;
     justify-content: center;
     align-items: center;
   }
 
   .cover-wrapper img {
-    width: 140px;
-    height: 140px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     border-radius: 15px;
 
