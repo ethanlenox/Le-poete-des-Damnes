@@ -1,15 +1,23 @@
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
   const intro = document.getElementById("intro");
   const skip = document.getElementById("skipIntro");
 
-  // intro déjà vue
-  if (sessionStorage.getItem("introPlayed")) {
+  if (!intro) return;
 
-    intro.remove();
+  const closeIntro = () => {
 
-    return;
-  }
+    intro.classList.add("hide");
+
+    setTimeout(() => {
+      intro.remove();
+    }, 1200);
+  };
+
+  setTimeout(closeIntro, 5200);
+
+  skip?.addEventListener("click", closeIntro);
+});
 
   // mémorisation session
   sessionStorage.setItem("introPlayed", "true");
