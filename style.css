@@ -1390,12 +1390,6 @@ body {
     width: 100%;
   }
 
-  /* SUPPRESSION ÉLÉMENTS NON ESSENTIELS MOBILE 
-  #volumeBar,
-  #waveform {
-    display: none;
-  } */
-
 /* état compact */
 #miniPlayer.compact {
   display: flex;
@@ -1481,13 +1475,6 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
-
-/* COVER PLUS GRAND MOBILE 
-.track img {
-  width: 78vw;
-  max-width: 340px;
-  height: auto;
-}*/
 
 /* BOUTONS PLUS AÉRÉS */
 .music-links {
@@ -2415,11 +2402,6 @@ body.lyrics-page .links a:hover {
   text-shadow: 0 0 12px rgba(0,229,255,0.6);
 }
 
-
-
-
-
-
 /* =========================================================
                         POLISH VISUEL 
              Ajout uniquement esthétique / finition
@@ -2603,4 +2585,3 @@ body {
   0%, 100% { transform: scaleY(0.5); opacity: 0.4; }
   50% { transform: scaleY(1.2); opacity: 1; }
 }
-
