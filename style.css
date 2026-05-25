@@ -1195,6 +1195,25 @@ body {
   }
 
   /* -------------------------
+              INTRO
+     ------------------------- */
+
+    .intro-title {
+
+    font-size: clamp(42px, 12vw, 68px);
+
+    letter-spacing: 6px;
+
+    padding: 0 20px;
+  }
+
+  #skipIntro {
+
+    bottom: 28px;
+  }
+}
+
+  /* -------------------------
      HEADER
   --------------------------*/
   .bio-header {
