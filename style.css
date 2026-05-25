@@ -936,20 +936,17 @@ body {
   -------------------------*/
 
   #intro {
-
+  z-index: 999999;
+  position: fixed;
+  inset: 0;
   padding: 20px;
 }
 
 .intro-title {
-
   width: 100%;
-
   max-width: 100vw;
-
   text-align: center;
-
   line-height: 1.1;
-
   word-break: break-word;
 }
 
