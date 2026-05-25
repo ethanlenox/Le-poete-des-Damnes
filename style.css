@@ -1922,9 +1922,12 @@ body {
 }
 
 
-
-
+/* _____________________ */
+/* ===================== */
 /* 💻 FIX PC UNIQUEMENT */
+/* ===================== */
+/* _____________________ */
+
 @media (min-width: 769px) {
   #miniPlayer.compact {
     justify-content: center;
@@ -1965,6 +1968,7 @@ body {
 
   .track img:hover {
     transform: scale(1.05);
+  }
   }
   /* ===================== */
 /* 🎵 HEADER ALBUM */
@@ -2096,9 +2100,9 @@ body.lyrics-page .links a:hover {
 
 
 /* =========================================================
-                MODULE UI FINAL - POLISH VISUEL 
+                        POLISH VISUEL 
              Ajout uniquement esthétique / finition
-              Safe override - aucune dépendance JS
+                     aucune dépendance JS
    ========================================================= */
 
 /* ---------- GLOBAL MICRO-FINISH ---------- */
@@ -2279,7 +2283,6 @@ body {
   50% { transform: scaleY(1.2); opacity: 1; }
 }
 
-
 /* ======================
    🎬INTRO MODULE FINAL
    ====================== */
@@ -2443,70 +2446,6 @@ body {
   animation:
     introSweep 4s ease forwards;
 }
-
-/* =========================================================
-   ⏭ SKIP
-========================================================= */
-
-#skipIntro {
-
-  position: absolute;
-
-  bottom: 40px;
-
-  z-index: 5;
-
-  padding: 10px 16px;
-
-  border-radius: 12px;
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
-  background:
-    rgba(255,255,255,0.05);
-
-  color: rgba(255,255,255,0.7);
-
-  font-size: 11px;
-
-  letter-spacing: 2px;
-
-  cursor: pointer;
-
-  backdrop-filter: blur(12px);
-
-  transition: 0.25s ease;
-}
-
-#skipIntro:hover {
-
-  color: white;
-
-  border-color:
-    rgba(0,229,255,0.4);
-
-  box-shadow:
-    0 0 18px rgba(0,229,255,0.2);
-}
-
-/* =========================================================
-   🎬 HIDE
-========================================================= */
-
-#intro.hide {
-
-  opacity: 0;
-
-  visibility: hidden;
-
-  filter: blur(14px);
-
-  transform: scale(1.05);
-
-  pointer-events: none;
-}
-
 /* =========================================================
    🎞 ANIMATIONS
 ========================================================= */
