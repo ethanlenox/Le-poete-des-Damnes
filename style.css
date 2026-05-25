@@ -1482,12 +1482,12 @@ body {
   letter-spacing: 1px;
 }
 
-/* COVER PLUS GRAND MOBILE */
+/* COVER PLUS GRAND MOBILE 
 .track img {
   width: 78vw;
   max-width: 340px;
   height: auto;
-}
+}*/
 
 /* BOUTONS PLUS AÉRÉS */
 .music-links {
@@ -1627,7 +1627,7 @@ body {
     width: 140px;
     height: 140px;
     object-fit: cover;
-    border-radius: 14px;
+    border-radius: 15px;
 
     box-shadow:
       0 10px 25px rgba(0,0,0,0.5),
@@ -2149,9 +2149,6 @@ body {
       blur(5px);
   }
 }
-
-
-
 
 /* ===================== */
 /* 🎵 TRACK STRUCTURE */
