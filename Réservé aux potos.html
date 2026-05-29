@@ -32,19 +32,21 @@ if(access !== "ok"){
 }
 
 /* =========================
-   TERMINAL
+   TERMINAL HACKER
 ========================= */
 
 const terminal = document.getElementById("terminal");
 
 const lines = [
 
-"> connexion au serveur...",
-"> utilisateur vérifié...",
-"> décryptage des archives...",
-"> accès autorisé...",
-"> Dossiers secrets LPDD...",
-"> chargement des fichiers..."
+"> Connexion au Serveur...",
+"> Vérification Utilisateur...",
+"> Poto Identifié...",
+"> Décryptage des Archives...",
+"> Ouverture des Dossiers Cachés...",
+"> Accès Aautorisé...",
+"> Dossiers Secrets LPDD...",
+"> Chargement des Donnèes..."
 
 ];
 
@@ -68,7 +70,7 @@ function addLine(){
 
   } else {
 
-    showDownloads();
+    showTracks();
 
   }
 
@@ -77,40 +79,130 @@ function addLine(){
 addLine();
 
 /* =========================
-   FICHIERS
+   TRACKS
 ========================= */
 
-function showDownloads(){
+function showTracks(){
 
-  const files = [
+  const tracks = [
 
     {
-      name: "TRACK_EXCLUSIF.mp3",
+      title: "Le King de la Night",
+      cover: "img/cover1.jpg",
       file: "audio/track1.mp3",
-      id: "Le king de la Night"
+      id: "track1"
     },
 
     {
-      name: "ARCHIVE_VIDEO.mp4",
-      file: "media/video.mp4",
-      id: "video1"
+      title: "Lucide Inconscient",
+      cover: "img/cover2.jpg",
+      file: "audio/track2.mp3",
+      id: "track2"
+    },
+
+    {
+      title: "Encore Nous",
+      cover: "img/cover3.jpg",
+      file: "audio/track3.mp3",
+      id: "track3"
+    },
+
+    {
+      title: "Capitaine Binaire",
+      cover: "img/cover4.jpg",
+      file: "audio/track4.mp3",
+      id: "track4"
+    },
+
+    {
+      title: "Je Scroll",
+      cover: "img/cover5.jpg",
+      file: "audio/track.mp3",
+      id: "track5"
+    },
+
+    {
+      title: "Plus Fort",
+      cover: "img/cover6.jpg",
+      file: "audio/track6.mp3",
+      id: "track6"
+    },
+
+    {
+      title: "Wait",
+      cover: "img/cover7.jpg",
+      file: "audio/track7.mp3",
+      id: "track7"
+    },
+
+    {
+      title: "Ce Soir",
+      cover: "img/cover8.jpg",
+      file: "audio/track8.mp3",
+      id: "track8"
+    },
+
+    {
+      title: "Connexion",
+      cover: "img/cover9.jpg",
+      file: "audio/track9.mp3",
+      id: "track9"
+    },
+
+    {
+      title: "Soirée Folle",
+      cover: "img/cover10.jpg",
+      file: "audio/track10.mp3",
+      id: "track10"
+    },
+
+    {
+      title: "Beyond the Dark",
+      cover: "img/cover11.jpg",
+      file: "audio/track11.mp3",
+      id: "track11"
+    },
+
+    {
+      title: "Magnètique",
+      cover: "img/cover12.jpg",
+      file: "audio/track12.mp3",
+      id: "track12"
     }
 
   ];
 
-  files.forEach(file => {
+  tracks.forEach(track => {
 
     const block = document.createElement("div");
 
     block.classList.add("download-block");
 
+    /* NOM */
+
     const title = document.createElement("div");
 
-    title.textContent = "> " + file.name;
+    title.classList.add("line");
+
+    title.textContent = "> " + track.title;
+
+    /* COVER */
+
+    const image = document.createElement("img");
+
+    image.src = track.cover;
+
+    image.style.width = "220px";
+
+    image.style.marginTop = "20px";
+
+    image.style.border = "1px solid #00ff88";
+
+    /* BOUTON */
 
     const button = document.createElement("a");
 
-    button.href = file.file;
+    button.href = track.file;
 
     button.download = "";
 
@@ -120,7 +212,7 @@ function showDownloads(){
 
     /* 1 SEUL TÉLÉCHARGEMENT */
 
-    if(localStorage.getItem(file.id)){
+    if(localStorage.getItem(track.id)){
 
       button.textContent = "DÉJÀ TÉLÉCHARGÉ";
 
@@ -130,7 +222,7 @@ function showDownloads(){
 
     button.addEventListener("click", () => {
 
-      localStorage.setItem(file.id, "done");
+      localStorage.setItem(track.id, "done");
 
       button.textContent = "DÉJÀ TÉLÉCHARGÉ";
 
@@ -139,6 +231,8 @@ function showDownloads(){
     });
 
     block.appendChild(title);
+
+    block.appendChild(image);
 
     block.appendChild(button);
 
