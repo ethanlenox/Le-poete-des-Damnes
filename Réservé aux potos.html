@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+<title>Terminal sécurisé</title>
+
+</head>
+
+<body class="terminal-page">
+
+<div class="terminal" id="terminal"></div>
+
+<script>
+
+/* =========================
+   ANTI PARTAGE DU LIEN
+========================= */
+
+const access = sessionStorage.getItem("potos-access");
+
+if(access !== "ok"){
+
+  window.location.href = "index.html";
+
+}
+
+/* =========================
+   TERMINAL
+========================= */
+
+const terminal = document.getElementById("terminal");
+
+const lines = [
+
+"> connexion au serveur...",
+"> utilisateur vérifié...",
+"> décryptage des archives...",
+"> accès autorisé...",
+"> Dossiers secrets LPDD...",
+"> chargement des fichiers..."
+
+];
+
+let index = 0;
+
+function addLine(){
+
+  if(index < lines.length){
+
+    const div = document.createElement("div");
+
+    div.classList.add("line");
+
+    div.textContent = lines[index];
+
+    terminal.appendChild(div);
+
+    index++;
+
+    setTimeout(addLine, 900);
+
+  } else {
+
+    showDownloads();
+
+  }
+
+}
+
+addLine();
+
+/* =========================
+   FICHIERS
+========================= */
+
+function showDownloads(){
+
+  const files = [
+
+    {
+      name: "TRACK_EXCLUSIF.mp3",
+      file: "audio/track1.mp3",
+      id: "Le king de la Night"
+    },
+
+    {
+      name: "ARCHIVE_VIDEO.mp4",
+      file: "media/video.mp4",
+      id: "video1"
+    }
+
+  ];
+
+  files.forEach(file => {
+
+    const block = document.createElement("div");
+
+    block.classList.add("download-block");
+
+    const title = document.createElement("div");
+
+    title.textContent = "> " + file.name;
+
+    const button = document.createElement("a");
+
+    button.href = file.file;
+
+    button.download = "";
+
+    button.textContent = "TÉLÉCHARGER";
+
+    button.classList.add("download-btn");
+
+    /* 1 SEUL TÉLÉCHARGEMENT */
+
+    if(localStorage.getItem(file.id)){
+
+      button.textContent = "DÉJÀ TÉLÉCHARGÉ";
+
+      button.classList.add("used");
+
+    }
+
+    button.addEventListener("click", () => {
+
+      localStorage.setItem(file.id, "done");
+
+      button.textContent = "DÉJÀ TÉLÉCHARGÉ";
+
+      button.classList.add("used");
+
+    });
+
+    block.appendChild(title);
+
+    block.appendChild(button);
+
+    terminal.appendChild(block);
+
+  });
+
+}
+
+</script>
+
+</body>
+</html>
