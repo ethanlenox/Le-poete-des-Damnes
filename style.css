@@ -2587,13 +2587,13 @@ body {
 }
 
 /* =========================
-   POPUP SECRÈTE
+   POPUP
 ========================= */
 
 .secret-popup{
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.96);
+  background: rgba(0,0,0,0.97);
   display: none;
   justify-content: center;
   align-items: center;
@@ -2601,26 +2601,26 @@ body {
 }
 
 .secret-box{
-  width: 320px;
+  width: 340px;
   background: #050505;
-  border: 1px solid #00ffe1;
+  border: 1px solid #00ff88;
   padding: 40px;
   text-align: center;
-  box-shadow: 0 0 30px #00ffe1;
+  box-shadow: 0 0 30px #00ff88;
 }
 
 .secret-box h2{
-  color: #00ffe1;
-  margin-bottom: 20px;
-  letter-spacing: 2px;
+  color: #00ff88;
+  margin-bottom: 25px;
+  letter-spacing: 3px;
 }
 
 .secret-box input{
   width: 100%;
   padding: 12px;
   background: black;
-  border: 1px solid #00ffe1;
-  color: white;
+  border: 1px solid #00ff88;
+  color: #00ff88;
   margin-bottom: 15px;
   outline: none;
 }
@@ -2629,9 +2629,10 @@ body {
   width: 100%;
   padding: 12px;
   border: none;
-  background: #00ffe1;
-  cursor: pointer;
+  background: #00ff88;
+  color: black;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .secret-box button:hover{
@@ -2644,49 +2645,51 @@ body {
 }
 
 /* =========================
-   PAGE POTOS
+   TERMINAL HACKER
 ========================= */
 
-.potos-page{
+body.terminal-page{
   background: black;
-  color: white;
-  font-family: sans-serif;
-  text-align: center;
-  padding: 50px 20px;
+  color: #00ff88;
+  font-family: monospace;
+  padding: 30px;
 }
 
-.potos-title{
-  color: #00ffe1;
-  margin-bottom: 50px;
-  font-size: 40px;
+.terminal{
+  max-width: 900px;
+  margin: auto;
 }
 
-.media-card{
-  max-width: 700px;
-  margin: 40px auto;
-  border: 1px solid #00ffe1;
+.line{
+  margin: 8px 0;
+  opacity: 0;
+  animation: showLine 0.5s forwards;
+}
+
+@keyframes showLine{
+  to{
+    opacity: 1;
+  }
+}
+
+.download-block{
+  margin-top: 40px;
   padding: 20px;
-  background: #050505;
-  box-shadow: 0 0 20px rgba(0,255,225,0.3);
-}
-
-.media-card img,
-.media-card video,
-.media-card audio{
-  width: 100%;
-  margin-top: 15px;
+  border: 1px solid #00ff88;
 }
 
 .download-btn{
   display: inline-block;
-  margin-top: 20px;
+  margin-top: 15px;
   padding: 12px 20px;
-  background: #00ffe1;
+  background: #00ff88;
   color: black;
   text-decoration: none;
   font-weight: bold;
 }
 
-.download-btn:hover{
-  background: white;
+.download-btn.used{
+  background: #222;
+  color: #666;
+  pointer-events: none;
 }
