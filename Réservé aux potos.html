@@ -104,7 +104,8 @@ function typeLine(text, element, speed = 25){
 
     if(i < text.length){
 
-      element.textContent = text.substring(0, i + 1);
+      element.textContent = text.slice(0, i + 1);
+
       element.appendChild(cursor);
 
       i++;
@@ -114,6 +115,7 @@ function typeLine(text, element, speed = 25){
     } else {
 
       element.appendChild(cursor);
+
     }
 
   }
