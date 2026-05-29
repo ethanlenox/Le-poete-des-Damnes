@@ -2603,10 +2603,10 @@ body {
 .secret-box{
   width: 340px;
   background: #050505;
-  border: 1px solid #00ff88;
+  border: 1px solid #4aa3ff;
   padding: 40px;
   text-align: center;
-  box-shadow: 0 0 30px #00ff88;
+  box-shadow: 0 0 30px #4aa3ff;
 }
 
 .secret-box h2{
@@ -2650,7 +2650,7 @@ body {
 
 body.terminal-page{
   background: black;
-  color: #00ff88;
+  color: #4aa3ff;
   font-family: monospace;
   padding: 30px;
 }
@@ -2682,7 +2682,7 @@ body.terminal-page{
   display: inline-block;
   margin-top: 15px;
   padding: 12px 20px;
-  background: #00ff88;
+  background: #4aa3ff;
   color: black;
   text-decoration: none;
   font-weight: bold;
