@@ -130,6 +130,74 @@ document.querySelectorAll("a").forEach(link => {
   </div>
 
 </div>
+
+  <script>
+
+/* =========================
+   PAGE SECRÈTE
+========================= */
+
+const banner = document.querySelector(".banner");
+
+const popup = document.getElementById("secret-popup");
+
+const btn = document.getElementById("secret-btn");
+
+const input = document.getElementById("secret-password");
+
+const error = document.getElementById("secret-error");
+
+/* OUVERTURE */
+
+banner.addEventListener("click", () => {
+
+  popup.style.display = "flex";
+
+});
+
+/* VALIDATION */
+
+btn.addEventListener("click", () => {
+
+  const password = input.value;
+
+  if(password === "pourlespotoscgratuit"){
+
+    window.location.href = "reserve-potos.html";
+
+  } else {
+
+    error.textContent = "Code incorrect";
+
+  }
+
+});
+
+/* TOUCHE ENTRÉE */
+
+input.addEventListener("keypress", (e) => {
+
+  if(e.key === "Enter"){
+
+    btn.click();
+
+  }
+
+});
+
+/* FERMETURE */
+
+popup.addEventListener("click", (e) => {
+
+  if(e.target === popup){
+
+    popup.style.display = "none";
+
+  }
+
+});
+
+</script>
   
 </body>
 </html>
