@@ -60,9 +60,21 @@ function addLine(){
 
     div.classList.add("line");
 
-    div.textContent = lines[index];
+    typeLine(lines[index], div, 25);
 
     terminal.appendChild(div);
+
+    /* FAIRE DISPARAÎTRE LA LIGNE PRÉCÉDENTE */
+    const allLines = document.querySelectorAll(".line");
+
+    allLines.forEach((line, i) => {
+
+      if(i !== allLines.length - 1){
+        line.style.opacity = "0";
+        line.style.transition = "opacity 0.4s";
+      }
+
+    });
 
     index++;
 
@@ -73,10 +85,66 @@ function addLine(){
     showTracks();
 
   }
-
 }
 
-addLine();
+
+function typeLine(text, element, speed = 25){
+
+  let i = 0;
+
+  element.textContent = "";
+
+  function type(){
+
+    if(i < text.length){
+
+      element.textContent += text[i];
+      i++;
+
+      setTimeout(type, speed);
+
+    }
+
+  }
+
+  type();
+}
+   
+function addLine(){
+
+  if(index < lines.length){
+
+    const div = document.createElement("div");
+
+    div.classList.add("line");
+
+    terminal.appendChild(div);
+
+    /* typing effet */
+    typeLine(lines[index], div, 25);
+
+    /* fade des anciennes lignes */
+    const allLines = document.querySelectorAll(".line");
+
+    allLines.forEach((line, i) => {
+
+      if(i !== allLines.length - 1){
+        line.style.opacity = "0.15";
+        line.style.transition = "opacity 0.4s";
+      }
+
+    });
+
+    index++;
+
+    setTimeout(addLine, 1200);
+
+  } else {
+
+    showTracks();
+
+  }
+}
 
 /* =========================
    TRACKS
