@@ -20,8 +20,8 @@
 <script>
 
 /* =========================
-   ANTI PARTAGE DU LIEN
-========================= */
+     ANTI PARTAGE DU LIEN
+   ========================= */
 
 const access = sessionStorage.getItem("potos-access");
 
@@ -32,61 +32,27 @@ if(access !== "ok"){
 }
 
 /* =========================
-   TERMINAL HACKER
-========================= */
+       TERMINAL HACKER
+   ========================= */
 
 const terminal = document.getElementById("terminal");
 
 const lines = [
-
 "> Connexion au Serveur...",
 "> Vérification Utilisateur...",
 "> Poto Identifié...",
 "> Décryptage des Archives...",
 "> Ouverture des Dossiers Cachés...",
-"> Accès Aautorisé...",
+"> Accès Autorisé...",
 "> Dossiers Secrets LPDD...",
-"> Chargement des Donnèes..."
-
+"> Chargement des Données..."
 ];
 
 let index = 0;
 
-function addLine(){
-
-  if(index < lines.length){
-
-    const div = document.createElement("div");
-
-    div.classList.add("line");
-
-    typeLine(lines[index], div, 25);
-
-    terminal.appendChild(div);
-
-    /* FAIRE DISPARAÎTRE LA LIGNE PRÉCÉDENTE */
-    const allLines = document.querySelectorAll(".line");
-
-    allLines.forEach((line, i) => {
-
-      if(i !== allLines.length - 1){
-        line.style.opacity = "0";
-        line.style.transition = "opacity 0.4s";
-      }
-
-    });
-
-    index++;
-
-    setTimeout(addLine, 900);
-
-  } else {
-
-    showTracks();
-
-  }
-}
-
+/* =========================
+   TYPEWRITER
+========================= */
 
 function typeLine(text, element, speed = 25){
 
@@ -105,7 +71,6 @@ function typeLine(text, element, speed = 25){
     if(i < text.length){
 
       element.textContent = text.slice(0, i + 1);
-
       element.appendChild(cursor);
 
       i++;
@@ -122,40 +87,44 @@ function typeLine(text, element, speed = 25){
 
   type();
 }
-   
+
+/* =========================
+           ADD LINE
+   ========================= */
+
 function addLine(){
 
-  if(index < lines.length){
-
-    const div = document.createElement("div");
-    div.classList.add("line");
-
-    terminal.appendChild(div);
-
-    typeLine(lines[index], div, 25);
-
-    /* fade anciennes lignes */
-    const allLines = document.querySelectorAll(".line");
-
-    allLines.forEach((line, i) => {
-
-      if(i !== allLines.length - 1){
-        line.style.opacity = "0.2";
-        line.style.transition = "opacity 0.4s";
-      }
-
-    });
-
-    index++;
-
-    setTimeout(addLine, 1200);
-
-  } else {
-
+  if(index >= lines.length){
     showTracks();
-
+    return;
   }
+
+  const div = document.createElement("div");
+  div.classList.add("line");
+
+  terminal.appendChild(div);
+
+  typeLine(lines[index], div, 25);
+
+  /* fade anciennes lignes */
+  const allLines = document.querySelectorAll(".line");
+
+  allLines.forEach((line, i) => {
+
+    if(i !== allLines.length - 1){
+      line.style.opacity = "0.2";
+      line.style.transition = "opacity 0.4s";
+    }
+
+  });
+
+  index++;
+
+  setTimeout(addLine, 1200);
 }
+
+/* START */
+addLine();
 
 /* =========================
    TRACKS
