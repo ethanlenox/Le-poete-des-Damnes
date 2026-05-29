@@ -2585,3 +2585,108 @@ body {
   0%, 100% { transform: scaleY(0.5); opacity: 0.4; }
   50% { transform: scaleY(1.2); opacity: 1; }
 }
+
+/* =========================
+   POPUP SECRÈTE
+========================= */
+
+.secret-popup{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.96);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.secret-box{
+  width: 320px;
+  background: #050505;
+  border: 1px solid #00ffe1;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 0 30px #00ffe1;
+}
+
+.secret-box h2{
+  color: #00ffe1;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.secret-box input{
+  width: 100%;
+  padding: 12px;
+  background: black;
+  border: 1px solid #00ffe1;
+  color: white;
+  margin-bottom: 15px;
+  outline: none;
+}
+
+.secret-box button{
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #00ffe1;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.secret-box button:hover{
+  background: white;
+}
+
+#secret-error{
+  color: red;
+  margin-top: 10px;
+}
+
+/* =========================
+   PAGE POTOS
+========================= */
+
+.potos-page{
+  background: black;
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.potos-title{
+  color: #00ffe1;
+  margin-bottom: 50px;
+  font-size: 40px;
+}
+
+.media-card{
+  max-width: 700px;
+  margin: 40px auto;
+  border: 1px solid #00ffe1;
+  padding: 20px;
+  background: #050505;
+  box-shadow: 0 0 20px rgba(0,255,225,0.3);
+}
+
+.media-card img,
+.media-card video,
+.media-card audio{
+  width: 100%;
+  margin-top: 15px;
+}
+
+.download-btn{
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 20px;
+  background: #00ffe1;
+  color: black;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.download-btn:hover{
+  background: white;
+}
