@@ -2693,3 +2693,15 @@ body.terminal-page{
   color: #666;
   pointer-events: none;
 }
+
+.cursor{
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+  color: #4aa3ff;
+}
+
+@keyframes blink{
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
