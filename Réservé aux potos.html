@@ -94,15 +94,26 @@ function typeLine(text, element, speed = 25){
 
   element.textContent = "";
 
+  const cursor = document.createElement("span");
+  cursor.classList.add("cursor");
+  cursor.textContent = "_";
+
+  element.appendChild(cursor);
+
   function type(){
 
     if(i < text.length){
 
-      element.textContent += text[i];
+      element.textContent = text.substring(0, i + 1);
+      element.appendChild(cursor);
+
       i++;
 
       setTimeout(type, speed);
 
+    } else {
+
+      element.appendChild(cursor);
     }
 
   }
@@ -115,21 +126,19 @@ function addLine(){
   if(index < lines.length){
 
     const div = document.createElement("div");
-
     div.classList.add("line");
 
     terminal.appendChild(div);
 
-    /* typing effet */
     typeLine(lines[index], div, 25);
 
-    /* fade des anciennes lignes */
+    /* fade anciennes lignes */
     const allLines = document.querySelectorAll(".line");
 
     allLines.forEach((line, i) => {
 
       if(i !== allLines.length - 1){
-        line.style.opacity = "0.15";
+        line.style.opacity = "0.2";
         line.style.transition = "opacity 0.4s";
       }
 
