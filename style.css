@@ -2623,8 +2623,8 @@ body {
 }
 
 /* =========================
-   TERMINAL HACKER
-========================= */
+      TERMINAL HACKER
+   ========================= */
 
 body.terminal-page{
   background: black;
@@ -2682,4 +2682,31 @@ body.terminal-page{
 @keyframes blink{
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
+}
+
+/* =========================
+          PAGE BONUS
+   ========================= */
+.bonus-section{
+    text-align:center;
+    margin:40px 0;
+}
+
+.gift-btn{
+    display:inline-block;
+    padding:12px 30px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:1rem;
+
+    background:#00e5ff;
+    color:#000;
+
+    transition:0.3s;
+}
+
+.gift-btn:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 20px #00e5ff;
 }
