@@ -1657,18 +1657,6 @@ body {
     box-shadow: 0 0 18px rgba(74,163,255,0.3);
   }
 
-  /* SPOTIFY = VERT CLASSIQUE */
-  .music-btn.spotify {
-    color: #1DB954;
-    background: rgba(29,185,84,0.08);
-    box-shadow: 0 0 12px rgba(29,185,84,0.12);
-  }
-
-  .music-btn.spotify:hover {
-    background: rgba(29,185,84,0.15);
-    box-shadow: 0 0 18px rgba(29,185,84,0.25);
-  }
-
   /* -------------------------
      PAROLES BUTTON (GLASS PRO)
   --------------------------*/
@@ -2224,11 +2212,6 @@ body {
   box-shadow: 0 0 15px rgba(0,229,255,0.35);
 }
 
-.music-btn.spotify:hover {
-  border-color: rgba(30,215,96,0.5);
-  box-shadow: 0 0 15px rgba(30,215,96,0.35);
-}
-
 
 /* _____________________ */
 /* ===================== */
@@ -2481,11 +2464,6 @@ body {
 
 .music-btn.bandcamp {
   background: #1db954;
-  color: #000;
-}
-
-.music-btn.spotify {
-  background: #1ed760;
   color: #000;
 }
 
